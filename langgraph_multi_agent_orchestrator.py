@@ -36,7 +36,7 @@ class StigmergyLayer:
         self.persist_path = Path(persist_path)
         self.persist_path.parent.mkdir(parents=True, exist_ok=True)
         self.traces: Dict[str, Any] = {}
-        self.lock = threading.Lock()  # Thread safety for parallel agents
+        self.lock = threading.RLock()  # Reentrant lock for thread safety
         self.load()
     
     def deposit_trace(self, agent_id: str, trace_type: str, data: Any):
@@ -79,11 +79,10 @@ class StigmergyLayer:
         """
         Persist stigmergy state to disk.
         PRIVATE: Must be called with self.lock held.
-        """
-        # Verify lock is held (will raise RuntimeError if not)
-        if not self.lock.locked():
-            raise RuntimeError("_save() must be called with lock held")
         
+        Note: Lock verification removed as threading.Lock.locked() doesn't reliably
+        check current thread ownership. Instead, rely on proper usage via with-lock blocks.
+        """
         with open(self.persist_path, 'w') as f:
             json.dump(self.traces, f, indent=2)
     
