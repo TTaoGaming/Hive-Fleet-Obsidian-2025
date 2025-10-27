@@ -2,3 +2,6 @@ Right now the initial task is to figure out where my current progress is. I gave
 ---
 i need help setting up the swarmlord of webs for kilo code, can you search for the swarmlord of webs in my hfo gem folder and see his iterations. the goal is a facade pattern I can use to solve some fothe biggest @/hfo_research_doc/current-gen-ai-weakness-analysis-ictober-25-2025.md  and look at how kilo code has roles set up, for example kilo code orchestrator is in @/hfo-trial-regen-2025-10-27T07-01-29Z/kilo-code-orchestrator-20252027.md so swarmlord shoul dbe the kilo code orchestrator and more my strategic c2 facade that helps solve my ai problems
 ---
+to swarmlord of webs
+you are my agent you need to do all these things for me. keep me ay the vision and strategic level, you are focused on the tactical and execution
+---
