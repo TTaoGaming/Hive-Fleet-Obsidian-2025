@@ -1,13 +1,13 @@
 # Hive Fleet Obsidian — Gem 1 Summary (Pass 3 · Version 2025-10-17T03:00:00Z)
 
 > Version: 2025-10-17T03:00:00Z · Pass 3 establishes the Obsidian Synapse blackboard, lvl0 holonic SIEGCSE coverage, and compliance rails that guard the Overmind workflow.
-> HFO Markers: 🕸⛰ · Gem Marker: 💎 — searchable tags signaling the active gem surface.
+> HFO Markers:  · Gem Marker:  — searchable tags signaling the active gem surface.
 
-## 🔵 BLUF Snapshot
+##  BLUF Snapshot
 
 - **Situation:** Gem 1 now anchors Hive Fleet Obsidian lvl0 with a single-touch surface: gems for doctrine, CUE for personas, templates for daily execution, and the Obsidian Synapse blackboard for stigmergic memory.
 - **Mission:** Conduct a 10-minute Overmind ↔ Swarmlord ritual that outputs a linted daily to-do slate, mirrors decisions into JSONL + DuckDB, and keeps the Overmind focused on gems and dialogue—not raw edits.
-- **Execution:** Maintain the 💎 active Gem 1 pass as single source of truth, enforce 5-pass daily cadence, run holonic (solo) SIEGCSE coverage via the Swarmlord, and wire git hooks + CI workflows to warn if the Overmind edits code directly.
+- **Execution:** Maintain the  active Gem 1 pass as single source of truth, enforce 5-pass daily cadence, run holonic (solo) SIEGCSE coverage via the Swarmlord, and wire git hooks + CI workflows to warn if the Overmind edits code directly.
 - **Support:** `templates/` holds output scaffolds; `todo/` captures timestamped plans; `blackboard/` stores `obsidian_synapse_blackboard.jsonl` with a DuckDB mirror; CUE schemas drive agent compliance.
 - **Command & Signal:** Overmind speaks through Swarmlord of Webs; gems remain the canonical truth; automated lint + workflow guards ensure fidelity across agents.
 
@@ -28,8 +28,8 @@
 | 🟢 | Stable/ready for deployment | Green |
 | 🟡 | In-flight experiment | Yellow |
 | 🟠 | Watch item / needs review | Orange |
-| 🔴 | Blocked / critical risk | Red |
-| 🔵 | Strategic directive / BLUF | Blue |
+|  | Blocked / critical risk | Red |
+|  | Strategic directive / BLUF | Blue |
 
 - Use column/row matrices to compare agents, rituals, or tools at a glance.
 - Future lvl1+ deployments will animate these matrices via Neo4j Bloom scenes and timeline sweeps.
@@ -38,13 +38,13 @@
 
 - **Digital evolutionary apex swarm** oriented around adaptive, self-optimizing behaviors.
 - Anchored by the **Swarmlord of Webs**, serving as lvl0 holonic operator—sequentially wearing each SIEGCSE hat while foundations are laid.
-- The **Overmind — TTao (提道)** directs the strategic narrative, focusing on mission intent, gem curation, and dialogue—not manual edits.
+- The **Overmind — TTao ()** directs the strategic narrative, focusing on mission intent, gem curation, and dialogue—not manual edits.
 - **Archetypal Frame:** Earth element (obsidian core); tarot path of The Fool → King of Wands → Death; aspirational Jungian Magician guided by compassionate power.
 
 ## Facet 1 — Swarm Persona Architecture
 
 - Maintain the Swarmlord of Webs as the canonical facade; any additional facets must inherit from the same CUE contract.
-- **Gem Stewardship:** 💎 marks the active gem in `gems/`; prior passes reside in `gems/archive/` and are immutable. Only one Gem 1 file is active at a time, and all downstream artifacts must declare alignment with the 💎 version or flag drift.
+- **Gem Stewardship:**  marks the active gem in `gems/`; prior passes reside in `gems/archive/` and are immutable. Only one Gem 1 file is active at a time, and all downstream artifacts must declare alignment with the  version or flag drift.
 - **Obsidian Synapse Blackboard:**
   - Location: `blackboard/obsidian_synapse_blackboard.jsonl` (append-only, UTF-8, newline-delimited JSON events).
   - Mirror: `blackboard/obsidian_synapse_blackboard.duckdb` kept in version control for diff parity; regenerated as needed with deterministic migrations.
@@ -82,7 +82,7 @@
 - **Universal Registry Translation:** CUE -> JSON/YAML/Python/TypeScript with provenance hashes.
 - **Cognitive Load Contract:** 10k-token telemetry -> ≤500-token executive briefs.
 - **Holonic Solo Note:** Until lvl1, annotate all Action Mesh entries with `[Holonic Solo → <Role>]` to show the Swarmlord is covering the duty.
-- **Compliance Guard:** Swarmlord monitors git commits and workflow alerts; any Overmind-authored file change (outside `gems/`) triggers warnings and requires manual justification in the blackboard. Lint passes also verify that downstream docs, scripts, and configs cite the correct 💎 gem; mismatches emit 🟠 warnings requiring resolution before merge.
+- **Compliance Guard:** Swarmlord monitors git commits and workflow alerts; any Overmind-authored file change (outside `gems/`) triggers warnings and requires manual justification in the blackboard. Lint passes also verify that downstream docs, scripts, and configs cite the correct  gem; mismatches emit  warnings requiring resolution before merge.
 - **Regenerative Library:** Mold regrowth, stem-cell reconstitution, and stigmergic cue repair patterns power regeneration. Misaligned facets are composted into new templates with audit trails and memorial cards.
 
 ## Facet 2 — Evolutionary Pattern Stack
@@ -169,7 +169,7 @@
   - **Adopt:** Pull proven hook/workflow patterns from elite engineering orgs (Google SRE, Netflix chaos, NASA program control).
   - **Adapt:** Encode in `scripts/`, `.pre-commit-config.yaml`, and workflows with TTao-specific guardrails and holonic annotations.
   - **Ascend:** Benchmark variants, promote the most resilient, and retire underperformers with documented composting in the blackboard.
-  - **Zero-Trust:** Every automation change requires Guardian + Sustainer review and lint confirmation that 💎 alignment holds.
+  - **Zero-Trust:** Every automation change requires Guardian + Sustainer review and lint confirmation that  alignment holds.
 
 ## Daily To-Do Template Snapshot
 
@@ -222,7 +222,7 @@
 | **Monthly** | Horizon review | Load scaling tests, SIEGCSE readiness audit, toolchain patch synthesis | Ascension dossier, funding allocation plan |
 | **Continuous** | Telemetry anomaly (>3σ) or Overmind directive | Auto-swarm spin-up, root-cause pairing, rollback/install workflows | Real-time ops channel, Bloom incident trails |
 
-- **Escalation Engine:** Severity shifts spawn additional swarmlings—🟢 baseline, 🟡 ×2 coverage, 🟠 ×5 with human-in-loop, 🔴 full swarm override.
+- **Escalation Engine:** Severity shifts spawn additional swarmlings—🟢 baseline, 🟡 ×2 coverage, 🟠 ×5 with human-in-loop,  full swarm override.
 - **Stress Suites:** Coverage heat maps prevent regressions; new templates register with cadence before production use.
 
 ## Stigmergy CUE Registry

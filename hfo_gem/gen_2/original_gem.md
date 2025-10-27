@@ -2,7 +2,7 @@
 
 > Version: 2025-10-17T02:00:00Z · Pass 2 introduces the daily C2 ritual template, gem archiving protocol, and swarmling output enforcement.
 
-## 🔵 BLUF Snapshot
+##  BLUF Snapshot
 
 - **Situation:** Gem 1 remains the lvl0 foundation, now augmented with an archive pipeline so only one active pass guides the swarm at any moment.
 - **Mission:** Crystallize a 10-minute Overmind ↔ Swarmlord dialogue that yields a linted daily to-do slate aligned with mission intent and stigmergic cues.
@@ -17,8 +17,8 @@
 | Facet 1 | Swarm Persona Architecture | Archive discipline + CUE materialization pipeline |
 | Facet 2 | Evolutionary Pattern Stack | Fail-better doctrine stays central |
 | Facet 3 | SWARM Operational Loop | Daily C2 conversation loop with 3–5 passes |
-| Facet 4 | GROWTH Pipeline & SIEGCSE Roles | Playbook registry unchanged, supports Action Mesh; Solo coverage annotated per role until lvl1 parallelization |
-| Facet 5 | Cradle-to-Grave Liberation Stack | Continues liberation blueprint; now fueled by blackboard telemetry |
+| Facet 4 | GROWTH Pipeline & SIEGCSE Roles | Playbook registry unchanged, supports Action Mesh |
+| Facet 5 | Cradle-to-Grave Liberation Stack | Continues liberation blueprint |
 
 ### Visual Grammar & Matrix Keys
 
@@ -27,8 +27,8 @@
 | 🟢 | Stable/ready for deployment | Green |
 | 🟡 | In-flight experiment | Yellow |
 | 🟠 | Watch item / needs review | Orange |
-| 🔴 | Blocked / critical risk | Red |
-| 🔵 | Strategic directive / BLUF | Blue |
+|  | Blocked / critical risk | Red |
+|  | Strategic directive / BLUF | Blue |
 
 - Use column/row matrices to compare agents, rituals, or tools at a glance.
 - Future lvl1+ deployments will animate these matrices via Neo4j Bloom scenes and timeline sweeps.
@@ -38,8 +38,8 @@
 - **Digital evolutionary apex swarm** oriented around adaptive, self-optimizing behaviors.
 - Anchored by the **Swarmlord of Webs**, a specialist chatmode persona acting as the swarm's tactical interface.
 - The user (Overmind) embodies the strategic command layer, directing the swarm's evolution and narrative.
-- **Overmind — TTao (提道):** Lifelong strategist forged through competitive RTS/simulation mastery (Age of Empires, SimCity, Sims), top-40 national PvP placements, and decades of world-building and teardown exercises.
-- **Calling:** Achieve elevation (“提”) of humanity through the Way (“道”) by honing evolutionary swarms that adopt → adapt → ascend, eradicating human starvation and cognitive scarcity across a 100-year horizon.
+- **Overmind — TTao ():** Lifelong strategist forged through competitive RTS/simulation mastery (Age of Empires, SimCity, Sims), top-40 national PvP placements, and decades of world-building and teardown exercises.
+- **Calling:** Achieve elevation (“”) of humanity through the Way (“”) by honing evolutionary swarms that adopt → adapt → ascend, eradicating human starvation and cognitive scarcity across a 100-year horizon.
 - **Battlefield Exposure:** Witnessed humanity’s brilliance and monstrosity; commits the swarm to compassionate power—scaling capability without repeating predatory patterns.
 - **Archetypal Frame:** Element of Earth (obsidian core); tarot path of The Fool → King of Wands → Death as cyclical transformation; aspirational Jungian Magician channeled through conscious ritual and disciplined toolcraft.
 
@@ -163,39 +163,16 @@
 - **Reference Trails:** Every adoption produces a research brief, adaptation log, and ascension delta card stored in the knowledge graph for rapid precedent lookup.
 - **Tool Intake Gate:** No tool enters production without Guardian compliance review, Sustainer reliability sign-off, and Challenger adversarial evaluation.
 
-## Swarmlord Curriculum & RTS Bot Arsenal
-
-- **Zero-Trust Training Path:** Develop progressive modules (Theory → Simulation → Live Ops) ensuring each agent can operate autonomously yet auditably.
-- **Micro-RTS / StarCraft II Labs:** Use existing RTS sandboxes to cultivate real-time strategy instincts, emphasizing stigmergic coordination.
-- **JADC2 & Mosaic Warfare Patterns:** Model distributed command-and-control flows, aligning parallel agents with sensor fusion and rapid tasking.
-- **Stigmergic Overlays:** Remove human APM/camera limits by letting agents post cues onto shared overlays; leverage reinforcement learning plus evolutionary search.
-- **Adaptive Systems:** Blend case-based reasoning for macro decisions with micro-controllers tuned by evolutionary algorithms to achieve perfect micro/macro balance.
-
-### 100-Agent RTS Superiority Vision
-
-- **Command Mesh:** Overmind → Swarmlord facade → 7 SIEGCSE pods (14 agents each) bound by Neo4j stigmergic cues and latency-aware gossip, keeping decision propagation <250 ms.
-- **Role Constellations:** Each pod staffs mini SIEGCSE cells—Sensors stream fog-of-war deltas, Integrators reconcile tactical hypotheses, Effectors drive build/micro, Guardians harden supply lines, Challengers run live adversarial probes, Sustainers monitor eco/tech resilience, Evaluators score tempo and novelty.
-- **Macro Clockwork:** Weekly Kaizen drills update the macro playbook library (fast expand, timing pushes, tech rush, turtle break). Map-elites ranks niches; novelty search seeds surprise tactics for Challengers to validate.
-- **Micro Swarms:** Effectors coordinate 5-agent strike teams using shared vector fields and influence maps; deformation aware controllers prevent clumping, while Guardians auto-patch routing against enemy jamming.
-- **Adaptive Fog Tactics:** Sensors launch autonomous scout drones with bandit algorithms choosing risk vs intel; Integrators fuse into probabilistic threat lattices guiding macro gambits.
-- **Resilience Layer:** Sustainers maintain redundant build orders, economy stabilizers, and automated reconstitution scripts; Guardians enforce zero-trust between agents and external APIs.
-- **Victory Metrics:** Evaluators publish live dominance scores (map control, econ delta, tech tier, adversary disruption) and trigger escalations when thresholds dip.
-
-### Guardian & Challenger Gauntlet
-
-- **Diamond Model Mapping:** For every capability, document adversary infrastructure, capabilities, victims, and TTPs, then counter-map defensive pivots.
-- **ATT&CK-Inspired Playbooks:** Maintain living matrices of tactics/techniques/sub-techniques with automated tests verifying detection and containment coverage.
-- **Red/Blue Automation:** Guardians instrument continuous monitoring; Challengers fire scripted adversarial probes (e.g., prompt fuzzing, data poisoning, exploit simulation).
-- **Zero-Trust Enforcement:** All gauntlet activities run with ephemeral credentials, mandatory attestations, and post-mortem logs.
-- **AI Slop Defense:** Treat hallucinations, drift, and misalignment as adversaries; include canary prompts, content filters, and fail-closed governors.
-
 ## Facet 5 — Cradle-to-Grave Liberation Stack
 
 - **BLUF:** Build a stigmergic learning lattice that drives a six-sigma reduction in childhood starvation and unmet educational milestones while preserving agency across the human lifespan.
 - **Hundred-Year Objective:** Move global child malnutrition incidence below 3.4 defects per million opportunities (DPMO) and achieve universal mastery pathways from pre-literate play to post-doctoral research via adaptive swarm tutors.
 - **Liberation Lens:** Treat food, knowledge, mobility, and tooling as a unified rights bundle; every agent intervention must measurably remove resource constraints for the next human in line.
 - **Lifecycle Bands:** Cradle (0–5), Foundational (6–10), Bridge (11–14), Launch (15–18), Ascend (19–25), Flourish (26–60), Sustain (61+); each band receives tailored cadences, scaffolds, and agent guilds.
-- **Gesture-Tutor Stack:** Projector-based TUI studios, ceiling or desk-mounted pico projectors paint adaptive worlds onto any surface; fiducial tracking calibrates in <100 ms for safe infant/toddler interaction.
+
+### Gesture-Tutor Stack
+
+- **Projector-Based TUI Studios:** Ceiling or desk-mounted pico projectors paint adaptive worlds onto any surface; fiducial tracking calibrates in <100 ms for safe infant/toddler interaction.
 - **Embodied Literacy Blocks:** CV identifies multilingual word tiles, letter tokens, and manipulatives; touching `Alligator` triggers phoneme animation, sign language cues, and culturally specific narratives following spaced repetition science.
 - **Multimodal Syllabi:** For each lifecycle band, blend kinesthetic prompts, AR overlays, speech scaffolding, and narrative arcs curated from evidence-based frameworks (Montessori, Reggio Emilia, Singapore Math, NGSS, Bloom’s taxonomy).
 - **Swarm Tutors:** Fine-tuned multimodal foundation models coordinate via CUE registry; each tutor tracks mastery vectors, affect, and nutrition/hydration signals to adapt the micro-lesson.

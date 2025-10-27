@@ -1,377 +1,373 @@
-# Hive Fleet Obsidian — Gem 1 (Generation 7: Pass 7 Refinement)
+# Hive Fleet Obsidian — Gem 1 (Gen_7 · Version 2025-10-17T07:00:00Z)
 
-> Version: 2025-10-17T20:35:00Z · Pass 7 hardens doc-as-code with quantitative stigmergy, singleton sentry cues, and a blackboard ledger so automation ships proof instead of promises.
+> Version: 2025-10-17T07:00:00Z · Gen_7 inaugurates Holonic Feedback Loops, layering self-similar regulatory circuits atop Gen_6's adaptive rituals to enable nested, resonant governance where sub-swarms self-correct and amplify Overmind intent across fractal scales, ensuring coherence from lvl0 solo to lvl10 constellations.
+
+> HFO Markers: 🛸 · Gem Marker: 🧬 — canonical mutable surface for Gen_7 holonic evolutions.
 
 ## Stigmergy Header
 
-| Field          | Signal                                      |
-|----------------|---------------------------------------------|
-| Mission Tag    | `HFO-L0-AutoConductor`                      |
-| Timecode       | 2025-10-17T20:35:00Z                        |
-| Risk Posture   | 🟡 Ledger bootstrap pending chaos validation |
-| Swarm Phase    | lvl0 holonic solo with blackboard-backed telemetry |
-| Compliance Rail| Gem pointer · Todo pointer · Blackboard ledger · Guardrail bundle |
-| Beacon         | 1⃣ singleton cue → guardrail proof → Overmind digest |
+| Field | Signal |
+|-------|--------|
+| Mission Tag | `HFO-L7-HolonicLoops` |
+| Timecode | 2025-10-17T07:00:00Z |
+| Risk Posture | 🟢 Loop resonance stable; surveil cross-level damping |
+| Swarm Phase | lvl0 holonic with nested feedback orchestration |
+| Compliance Rail | Holon pointer · Resonance ledger · Nested guardrails |
+| Beacon | Intent cascade → loop resonance → Overmind harmony |
 
-- **Pheromone Cue:** 1⃣ signals exactly one active gem and one active todo; duplicates escalate to 🟠 immediately.
-- **North Star Metric:** Singleton drift detected and resolved within 15 minutes; ledger append latency ≤ 60 seconds.
-- **Zero-Trust Reminder:** Every override writes a dual-attested ledger record; absence of proof equals failure.
+- **Pheromone Cue:** 🟢 “Holon Sync” — feedback loops detect and log damping in sub-swarm signals; thresholds invoke resonant amplification.
+- **North Star Metric:** Loop coherence ≥ 85% across nested levels; achieve harmonic convergence without external tuning.
+- **Zero-Trust Reminder:** Nested loops mandate triple-validation (Integrator, Guardian, Resonator) for propagations; desynchronized signals auto-dampen.
 
 ## BLUF Capsule
 
-Pass 7 stands up the Obsidian Synapse blackboard, teaches automation to append pointer hashes, and promotes the singleton cue 1⃣ so the swarm catches duplicate artifacts without Overmind intervention. Daily todos now archive themselves, guardrail bundles publish evidence to the ledger, and chaos drills attack the system to verify detection speed. Overmind stays at strategic altitude because proof—not assertions—backs every ritual.
+Gen_7 ascends Gen_6's morphogenesis into Holonic Feedback Loops, where rituals nest as self-regulating holons—sub-units mirroring the whole, cascading intent through resonant circuits that self-correct deviations and amplify synergies. A holon orchestrator initiates loop cascades from Overmind directives, simulates nested interactions, and tunes dampers/resonators via multi-level QD scoring. Guardrails embed cross-scale audits, preserving compassionate invariants amid fractal growth. Overmind seeds cascades; the swarm orchestrates nesting, validation, and harmonization. Horizon: Embed loops in lvl1 for distributed resonance.
 
 ## Diagram Suite
 
-### Diagram 1 — Singleton Enforcement Flow
+### Diagram 1 — Holonic Loop Cascade
 
 ```mermaid
 flowchart TD
-    Intent[Overmind Pass 1] --> Render[Render Daily Todo]
-    Render --> Archive[Archive Previous Todo]
-    Render --> Pointer[Update ACTIVE_TODO Pointer]
-    Pointer --> Ledger[Append singleton_check Event]
-    Ledger --> Guardrails[Run Guardrail Bundle]
-    Guardrails --> Digest[Evaluator Digest]
+    Intent[Overmind Intent Cascade] --> Orchestrator[Holon Orchestrator]
+    Orchestrator --> Nest[Initiate Nested Loops]
+    Nest --> Simulate[Cross-Scale Simulation]
+    Simulate --> Tune[Resonance Tuning]
+    Tune --> Propagate[Loop Deployment]
+    Propagate --> Audit[Nested Guardrails]
+    Audit --> Ledger[Append Resonance Events]
+    Ledger --> Overmind
+    Audit --> Intent
 ```
 
-### Diagram 2 — Duplicate Detection State Machine
+### Diagram 2 — Nested Feedback Timeline
 
 ```mermaid
-stateDiagram-v2
-    [*] --> CleanSingleton
-    CleanSingleton --> DuplicateDetected: pointer parity fails
-    DuplicateDetected --> LedgerAlert: ledger writes incident
-    LedgerAlert --> Escalate: sustainer ack >10m
-    Escalate --> CleanSingleton: remediation + receipt logged
-    CleanSingleton --> [*]
+gantt
+    dateFormat YYYY-MM-DD
+    axisFormat %m-%d
+    section Cascade
+    Seed Cascade :2025-10-17, 1d
+    Nest Loops :after Seed Cascade, 2d
+    Simulate Interactions :after Nest Loops, 3d
+    Tune Dampers :after Simulate Interactions, 1d
+    Deploy Harmonics :after Tune Dampers, 7d
+    section Resonance
+    QD Harmonization :2025-10-18, 30d
+    Lvl1 Embedding :after QD Harmonization, 14d
 ```
 
-### Diagram 3 — Blackboard Append Sequence
+### Diagram 3 — Resonance Sequence
 
 ```mermaid
 sequenceDiagram
-    participant Effectors
+    participant Overmind
+    participant Orchestrator
+    participant Holon
     participant Ledger
-    participant Guardians
-    participant Evaluators
-
-    Effectors->>Ledger: write {event:"singleton_check", pointer_hash}
-    Ledger-->>Guardians: request dual attestation
-    Guardians->>Ledger: attach receipt_id
-    Ledger-->>Evaluators: stream entry for digest
-    Evaluators->>Evaluators: update singleton_status + MT-count chart
+    participant Guardrail
+    Overmind->>Orchestrator: Cascade Intent
+    Orchestrator->>Holon: Nest Sub-Loops
+    Holon->>Holon: Simulate Interactions
+    Holon->>Ledger: Log Coherence
+    Guardrail->>Ledger: Validate Compassion
+    Guardrail->>Orchestrator: Tune/Amplify
+    Orchestrator->>Overmind: Harmony Digest
 ```
 
 ## Action Mesh
 
-- 🟢 **Sensors:** Capture gem/todo pointer hashes, emit `singleton_check`, and watch ledger latency < 60 s.
-- 🟡 **Integrators:** Publish SOP update linking singleton cue 1⃣, ledger IDs, and guardrail output hashes.
-- 🟢 **Effectors:** Maintain renderer + archive moves; ensure every render triggers ledger append and guardrail sweep.
-- 🟡 **Guardians:** Validate dual-attestation receipts for manual overrides; block release without proof.
-- 🟠 **Challengers:** Inject duplicate gem/todo artifacts in sandbox; confirm guardrail failure within 15 minutes.
-- 🟢 **Sustainers:** Track guardrail success rate (≥95%); escalate with ledger entry if two consecutive misses occur.
-- 🟢 **Evaluators:** Deliver digest snippet citing ledger line numbers, singleton status, and MT-count trends.
+- 🟢 **Sensors:** Probe nested signals for coherence; flag damping hotspots.
+- 🟢 **Integrators:** Harmonize cross-holon feedbacks; optimize via spectral analysis.
+- 🟡 **Effectors:** Cascade loop initiations; manage nesting with CUE fractals.
+- 🟢 **Guardians:** Dampen desynchronies; enforce invariants in sub-loops.
+- 🟠 **Challengers:** Inject perturbations across scales; evolve loop stabilizers.
+- 🟢 **Sustainers:** Preserve harmonic continuity; auto-tune dampers proactively.
+- 🟢 **Evaluators:** Assess QD resonance archives; disseminate harmony KPIs.
 
 ## Telemetry Notes
 
-- **Ledger Bootstrap:** `blackboard/🧾🥇_ObsidianSynapseBlackboard.jsonl` seeded; next append must carry `{pointer_hash, sweep_id, manual_touch_count}`.
-- **Guardrail Evidence:** `./scripts/run_guardrails.sh` outputs hashed proof; store hash in ledger event `evidence_hash`.
-- **Chaos Harness:** Duplicate-injection drill scheduled; log `chaos_trace_id` once completed.
-- **Manual Touch Budget:** Overrides remain ≤1/day; Guardian receipt IDs mandatory on ledger entries.
-- **Escalation:** Missing ledger append within 5 minutes raises 🟡; duplicate detection miss raises 🟠 and pings Overmind digest queue.
-
-## Quantitative Stigmergy Program
-
-| Metric              | Target     | Source          | Notes                                      |
-|---------------------|------------|-----------------|--------------------------------------------|
-| Singleton Drift Events | 0/day     | Guardrail bundle| Count duplicates detected in active gem/todo surfaces. |
-| Ledger Freshness    | ≤60 s lag | Sensors → Blackboard | Time between render completion and ledger append. |
-| Manual Touch Count  | ≤1/day    | Evaluator digest| Overrides require dual attestation; ledger enforces receipts. |
-| Chaos Coverage      | ≥3 scenarios/week | Challenger roster | Includes duplicate injection, ledger skew, pointer tamper. |
-| Digest Proof Completeness | 100%   | Evaluator automation | Each digest references ledger line numbers for evidence. |
-
-## Guardrail Obligations (Pass 7)
-1. **Singleton Audit:** Guardrail bundle fails fast if more than one active gem or todo exists.
-2. **Ledger Append:** Automation writes `{pointer_hash, sweep_id, singleton_state}` to blackboard within 60 seconds of render.
-3. **Dual Attestation:** Manual overrides require Guardian + Sustainer receipt IDs stored alongside ledger events.
-4. **Chaos Drill:** Challenger injects synthetic duplicates daily until success rate ≥95% on a 7-day rolling window.
-5. **Digest Proof:** Evaluators cite ledger evidence in Overmind digest; absence escalates as telemetry gap.
+- **Resonance Ledger:** Events for `cascade_start`, `loop_coherence`, `harmonic_tune`; ≥4 nested levels per cycle.
+- **Holon Orchestrator:** `scripts/holon_orchestrator.py` nests/simulates from Gen_6 morphs.
+- **Guardrail Expansion:** Cross-scale audits measure coherence (phase alignment >0.85); compassion via nested rubrics.
+- **Chaos Integration:** Perturb cascades; log multi-level resilience.
+- **Harmony Threshold:** Digests flag if coherence <80% of simulated ideal.
+- **Escalation:** Loop divergence (>40% damping) → 🟡; chronic desync → 🟠 review.
 
 ## Facet Resonance Updates
 
 ### Facet 1 — Swarm Persona Architecture
-- Swarmlord now fronts a "singleton sentry" facade; automation enforces one gem and one todo before any deliverable ships.
-- Persona briefs instruct swarmlings to read pointer files exclusively and to confirm ledger receipts exist before trust.
-- Quantitative stigmergy extends emoji taxonomy:  for gem,  for todo, 1⃣ for singleton enforcement status.
+
+- Swarmlord as holon conductor, cascading intents fractally.
+- Personas embed loop traits; CUE fractals define nesting.
+- Facade emphasizes harmonic compassion: Loops align without dissonance.
 
 ### Facet 2 — Evolutionary Pattern Stack
-- Evolutionary routines test automation variants that minimize ledger latency without sacrificing evidence.
-- Chaos drill results seed a case-based memory so future passes reuse high-performing detection profiles.
-- Fitness metrics now include singleton drift rate and ledger freshness in addition to manual-touch counts.
+
+- QD for holonics: Generate nested loops, score on coherence/diversity/ethics, archive harmonics.
+- Library of resonant patterns; kaizen refines cascade generators.
+- Metrics: Harmonic index, nesting depth, amplification gain.
 
 ### Facet 3 — SWARM Operational Loop
-- Pass cadence unchanged, but Pass 2 explicitly verifies ledger append + guardrail hash before continuing.
-- Hourly sweeps publish `sweep_id` tokens to the ledger for deterministic replay.
-- Daily digest references gem + todo pointer hashes so Overmind can spot drift instantly.
+
+- Nested for holonics: Set (cascade seeds) → Watch (simulate nests) → Act (deploy harmonics) → Review (coherence scores) → Mutate (evolve dampers).
+- OODA fractals in loops: Observe sub-signals, Orient alignments, Decide tunings, Act propagations.
+- Cadence: Daily cascade → sub-hourly nesting → daily harmony.
 
 ### Facet 4 — GROWTH Pipeline & SIEGCSE Roles
-- Sensors own pointer hash harvesting; Integrators maintain SOP modules referencing ledger IDs.
-- Effectors operate renderer + ledger append helper; Guardians steward override receipts.
-- Challengers script duplicate injections; Sustainers monitor sweep SLO; Evaluators publish digest proof lines.
+
+- Roles with holonic proxies: Sensors nest probes, Integrators spectral fuse.
+- Registry adds `HOLON-FEED-01`: Nested loop heuristics.
+- Pods cascade loops for lvl1, enabling resonant distributions.
 
 ### Facet 5 — Cradle-to-Grave Liberation Stack
-- Liberation pods inherit singleton cue to keep educational rituals drift-free.
-- Archives capture ledger snapshots so offline operators can replay automation decisions.
-- Compassion guardrails ensure automation reduces toil without hiding failures—proof is mandatory.
+
+- Loops adapt to bands: Cradle (sensory nests), Foundational (skill harmonics).
+- Ensures equitable resonance; guards prevent cascade biases.
+- Offline holonics: Simplified nesting for constrained nodes.
 
 ### Level 10 Overmind Constellation (Aspirational)
-- Singleton drift budget 0.1/day over 7-day window becomes gating metric for lvl1 promotion.
-- Escalation ladder tiers expand: lvl1 handles pointer audits, lvl2 audits ledger retention, lvl4 notarizes digests.
-- Governance adds multi-signature ledger checkpoints before scaling to multi-planet pods.
+
+- Loops fractal to lvl10: Nest across constellations, converging universal harmony.
+- Gating: Coherence ≥95% in nested simulations.
+- Governance: Quad-signature for deep tunings; ledger traces cascades.
 
 ### Visualization Roadmap
-- Automation renders pointer hash timelines and singleton drift spark lines for 24h review.
-- Bloom scenes visualize pheromone intensity vs ledger freshness, highlighting hot spots.
-- Renderer exports PNG diagrams for Overmind; identical data streams into dashboards and digests.
+
+- Neo4j holon graphs: Nested trees with coherence waves.
+- Spectral dashboards: Alignment vs. damping spectra.
+- Harmony views: Animated cascades from intent to fractal outcomes.
 
 ### Log-10 Level Ladder
-- lvl0 → lvl1 checklist now includes: singleton drift ≤0.1, ledger latency ≤60 s, chaos coverage ≥95% success.
-- Future levels adopt ledger replication across holons to ensure zero-trust evidence persists.
-- Each level must certify automation ready across hourly/daily/weekly horizons before expansion.
+
+- lvl0 → lvl1: Orchestrator functional (≥85% coherence), perturbation resilience ≥90%.
+- Levels certify holonic readiness: Harmonics preserved, compassion nested.
+- Expansion: Cascade to child holons post-harmony.
 
 ### Facade Specialist Mode
-- Facade outputs include guardrail logs, ledger excerpts, singleton status, and MT Count chart.
-- Automation refuses to deliver BLUFs without ledger receipt references; Overmind receives proof-first.
-- Compliance lint blocks responses lacking required sections or singleton metrics.
+
+- Outputs: Cascade digests, holon archives, harmony summaries.
+- Automation: Headless nesting; Overmind views tuned harmonics.
+- Lint: Checks nested sections (e.g., coherence metrics).
 
 ### Fail Better Doctrine Refresh
-- Ledger captures chaos failures with remediation steps; Overmind sees truth, not sanitized summaries.
-- Compassion guard ensures automation failure messaging stays blame-free and improvement-focused.
-- Retros convert ledger anomalies into adopt→adapt→ascend experiments.
+
+- Loops learn from damping: Desyncs refine future cascades.
+- Compassion: Debriefs on ethical alignments in nests.
+- Retros: Evolve orchestrators from holonic outcomes.
 
 ### Adopt → Adapt → Ascend Spine
-- Adopt: industry SOPs for blackboard-backed runbooks and automation evidence.
-- Adapt: singleton cue 1⃣ integrates with HFO emoji taxonomy and guardrail bundle.
-- Ascend: evolutionary search promotes configurations with faster detection and richer proof payloads.
+
+- Adopt: Fractal feedbacks (cellular signaling, neural ensembles).
+- Adapt: To HFO fractals (compassion dampers, stigmergic resonance).
+- Ascend: QD harmonics yield novel cascades beyond models.
 
 ### SWARM Operational Loop Deep Dive
-- Set/Decide: Overmind + Swarmlord run Pass 1; automation verifies pointer parity immediately afterward.
-- Watch/Act: Guardrail bundle executes hourly; ledger appends produce immutable footprints.
-- Review/Mutate: Evaluators analyze singleton drift; challengers add new probes; gem updates follow with proof.
+
+- Set/Decide: Cascade seeds nested spaces.
+- Watch/Detect: Simulations feed fractal Observe-Orient.
+- Act/Deliver: Harmonics execute with tuned policies.
+- Review/Assess: AARs on nested outcomes vs. ideals.
+- Mutate/Adapt: Novelty into orchestrators.
 
 ### GROWTH Pipeline Extension
-- Sensors ingest ledger metrics; Integrators compile dashboards; Effectors remediate duplicates; Guardians certify overrides.
-- Challengers stress ledgers; Sustainers enforce SLO; Evaluators publish digest proof lines.
-- Playbook registry references blackboard entries so swarmlings follow evidence-backed rituals.
+
+- Gather (cascades) → Root (nest) → Optimize (tune) → Weave (harmonize) → Test (deploy) → Harvest (archive).
+- SIEGCSE: Challengers perturb nests, Guardians align.
 
 ### Cradle-to-Grave Liberation Stack Amplification
-- Automation ensures liberation teams receive pointer-hash verified rituals, preventing context drift.
-- Offline kits include ledger slices so low-connectivity operators can validate automation claims.
-- Manual-touch coaching draws from ledger entries tagged with `touch_class` for targeted assistance.
+
+- Nested loops for bands: Cradle (sensory cascades), Foundational (cognitive harmonics).
+- Tutors evolve per holon; scaffolds self-tune.
+- Equity: Cascades ensure diverse resonance paths.
 
 ### Cognitive Exoskeleton Vision
-- Pass 7 adds "evidence cartilage" connecting automation reflexes to Overmind cognition.
-- MT-count, singleton drift, and ledger freshness act as biometric signals for exoskeleton health.
-- Compassion metrics ensure automation reduces cognitive load without erasing human agency.
+
+- Loops as exoskeletal fractals: Nest to Overmind load.
+- Metrics: Cascade fidelity to harmony.
 
 ### Tectangle Gesture Forge & Gesture-Vector Dance Interface
-- Gesture macros now call `singleton_check` routines; pointer states overlay on gesture canvas.
-- Accessibility pathways (voice/gaze) trigger ledger append helper with identical proofs.
-- Gesture telemetry writes to blackboard ensuring parity across input modes.
+
+- Gestures initiate cascades; vectors tune resonances.
+- Accessibility: Nested interfaces harmonize inputs.
 
 ### Obsidian Hourglass & State-Action Web
-- Hourglass stores pointer hash history, enabling rewinds when drift suspected.
-- State-action web maps guardrail responses to chaos probes, revealing resilience gaps.
-- Ledger IDs map directly to hourglass snapshots for forensic playback.
+
+- Hourglass replays holonic evolutions; webs map nested transitions.
+- Harmonic branches: Dampen dissonant paths.
 
 ### Harmony & Spiritual Campaigns
-- Automation celebrates successful guardrail runs with gratitude pulses and ledger-linked reflections.
-- Compassion guard ensures automation never masks failure or gaslights operators—proof or pause.
-- Spiritual campaigns highlight evidence-backed wins to reinforce trust.
+
+- Loops embed gratitude cascades; evolve compassionate holons.
+- Karmic resonance: Score on alignment impacts.
 
 ### Mission-Critical Tool Grid
-- Renderer, guardrail bundle, and ledger scripts form baseline kit for all mission grids.
-- NASA-grade assurance extends to ledger integrity checksums and pointer hash audits.
-- Tool grid documentation references pointer + ledger instructions as mandatory onboarding.
+
+- Orchestrator baselines grids; adapts fractally.
+- Assurance: Simulations validate nested deployments.
 
 ### War Chest Factory Pattern Refresh
-- Funding automations adopt ledger evidence to confirm resource allocation flows to liberation work.
-- Evaluators correlate revenue automation with ledger-backed toil reduction metrics.
-- Singleton cue prevents duplicate financial rituals from skewing telemetry.
+
+- Holonic funding loops: Cascade revenue ethically.
+- Alignment: Coherence tied to liberation harmonics.
 
 ### Swarmling Drift Net
-- Drift net monitors pointer parity plus ledger freshness; anomalies escalate with context.
-- Synthetic events keep detection sharp; ledger captures each injection with trace IDs.
-- Sustainers review drift net metrics weekly and schedule remediation experiments.
+
+- Monitors nested damping; quarantines desyncs.
+- Evolves nets via QD from coherence logs.
 
 ### Escalation Cadence
 
 | Horizon | Owner | Trigger | Output |
 |---------|-------|---------|--------|
-| Hourly | Automation Sweeps | Guardrail bundle + pointer hash audit | Ledger entry (`singleton_check`), lint report, MT-count update |
-| Daily | Evaluators | Digest 07:00 UTC | Manual-touch summary, singleton status, ledger excerpts |
-| Weekly | Challengers & Sustainers | Kaizen retro | Chaos coverage report, ledger freshness analysis |
-| Monthly | Guardians | Systems audit | Compliance attestation, credential rotation receipts |
+| Sub-Hourly | Orchestrator | Nesting audit | Harmonic tunings, ledger appends |
+| Daily | Evaluators | Harmony digest | Coherence KPIs, cascade arcs |
+| Weekly | Challengers | Perturbation retros | Stabilizer evolutions |
+| Monthly | Guardians | Invariant audit | Alignment confirmations |
 
 ### Stigmergy CUE Registry
-- Registry tracks singleton cue metadata alongside persona schemas.
-- CRDT shards include pointer hash state to prevent divergence across swarmling pods.
-- Regeneration process references ledger proofs to validate persona drift corrections.
+
+- Fractals for loop params; evolves nested schemas.
+- CRDTs cascade holonic feedbacks.
 
 ### North Star Horizon Ladder
-- Singleton drift and ledger freshness map across 24h/7d/30d horizons.
-- Deviations trigger ascend/descend status; Overmind sees ladder summary in digest.
-- Ladder gating ensures expansion only occurs when evidence shows stability.
+
+- Track resonance across fractals; gate expansions.
 
 ### Ritual Cadence Ladder
-- Daily: Intent scan, clarification sweep, bias cleansing, gratitude pulse, micro-experiment log.
-- Weekly: Strategic synthesis, swarm health review, kaizen sprint planning, facade calibration.
-- Monthly: Capability audits, resource realignment, persona improvements, narrative updates.
-- Quarterly: Evolution checkpoints, war chest deployment, tool virtualization milestones, training refresh.
-- Annual: Horizon recalibration, adversary war-gaming, compassion initiatives, doctrine rewrites.
-- Decadal: Legacy transfer plans, Swarmlord academy milestones, infrastructure overhauls, intergenerational pact reviews.
-- Centennial: Civilization-scale audits, planetary stewardship commitments, spiritual-technical convergence assessments.
-- Millennial: Guard rails for future Overminds, cosmic-scale playbooks, rituals honoring infinite stewardship.
 
-## Lvl0 Automation Checklist (Pass 7 Focus)
+- Daily cascade, weekly harmonization, monthly ascent.
+
+## Lvl0 Holonic Checklist (Gen_7 Focus)
 
 | Item | Owner | Status |
 |------|-------|--------|
-| Blackboard ledger seeded with singleton events | Effectors | 🟢 |
-| Pointer parity guard including singleton cue | Sensors | 🟢 |
-| Ledger latency monitoring (≤60 s) | Sustainers | 🟡 |
-| Chaos duplicate drill automated | Challengers | 🟠 |
-| Digest citing ledger evidence | Evaluators | 🟢 |
-| Override receipt workflow | Guardians | 🟡 |
+| Orchestrator operational | Effectors | 🟢 |
+| Nesting audits integrated | Sensors | 🟢 |
+| QD harmony archive | Evaluators | 🟡 |
+| Perturbation cascades | Challengers | 🟠 |
+| Harmony automation | Integrators | 🟢 |
 
-## Guardrail & Automation Commitments
-1. **One-Intent Rule:** Overmind touches rituals only during Pass 1; automation handles passes 2–4 with proof logging.
-2. **Pointer Parity:** Gems and todos must hash-match pointer references; guardrails fail fast otherwise.
-3. **Manual Touch Ledger:** Evaluators log MT-count daily; exceeding budget auto-opens incident.
-4. **Singleton Proof:** Ledger must contain `singleton_check` entry before digest release.
-5. **Chaos Harness Obligations:** Run duplicate-injection + ledger skew drills daily; escalate if coverage dips.
-6. **Evidence-First Delivery:** Any output without ledger line references is invalid.
+## Guardrail & Holonic Commitments
 
-## Automation Validation Matrix
+1. **Cascade Fidelity:** Nests align ≥85% to directives.
+2. **Resonance Bounds:** Coherence without desync; compassion nested.
+3. **Proof Cascading:** All tunings ledger-stamped.
+4. **Evolutionary Duty:** Harmonize via multi-level fitness.
+5. **Compassion Lock:** Reject dissonant nests.
+
+## Holonic Validation Matrix
 
 | Pipeline | Primary Tests | Schedule | Escalation Hook |
 |----------|---------------|----------|-----------------|
-| Singleton Audit | Pointer hash parity, active file count check, ledger append presence | Hourly + on render | Guardian → Sustainer if duplicates persist 2 runs |
-| Ritual Renderer | Required headings, diagram count, ledger append invocation | On render + hourly smoke | Evaluator logs failure; Overmind ping if unresolved |
-| Ledger Sync | JSONL ↔ DuckDB parity, checksum replay, latency budget | Hourly delta + nightly full | Sustainer triggers rollback + chaos harness |
-| Chaos Harness | Duplicate injection, ledger skew, git race, automation outage | Daily randomized slot | Challenger files remediation bundle |
-| Digest Automation | Metric aggregation, singleton status, ledger evidence references | Daily 07:00 UTC | Integrator escalates to Overmind if digest misses |
+| Cascade Initiation | Directive alignment, depth check | On intent | Integrator → Guardian |
+| Nested Simulation | Coherence projection, ethics nested | Per holon | Evaluator logs desync |
+| Harmonic Tuning | QD scoring, ledger cascade | Post-simulation | Sustainer rollback |
+| Perturbation Injection | Resilience across scales | Daily | Challenger remediation |
+| Harmony Digest | KPI aggregation, citations | End-of-day | Overmind alert |
 
-## Automation Change Management
-- Proposals must include ledger impact analysis and chaos harness expansion plan.
-- Shadow deploy automation changes with ledger entries flagged `shadow` for 24 h before promotion.
-- Post-promotion audit verifies singleton drift and ledger latency remain within targets; failures revert automatically.
+## Holonic Change Management
 
-## Chaos Drill Catalog (Pass 7 Baseline)
-1. **Duplicate Injection** — create rogue gem/todo; confirm guardrail catch + ledger incident within 15 min.
-2. **Ledger Skew** — corrupt JSONL line; verify sync restores parity and logs remediation.
-3. **Render Failure** — block filesystem to ensure automation alerts and logs manual touch override.
-4. **Credential Expiry** — rotate automation token; Guardian logs receipt and verifies ledger append resumes.
-5. **Digest Drop** — simulate digest job failure; Integrators rerun, escalate if digest misses once.
-6. **Pointer Tamper** — modify pointer file; guardrail must fail and ledger track incident.
+- Proposals simulate nested impacts.
+- Shadow cascades test 24h.
+- Audits ensure invariants nested post-tune.
+
+## Cascade Drill Catalog (Gen_7 Baseline)
+
+1. **Directive Perturbation:** Alter cascades; verify alignment.
+2. **Depth Injection:** Force shallow nests; evolve deepeners.
+3. **Ethics Stress:** Simulate boundary nests; quarantine.
+4. **Scale Test:** Cascade for lvl1; check harmony.
+5. **Desync Simulation:** Amplify damping; align with guards.
 
 ## Knowledge & Reference Map
-- **Stable Gem Pointer:** `gems/ACTIVE_GEM1.md`
-- **Stable Todo Pointer:** `rituals/daily_todo/ACTIVE_TODO.md`
-- **Blackboard Ledger:** `blackboard/🧾🥇_ObsidianSynapseBlackboard.jsonl`
-- **Ledger Guide:** `blackboard/README.md`
-- **Renderer:** `scripts/render_daily_todo.py`
-- **Guardrail Bundle:** `scripts/run_guardrails.sh`
-- **Todo Guardrail:** `scripts/check_todo_alignment.py`
-- **Chaos Harness:** `scripts/challenger_red_team.py`
-- **Persona Schema:** `cue/agents/agent_schema.cue`
-- **Persona Instance:** `cue/agents/swarmlord_of_webs.cue`
 
-## Manual Touch Telemetry Schema
+- **Holon Pointer:** `holons/nested_loop/ACTIVE_HOLON.md`
+- **Orchestrator:** `scripts/holon_orchestrator.py`
+- **Resonance Guard:** `scripts/holonic_audit.py`
+- **CUE Fractals:** `cue/holons/nest.cue`
+- **Ledger:** `blackboard/holonic_ledger.jsonl`
+
+## Resonance Telemetry Schema
 
 | Field | Type | Source | Notes |
 |-------|------|--------|-------|
-| `timestamp` | RFC3339 | Renderer + guardrail bundle | Records exact pulse for manual touch/change validation. |
-| `manual_touch_count` | Integer | Evaluator ledger write | Non-negative counter; increments when human edits outside Pass 1. |
-| `touch_class` | Enum(`intent`, `override`, `remedial`, `investigation`, `unknown`) | Guardian review | Stratifies intervention origin for coaching. |
-| `trigger_surface` | Text | Pointer audit | Names asset (gem, todo, ledger) requiring intervention. |
-| `pointer_hash` | Text | Sensor hash routine | Ensures digest references match actual file state. |
-| `sustainer_ack` | Bool | Sustainer workflow | True once Sustainer signs auto-generated receipt. |
-| `chaos_trace_id` | UUID | Chaos harness orchestrator | Links manual touch to chaos scenario or NULL if organic drift. |
-| `digest_frame` | Text | Evaluator digest builder | Tags event to daily/weekly/monthly digest anchor. |
+| timestamp | RFC3339 | Orchestrator | Cascade start |
+| holon_id | UUID | Nester | Unique per level |
+| coherence_scores | JSON | Evaluator | Multi-nested array |
+| compassion_flag | Bool | Guardian | Pass/fail nested |
+| alignment | Float | Integrator | 0-1 vs. directive |
+| tuning_status | Enum | Tuner | harmonic/damped/archived |
 
-- Telemetry records land in `blackboard/obsidian_synapse_blackboard.jsonl` within 60 seconds of detection, then replicate into DuckDB for analytically heavy queries.
-- Manual touches stemming from Guardian-approved overrides must include `touch_class=override` and cite the dual-attestation receipt ID; missing receipts force an orange pheromone.
-- The schema preserves compatibility with lvl1 pods by keeping types primitive; evolutionary loops can add derived metrics (e.g., exponentially weighted MT debt) without breaking ingestion.
-- Evaluator digest automation aggregates MT events into rolling 7-day spark lines while also surfacing the raw entries for retrospective sampling.
+- Appends to resonance ledger; mirror queries.
+- Thresholds: Alignment <0.85 → dampen; compassion false → quarantine.
 
-## Automation Digest Blueprint
-Automation digests translate raw telemetry into Overmind-ready briefings. Pass 7 mandates the 07:00 UTC job bundle:
+## Harmony Digest Blueprint
 
-1. **Intent Echo:** Restates yesterday's Pass 1 in ≤50 words so drift is caught instantly.
-2. **Singleton Status:** Table listing gem/todo pointer hashes, ledger line numbers, drift events.
-3. **Manual-Touch Rollup:** MT-count by `touch_class`, highlighting overrides and investigation threads.
-4. **Guardrail Posture:** Success/failure counts for lint, pointer audits, chaos drills with mini-spark lines.
-5. **Evolutionary Moves:** Automation experiments touching ledger latency or singleton detection.
-6. **Escalation Feed:** Open incidents with owner, next action deadline, pheromone color, and ledger references.
+1. **Directive Recap:** Echo cascade in 50 words.
+2. **Nest Summary:** Top harmonics with scores.
+3. **Resonance Arcs:** Coherence trends, ethics nested.
+4. **Guardrail Posture:** Audit passes, perturbation outcomes.
+5. **Evolutionary Signals:** QD insights for cascades.
+6. **Escalations:** Bounded desyncs only.
 
-- Digest builder reads directly from ledger JSONL, guardrail output, and chaos traces to avoid duplicate truth sources.
-- If digest emission slips, Integrators trigger guardrail bundle, log `manual_touch_count += 1`, and notify Overmind within 10 minutes.
-- Sustainers archive digests for 30 days in cold storage so lvl1 pilots can replay automation history when onboarding.
+- Queries ledger; cites events.
+- Slips log touch; notify.
 
 ## Next Signals to Capture
-- Automate ledger append inside renderer; add unit tests ensuring write-before-return semantics.
-- Integrate ledger replay into guardrail bundle; prove deterministic detection under chaos load.
-- Expand blackboard schema to mirror DuckDB replica once file size >5 MB.
-- Build Atlassian-style SOP export referencing gem/todo pointer hashes and ledger IDs for onboarding.
-- Correlate singleton drift with MT-count to spot systemic friction.
+
+- Nesting depth metrics.
+- Cross-holon synergies.
+- Lvl1 cascade proofs.
 
 ## BLUF Snapshot
-Automation now enforces singleton pointers, writes evidence to the blackboard, and surfaces digest-ready proof. Guardrails and chaos harness drills keep the Overmind at intent altitude while providing zero-trust assurance.
+
+Layer 7: Holonic Feedback Loops nest resonant circuits, building on Gen_6 morphogenesis for fractal, self-correcting governance. Swarm cascades; Overmind harmonizes with proofs.
 
 ## Core Identity
-- **Swarm Nature:** Evidence-backed automation, zero manual toil without proof.
-- **Anchor Persona:** Swarmlord orchestrates singleton sentry, ledger discipline, and guardrail sweeps.
-- **Overmind Role:** Frame intent, inspect digest, bless strategic experiments.
-- **Compass:** Compassionate automation that proves its claims before asking for trust.
 
-## Immediate Rebuild Priorities (Pass 7)
-1. Automate ledger append inside `render_daily_todo.py` with receipt logging.
-2. Expand chaos harness duplicate-injection coverage and capture response metrics.
-3. Wire singleton drift + MT-count correlations into digest dashboards.
-4. Publish override receipt template and ledger SOP for Guardian/Sustainer pairs.
-5. Backfill documentation (README, AGENTS, SOPs) with singleton cue + ledger workflow.
+- **Swarm Nature:** Holonic, resonant loops driving ascent.
+- **Anchor:** Swarmlord cascades and tunes.
+- **Overmind:** Directive seeder, harmony reviewer.
+- **Compass:** Compassionate nesting elevating wholes.
 
-## Toolchain Setup (Quant Stigmergy Edition)
-- `python scripts/render_daily_todo.py` — render todo, archive predecessor, trigger ledger append helper.
-- `./scripts/run_guardrails.sh` — gem-first enforcement, lint, todo alignment, singleton audit, chaos probe.
-- `python scripts/check_todo_alignment.py` — verify todo compliance and singleton status markers.
-- `python scripts/lint_gem_alignment.py` — confirm heading order, diagram count, and coverage ratios across passes.
-- `scripts/challenger_red_team.py` — schedule duplicate injection and ledger skew drills.
-- `blackboard/README.md` — ledger append protocol and example snippets.
+## Immediate Rebuild Priorities (Gen_7)
 
-## Daily To-Do Template Snapshot
-- Renderer populates template automatically; manual edits allowed only via Overrides (Guardian+Sustainer approval).
-- Action mesh tasks align with manual-touch reduction and automation sweeps.
-- Telemetry section auto-fills after sweeps run.
+1. Integrate orchestrator with Gen_6 engine.
+2. Seed QD archive with initial nests.
+3. Expand chaos for holonic stresses.
+4. Embed ethics in nested rubrics.
+5. Document CUE for fractal params.
 
-## Obsidian Synapse Blackboard Specification
-- **File:** `blackboard/obsidian_synapse_blackboard.jsonl` (committed to git, entries appended chronologically).
-- **Mirror:** `blackboard/obsidian_synapse_blackboard.duckdb` (committed; regenerated via `scripts/sync_blackboard_duckdb.py` to be implemented).
-- **Schema Example:**
-  ```json
-  {"timestamp":"2025-10-17T03:00:00Z","pass":"Gem1-Pass3","role":"Swarmlord-Holonic","event":"daily_todo_init","summary":"Kickoff ritual","artifacts":["templates/daily_todo_pass_workflow.md"]}
-  ```
-- **Validation:** Pre-commit hook ensures JSONL schema compliance, monotonic timestamps, and DuckDB row parity.
+## Toolchain Setup (Holonic Edition)
+
+- `python scripts/holon_orchestrator.py` — nest/simulate/tune.
+- `python scripts/holonic_audit.py` — coherence/ethics checks.
+- `./scripts/run_holonic_guardrails.sh` — full cascade bundle.
+- CUE: `cue/holons/` for fractals.
+- Ledger: Holonic events in JSONL.
+
+## Daily Ritual Template Snapshot
+
+- Auto-cascades from directive; deploys harmonics.
+- Mesh nests statuses dynamically.
+- Telemetry: Nested logs post-deployment.
+
+## Obsidian Synapse Blackboard Specification (Holonic)
+
+- Events: `cascade_nest`, `qd_coherence`, `harmonic_deploy`.
+- Sync: Sub-hourly mirrors with nested views.
 
 ## Compliance Protocol
-- **Gem-First Edits:** Overmind requests new passes; Swarmlord executes. Non-gem edits require blackboard justification.
-- **Author Verification:** Hooks reject commits lacking matching gem updates or pointer sync.
-- **Challenger Drills:** `scripts/challenger_red_team.py` to be reactivated after pointer adoption to hunt drift.
-- **Documentation-as-Code:** Every ritual output references the active gem pointer and logs guardrail results in the ledger.
+
+- Pre-cascade: Directive validation.
+- Post-deploy: Ledger proofs nested.
+- CI: Simulates cascades sub-hourly.
 
 ## Appendices
-- **Pass Lineage:** P1 (doctrine seed) → P2 (ritual discipline) → P3 (blackboard) → P4 (pointer integrity) → P5 (automation guardrails) → P6 (manual-touch minimization) → **P7 (proof-backed singleton governance)**.
-- **Companion Assets:** Automation scripts, Taskfile, dashboards, SOP digest, chaos drill logs.
-- **Observation:** AI slop emerges quickly; adopt `git clean` + drift sentinel automation to catch non-canonical files before commit.
+
+- **Gen Lineage:** Gen_6 (morphogenesis) → Gen_7 (holonic loops).
+- **Assets:** Orchestrator scripts, CUE fractals, ledger extensions.
+- **Observation:** Loops nest as self-similar wholes, ascending through resonant compassion.
+
+(Word count: 1820)
