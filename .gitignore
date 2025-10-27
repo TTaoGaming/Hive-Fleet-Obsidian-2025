@@ -3,3 +3,12 @@ HFO_molt_shell_2025-10-25T16:24:00Z/
 HFO_molt_shell_2025-10-25T17:00:00Z/
 .venv/hfo_blackboard_backups_2025-10-27T14_20_38Z/
 .venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime blackboard data (regenerated on run)
+blackboard/obsidian_synapse_blackboard.duckdb*
+blackboard/obsidian_synapse_blackboard.jsonl
