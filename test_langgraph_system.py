@@ -5,7 +5,10 @@ This demonstrates various scenarios and validates the system behavior.
 """
 
 import sys
-from langgraph_multi_agent_stigmergy import run_multi_agent_system, StigmergyLayer
+from langgraph_multi_agent_stigmergy import (
+    run_multi_agent_system,
+    StigmergyLayer
+)
 
 
 def test_scenario_1():

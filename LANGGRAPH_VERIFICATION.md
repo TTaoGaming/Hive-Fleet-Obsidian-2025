@@ -112,8 +112,11 @@ The LangGraph multi-agent system with stigmergy pattern has been successfully im
 │              │               │ Verify decisions       │
 └──────────────┴───────────────┴────────────────────────┘
 
-Aggregate Explore/Exploit: 50% explore, 50% exploit
-(Explorer: 60% * 1 + Exploiter: 40% * 1) / 2 = 50%
+Aggregate Explore/Exploit (active agents only):
+- Explorer: 60% explore
+- Exploiter: 40% explore  
+- Average: (60% + 40%) / 2 = 50% explore, 50% exploit
+- Note: Validator doesn't explore/exploit, it validates consensus
 ```
 
 ---
