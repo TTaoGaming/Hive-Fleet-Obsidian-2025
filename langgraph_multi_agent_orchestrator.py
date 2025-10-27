@@ -21,6 +21,7 @@ from pathlib import Path
 import random
 from operator import add
 import threading
+import copy
 
 
 # ===== STIGMERGY LAYER (Virtual Blackboard) =====
@@ -51,7 +52,7 @@ class StigmergyLayer:
                 "timestamp": timestamp,
                 "strength": 1.0  # Pheromone strength
             }
-            self.save()
+            self._save()
     
     def read_traces(self, trace_type: str = None, min_strength: float = 0.1) -> List[Dict]:
         """Read traces from environment, optionally filtered by type"""
@@ -61,7 +62,8 @@ class StigmergyLayer:
                 if trace["strength"] < min_strength:
                     continue
                 if trace_type is None or trace["type"] == trace_type:
-                    traces.append(trace.copy())
+                    # Use deepcopy for complete isolation in concurrent environment
+                    traces.append(copy.deepcopy(trace))
             return sorted(traces, key=lambda x: x["timestamp"], reverse=True)
     
     def evaporate(self, decay_rate: float = 0.1):
@@ -71,10 +73,17 @@ class StigmergyLayer:
                 self.traces[key]["strength"] *= (1 - decay_rate)
                 if self.traces[key]["strength"] < 0.01:
                     del self.traces[key]
-            self.save()
+            self._save()
     
-    def save(self):
-        """Persist stigmergy state to disk (must be called with lock held)"""
+    def _save(self):
+        """
+        Persist stigmergy state to disk.
+        PRIVATE: Must be called with self.lock held.
+        """
+        # Verify lock is held (will raise RuntimeError if not)
+        if not self.lock.locked():
+            raise RuntimeError("_save() must be called with lock held")
+        
         with open(self.persist_path, 'w') as f:
             json.dump(self.traces, f, indent=2)
     
