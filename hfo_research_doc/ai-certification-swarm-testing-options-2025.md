@@ -209,8 +209,8 @@ The following certifications represent the best opportunities for testing multi-
 
 ## Comparative Matrix
 
-| # | Certification | Domain | Cost (USD) | Duration | Prerequisites | Languages | Global Recognition | Est. Completion Time |
-|---|---------------|--------|------------|----------|---------------|-----------|-------------------|---------------------|
+| No. | Certification | Domain | Cost (USD) | Duration | Prerequisites | Languages | Global Recognition | Est. Completion Time |
+|-----|---------------|--------|------------|----------|---------------|-----------|-------------------|---------------------|
 | 1 | IBM AI Fundamentals | AI | Free | Self-paced | None | English | High | 1-2 days |
 | 2 | Google Cybersecurity Pro | Cybersecurity | Free-$49/mo | 6 months / 2-3 weeks | None | 10+ (subtitles) | Very High | 2-3 weeks intensive |
 | 3 | Microsoft AI-900 | AI | $99 | 1-3 days + exam | None | 11+ | Very High | 3-5 days |
@@ -556,8 +556,7 @@ The following certifications represent the best opportunities for testing multi-
 - **Microsoft Learn:** Free, comprehensive training platform
 
 ### Verification Resources:
-- **Credly:** Digital badge verification platform (used by many cert providers)
-- **Acclaim/Credly:** Certificate verification and sharing
+- **Credly (formerly Acclaim):** Digital badge verification platform (used by many cert providers)
 - **LinkedIn:** Professional credential verification
 - **Certificate verification portals:** Most providers offer URL-based verification
 
