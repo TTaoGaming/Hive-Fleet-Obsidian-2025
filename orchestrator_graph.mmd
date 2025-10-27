@@ -1,0 +1,24 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	manager(manager)
+	agent_1(agent_1)
+	agent_2(agent_2)
+	agent_3(agent_3)
+	quorum(quorum)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> manager;
+	agent_1 --> quorum;
+	agent_2 --> quorum;
+	agent_3 --> quorum;
+	manager --> agent_1;
+	manager --> agent_2;
+	manager --> agent_3;
+	quorum -.-> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

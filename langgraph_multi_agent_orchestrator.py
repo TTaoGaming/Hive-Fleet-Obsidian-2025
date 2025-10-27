@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import random
 from operator import add
+import threading
 
 
 # ===== STIGMERGY LAYER (Virtual Blackboard) =====
@@ -27,55 +28,62 @@ class StigmergyLayer:
     """
     Virtual stigmergy layer for indirect agent communication.
     Agents leave traces/pheromones that influence other agents' behavior.
+    Thread-safe for parallel agent execution.
     """
     
     def __init__(self, persist_path: str = "blackboard/stigmergy_state.json"):
         self.persist_path = Path(persist_path)
         self.persist_path.parent.mkdir(parents=True, exist_ok=True)
         self.traces: Dict[str, Any] = {}
+        self.lock = threading.Lock()  # Thread safety for parallel agents
         self.load()
     
     def deposit_trace(self, agent_id: str, trace_type: str, data: Any):
         """Agent deposits a trace (pheromone) in the environment"""
         timestamp = datetime.now(timezone.utc).isoformat()
         trace_key = f"{agent_id}_{trace_type}_{timestamp}"
-        self.traces[trace_key] = {
-            "agent_id": agent_id,
-            "type": trace_type,
-            "data": data,
-            "timestamp": timestamp,
-            "strength": 1.0  # Pheromone strength
-        }
-        self.save()
+        
+        with self.lock:
+            self.traces[trace_key] = {
+                "agent_id": agent_id,
+                "type": trace_type,
+                "data": data,
+                "timestamp": timestamp,
+                "strength": 1.0  # Pheromone strength
+            }
+            self.save()
     
     def read_traces(self, trace_type: str = None, min_strength: float = 0.1) -> List[Dict]:
         """Read traces from environment, optionally filtered by type"""
-        traces = []
-        for key, trace in self.traces.items():
-            if trace["strength"] < min_strength:
-                continue
-            if trace_type is None or trace["type"] == trace_type:
-                traces.append(trace)
-        return sorted(traces, key=lambda x: x["timestamp"], reverse=True)
+        with self.lock:
+            traces = []
+            for key, trace in self.traces.items():
+                if trace["strength"] < min_strength:
+                    continue
+                if trace_type is None or trace["type"] == trace_type:
+                    traces.append(trace.copy())
+            return sorted(traces, key=lambda x: x["timestamp"], reverse=True)
     
     def evaporate(self, decay_rate: float = 0.1):
         """Pheromone evaporation - traces decay over time"""
-        for key in list(self.traces.keys()):
-            self.traces[key]["strength"] *= (1 - decay_rate)
-            if self.traces[key]["strength"] < 0.01:
-                del self.traces[key]
-        self.save()
+        with self.lock:
+            for key in list(self.traces.keys()):
+                self.traces[key]["strength"] *= (1 - decay_rate)
+                if self.traces[key]["strength"] < 0.01:
+                    del self.traces[key]
+            self.save()
     
     def save(self):
-        """Persist stigmergy state to disk"""
+        """Persist stigmergy state to disk (must be called with lock held)"""
         with open(self.persist_path, 'w') as f:
             json.dump(self.traces, f, indent=2)
     
     def load(self):
         """Load stigmergy state from disk"""
-        if self.persist_path.exists():
-            with open(self.persist_path, 'r') as f:
-                self.traces = json.load(f)
+        with self.lock:
+            if self.persist_path.exists():
+                with open(self.persist_path, 'r') as f:
+                    self.traces = json.load(f)
 
 
 # Helper function to merge agent results
