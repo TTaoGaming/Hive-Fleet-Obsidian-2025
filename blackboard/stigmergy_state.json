@@ -1,0 +1,3144 @@
+{
+  "manager_plan_2025-10-27T18:47:05.941424Z": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:47:05.941390Z"
+    },
+    "timestamp": "2025-10-27T18:47:05.941424Z",
+    "strength": 0.03433683820292516
+  },
+  "agent_1_result_2025-10-27T18:47:05.942669Z": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 0
+    },
+    "timestamp": "2025-10-27T18:47:05.942669Z",
+    "strength": 0.03433683820292516
+  },
+  "agent_2_result_2025-10-27T18:47:05.943099Z": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 1
+    },
+    "timestamp": "2025-10-27T18:47:05.943099Z",
+    "strength": 0.03433683820292516
+  },
+  "agent_3_result_2025-10-27T18:47:05.943436Z": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 2
+    },
+    "timestamp": "2025-10-27T18:47:05.943436Z",
+    "strength": 0.03433683820292516
+  },
+  "manager_plan_2025-10-27T18:48:40.783272+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:48:40.783266+00:00"
+    },
+    "timestamp": "2025-10-27T18:48:40.783272+00:00",
+    "strength": 0.03433683820292516
+  },
+  "agent_1_result_2025-10-27T18:48:40.784421+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Analyze and process distributed AI swarm intelligence patterns' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 3
+    },
+    "timestamp": "2025-10-27T18:48:40.784421+00:00",
+    "strength": 0.03433683820292516
+  },
+  "agent_2_result_2025-10-27T18:48:40.784640+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Analyze and process distributed AI swarm intelligence patterns' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 4
+    },
+    "timestamp": "2025-10-27T18:48:40.784640+00:00",
+    "strength": 0.03433683820292516
+  },
+  "agent_3_result_2025-10-27T18:48:40.785188+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 5
+    },
+    "timestamp": "2025-10-27T18:48:40.785188+00:00",
+    "strength": 0.03433683820292516
+  },
+  "quorum_decision_2025-10-27T18:48:40.786639+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:48:40.786639+00:00",
+    "strength": 0.03433683820292516
+  },
+  "manager_plan_2025-10-27T18:48:41.289071+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_1",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:48:41.289064+00:00"
+    },
+    "timestamp": "2025-10-27T18:48:41.289071+00:00",
+    "strength": 0.03815204244769462
+  },
+  "agent_1_result_2025-10-27T18:48:41.289984+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 6
+    },
+    "timestamp": "2025-10-27T18:48:41.289984+00:00",
+    "strength": 0.03815204244769462
+  },
+  "agent_2_result_2025-10-27T18:48:41.290163+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 7
+    },
+    "timestamp": "2025-10-27T18:48:41.290163+00:00",
+    "strength": 0.03815204244769462
+  },
+  "agent_3_result_2025-10-27T18:48:41.290333+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 8
+    },
+    "timestamp": "2025-10-27T18:48:41.290333+00:00",
+    "strength": 0.03815204244769462
+  },
+  "quorum_decision_2025-10-27T18:48:41.292086+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:48:41.292086+00:00",
+    "strength": 0.03815204244769462
+  },
+  "manager_plan_2025-10-27T18:48:41.794494+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_2",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:48:41.794490+00:00"
+    },
+    "timestamp": "2025-10-27T18:48:41.794494+00:00",
+    "strength": 0.042391158275216244
+  },
+  "agent_1_result_2025-10-27T18:48:41.795693+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 9
+    },
+    "timestamp": "2025-10-27T18:48:41.795693+00:00",
+    "strength": 0.042391158275216244
+  },
+  "agent_2_result_2025-10-27T18:48:41.795891+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 10
+    },
+    "timestamp": "2025-10-27T18:48:41.795891+00:00",
+    "strength": 0.042391158275216244
+  },
+  "agent_3_result_2025-10-27T18:48:41.796102+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 11
+    },
+    "timestamp": "2025-10-27T18:48:41.796102+00:00",
+    "strength": 0.042391158275216244
+  },
+  "quorum_decision_2025-10-27T18:48:41.798119+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:48:41.798119+00:00",
+    "strength": 0.042391158275216244
+  },
+  "manager_plan_2025-10-27T18:51:05.463848+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:05.463842+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:05.463848+00:00",
+    "strength": 0.04710128697246249
+  },
+  "agent_1_result_2025-10-27T18:51:05.465329+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 12
+    },
+    "timestamp": "2025-10-27T18:51:05.465329+00:00",
+    "strength": 0.04710128697246249
+  },
+  "agent_2_result_2025-10-27T18:51:05.465924+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 13
+    },
+    "timestamp": "2025-10-27T18:51:05.465924+00:00",
+    "strength": 0.04710128697246249
+  },
+  "agent_3_result_2025-10-27T18:51:05.466764+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 14
+    },
+    "timestamp": "2025-10-27T18:51:05.466764+00:00",
+    "strength": 0.04710128697246249
+  },
+  "manager_plan_2025-10-27T18:51:53.305939+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:53.305934+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:53.305939+00:00",
+    "strength": 0.04710128697246249
+  },
+  "agent_1_result_2025-10-27T18:51:53.307529+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 15
+    },
+    "timestamp": "2025-10-27T18:51:53.307529+00:00",
+    "strength": 0.04710128697246249
+  },
+  "agent_3_result_2025-10-27T18:51:53.309188+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 16
+    },
+    "timestamp": "2025-10-27T18:51:53.309188+00:00",
+    "strength": 0.04710128697246249
+  },
+  "agent_2_result_2025-10-27T18:51:53.309103+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 16
+    },
+    "timestamp": "2025-10-27T18:51:53.309103+00:00",
+    "strength": 0.04710128697246249
+  },
+  "quorum_decision_2025-10-27T18:51:53.311044+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:51:53.311044+00:00",
+    "strength": 0.04710128697246249
+  },
+  "manager_plan_2025-10-27T18:51:53.813844+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_1",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:53.813839+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:53.813844+00:00",
+    "strength": 0.0523347633027361
+  },
+  "agent_1_result_2025-10-27T18:51:53.815370+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 18
+    },
+    "timestamp": "2025-10-27T18:51:53.815370+00:00",
+    "strength": 0.0523347633027361
+  },
+  "agent_3_result_2025-10-27T18:51:53.816656+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 19
+    },
+    "timestamp": "2025-10-27T18:51:53.816656+00:00",
+    "strength": 0.0523347633027361
+  },
+  "agent_2_result_2025-10-27T18:51:53.816555+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 19
+    },
+    "timestamp": "2025-10-27T18:51:53.816555+00:00",
+    "strength": 0.0523347633027361
+  },
+  "quorum_decision_2025-10-27T18:51:53.818909+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:51:53.818909+00:00",
+    "strength": 0.0523347633027361
+  },
+  "manager_plan_2025-10-27T18:51:54.322221+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_2",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:54.322215+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:54.322221+00:00",
+    "strength": 0.05814973700304011
+  },
+  "agent_1_result_2025-10-27T18:51:54.323898+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 21
+    },
+    "timestamp": "2025-10-27T18:51:54.323898+00:00",
+    "strength": 0.05814973700304011
+  },
+  "agent_2_result_2025-10-27T18:51:54.325533+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 22
+    },
+    "timestamp": "2025-10-27T18:51:54.325533+00:00",
+    "strength": 0.05814973700304011
+  },
+  "agent_3_result_2025-10-27T18:51:54.325631+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 22
+    },
+    "timestamp": "2025-10-27T18:51:54.325631+00:00",
+    "strength": 0.05814973700304011
+  },
+  "quorum_decision_2025-10-27T18:51:54.328171+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:54.328171+00:00",
+    "strength": 0.05814973700304011
+  },
+  "manager_plan_2025-10-27T18:51:54.831487+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_3",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:54.831482+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:54.831487+00:00",
+    "strength": 0.06461081889226679
+  },
+  "agent_1_result_2025-10-27T18:51:54.833282+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 24
+    },
+    "timestamp": "2025-10-27T18:51:54.833282+00:00",
+    "strength": 0.06461081889226679
+  },
+  "agent_3_result_2025-10-27T18:51:54.834692+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 25
+    },
+    "timestamp": "2025-10-27T18:51:54.834692+00:00",
+    "strength": 0.06461081889226679
+  },
+  "agent_2_result_2025-10-27T18:51:54.834598+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 25
+    },
+    "timestamp": "2025-10-27T18:51:54.834598+00:00",
+    "strength": 0.06461081889226679
+  },
+  "quorum_decision_2025-10-27T18:51:54.837033+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:51:54.837033+00:00",
+    "strength": 0.06461081889226679
+  },
+  "manager_plan_2025-10-27T18:51:55.340520+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_4",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:55.340516+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:55.340520+00:00",
+    "strength": 0.07178979876918531
+  },
+  "agent_1_result_2025-10-27T18:51:55.342356+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 27
+    },
+    "timestamp": "2025-10-27T18:51:55.342356+00:00",
+    "strength": 0.07178979876918531
+  },
+  "agent_2_result_2025-10-27T18:51:55.343796+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 28
+    },
+    "timestamp": "2025-10-27T18:51:55.343796+00:00",
+    "strength": 0.07178979876918531
+  },
+  "agent_3_result_2025-10-27T18:51:55.343897+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 28
+    },
+    "timestamp": "2025-10-27T18:51:55.343897+00:00",
+    "strength": 0.07178979876918531
+  },
+  "quorum_decision_2025-10-27T18:51:55.347333+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:55.347333+00:00",
+    "strength": 0.07178979876918531
+  },
+  "manager_plan_2025-10-27T18:51:55.851592+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_5",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:55.851587+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:55.851592+00:00",
+    "strength": 0.07976644307687257
+  },
+  "agent_1_result_2025-10-27T18:51:55.853354+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 30
+    },
+    "timestamp": "2025-10-27T18:51:55.853354+00:00",
+    "strength": 0.07976644307687257
+  },
+  "agent_3_result_2025-10-27T18:51:55.854979+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 31
+    },
+    "timestamp": "2025-10-27T18:51:55.854979+00:00",
+    "strength": 0.07976644307687257
+  },
+  "agent_2_result_2025-10-27T18:51:55.854873+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 31
+    },
+    "timestamp": "2025-10-27T18:51:55.854873+00:00",
+    "strength": 0.07976644307687257
+  },
+  "quorum_decision_2025-10-27T18:51:55.857919+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:55.857919+00:00",
+    "strength": 0.07976644307687257
+  },
+  "manager_plan_2025-10-27T18:51:56.361700+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_6",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:56.361695+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:56.361700+00:00",
+    "strength": 0.08862938119652508
+  },
+  "agent_1_result_2025-10-27T18:51:56.363827+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 33
+    },
+    "timestamp": "2025-10-27T18:51:56.363827+00:00",
+    "strength": 0.08862938119652508
+  },
+  "agent_2_result_2025-10-27T18:51:56.365397+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 34
+    },
+    "timestamp": "2025-10-27T18:51:56.365397+00:00",
+    "strength": 0.08862938119652508
+  },
+  "agent_3_result_2025-10-27T18:51:56.366921+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 35
+    },
+    "timestamp": "2025-10-27T18:51:56.366921+00:00",
+    "strength": 0.08862938119652508
+  },
+  "quorum_decision_2025-10-27T18:51:56.368354+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:56.368354+00:00",
+    "strength": 0.08862938119652508
+  },
+  "manager_plan_2025-10-27T18:51:56.872198+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_7",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:56.872193+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:56.872198+00:00",
+    "strength": 0.0984770902183612
+  },
+  "agent_1_result_2025-10-27T18:51:56.874062+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 36
+    },
+    "timestamp": "2025-10-27T18:51:56.874062+00:00",
+    "strength": 0.0984770902183612
+  },
+  "agent_3_result_2025-10-27T18:51:56.876019+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 37
+    },
+    "timestamp": "2025-10-27T18:51:56.876019+00:00",
+    "strength": 0.0984770902183612
+  },
+  "agent_2_result_2025-10-27T18:51:56.875901+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 37
+    },
+    "timestamp": "2025-10-27T18:51:56.875901+00:00",
+    "strength": 0.0984770902183612
+  },
+  "quorum_decision_2025-10-27T18:51:56.878877+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:56.878877+00:00",
+    "strength": 0.0984770902183612
+  },
+  "manager_plan_2025-10-27T18:51:57.382845+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_8",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:57.382840+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:57.382845+00:00",
+    "strength": 0.10941898913151243
+  },
+  "agent_1_result_2025-10-27T18:51:57.384982+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 39
+    },
+    "timestamp": "2025-10-27T18:51:57.384982+00:00",
+    "strength": 0.10941898913151243
+  },
+  "agent_3_result_2025-10-27T18:51:57.387178+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 40
+    },
+    "timestamp": "2025-10-27T18:51:57.387178+00:00",
+    "strength": 0.10941898913151243
+  },
+  "agent_2_result_2025-10-27T18:51:57.387089+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 40
+    },
+    "timestamp": "2025-10-27T18:51:57.387089+00:00",
+    "strength": 0.10941898913151243
+  },
+  "quorum_decision_2025-10-27T18:51:57.390285+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:57.390285+00:00",
+    "strength": 0.10941898913151243
+  },
+  "manager_plan_2025-10-27T18:51:57.894559+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_9",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:51:57.894555+00:00"
+    },
+    "timestamp": "2025-10-27T18:51:57.894559+00:00",
+    "strength": 0.12157665459056936
+  },
+  "agent_1_result_2025-10-27T18:51:57.897990+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 42
+    },
+    "timestamp": "2025-10-27T18:51:57.897990+00:00",
+    "strength": 0.12157665459056936
+  },
+  "agent_3_result_2025-10-27T18:51:57.899933+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 43
+    },
+    "timestamp": "2025-10-27T18:51:57.899933+00:00",
+    "strength": 0.12157665459056936
+  },
+  "agent_2_result_2025-10-27T18:51:57.899827+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 43
+    },
+    "timestamp": "2025-10-27T18:51:57.899827+00:00",
+    "strength": 0.12157665459056936
+  },
+  "quorum_decision_2025-10-27T18:51:57.903545+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:51:57.903545+00:00",
+    "strength": 0.12157665459056936
+  },
+  "manager_plan_2025-10-27T18:55:00.477876+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:55:00.477870+00:00"
+    },
+    "timestamp": "2025-10-27T18:55:00.477876+00:00",
+    "strength": 0.13508517176729928
+  },
+  "agent_1_result_2025-10-27T18:55:00.480559+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Analyze and process distributed AI swarm intelligence patterns' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 45
+    },
+    "timestamp": "2025-10-27T18:55:00.480559+00:00",
+    "strength": 0.13508517176729928
+  },
+  "agent_3_result_2025-10-27T18:55:00.483030+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 46
+    },
+    "timestamp": "2025-10-27T18:55:00.483030+00:00",
+    "strength": 0.13508517176729928
+  },
+  "agent_2_result_2025-10-27T18:55:00.482909+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Analyze and process distributed AI swarm intelligence patterns' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 46
+    },
+    "timestamp": "2025-10-27T18:55:00.482909+00:00",
+    "strength": 0.13508517176729928
+  },
+  "quorum_decision_2025-10-27T18:55:00.486505+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:55:00.486505+00:00",
+    "strength": 0.13508517176729928
+  },
+  "manager_plan_2025-10-27T18:55:00.991218+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_1",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:55:00.991212+00:00"
+    },
+    "timestamp": "2025-10-27T18:55:00.991218+00:00",
+    "strength": 0.1500946352969992
+  },
+  "agent_1_result_2025-10-27T18:55:00.993736+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 48
+    },
+    "timestamp": "2025-10-27T18:55:00.993736+00:00",
+    "strength": 0.1500946352969992
+  },
+  "agent_3_result_2025-10-27T18:55:00.996491+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 49
+    },
+    "timestamp": "2025-10-27T18:55:00.996491+00:00",
+    "strength": 0.1500946352969992
+  },
+  "agent_2_result_2025-10-27T18:55:00.996371+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 49
+    },
+    "timestamp": "2025-10-27T18:55:00.996371+00:00",
+    "strength": 0.1500946352969992
+  },
+  "quorum_decision_2025-10-27T18:55:01.000105+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:55:01.000105+00:00",
+    "strength": 0.1500946352969992
+  },
+  "manager_plan_2025-10-27T18:55:01.504818+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_2",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:55:01.504813+00:00"
+    },
+    "timestamp": "2025-10-27T18:55:01.504818+00:00",
+    "strength": 0.16677181699666577
+  },
+  "agent_1_result_2025-10-27T18:55:01.507407+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Analyze and process distributed AI swarm intelligence patterns' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 51
+    },
+    "timestamp": "2025-10-27T18:55:01.507407+00:00",
+    "strength": 0.16677181699666577
+  },
+  "agent_3_result_2025-10-27T18:55:01.510267+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 52
+    },
+    "timestamp": "2025-10-27T18:55:01.510267+00:00",
+    "strength": 0.16677181699666577
+  },
+  "agent_2_result_2025-10-27T18:55:01.510157+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Analyze and process distributed AI swarm intelligence patterns' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 52
+    },
+    "timestamp": "2025-10-27T18:55:01.510157+00:00",
+    "strength": 0.16677181699666577
+  },
+  "quorum_decision_2025-10-27T18:55:01.514138+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:55:01.514138+00:00",
+    "strength": 0.16677181699666577
+  },
+  "manager_plan_2025-10-27T18:57:07.759001+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:07.758993+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:07.759001+00:00",
+    "strength": 0.1853020188851842
+  },
+  "agent_1_result_2025-10-27T18:57:07.762351+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 54
+    },
+    "timestamp": "2025-10-27T18:57:07.762351+00:00",
+    "strength": 0.1853020188851842
+  },
+  "agent_3_result_2025-10-27T18:57:07.765468+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 55
+    },
+    "timestamp": "2025-10-27T18:57:07.765468+00:00",
+    "strength": 0.1853020188851842
+  },
+  "agent_2_result_2025-10-27T18:57:07.765025+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 55
+    },
+    "timestamp": "2025-10-27T18:57:07.765025+00:00",
+    "strength": 0.1853020188851842
+  },
+  "quorum_decision_2025-10-27T18:57:07.769253+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:07.769253+00:00",
+    "strength": 0.1853020188851842
+  },
+  "manager_plan_2025-10-27T18:57:08.274305+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_1",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:08.274299+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:08.274305+00:00",
+    "strength": 0.2058911320946491
+  },
+  "agent_1_result_2025-10-27T18:57:08.277473+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 57
+    },
+    "timestamp": "2025-10-27T18:57:08.277473+00:00",
+    "strength": 0.2058911320946491
+  },
+  "agent_3_result_2025-10-27T18:57:08.280773+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 58
+    },
+    "timestamp": "2025-10-27T18:57:08.280773+00:00",
+    "strength": 0.2058911320946491
+  },
+  "agent_2_result_2025-10-27T18:57:08.280325+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 58
+    },
+    "timestamp": "2025-10-27T18:57:08.280325+00:00",
+    "strength": 0.2058911320946491
+  },
+  "quorum_decision_2025-10-27T18:57:08.284675+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:08.284675+00:00",
+    "strength": 0.2058911320946491
+  },
+  "manager_plan_2025-10-27T18:57:08.789734+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_2",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:08.789729+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:08.789734+00:00",
+    "strength": 0.22876792454961012
+  },
+  "agent_1_result_2025-10-27T18:57:08.792984+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Analyze and process distributed AI swarm intelligence patterns' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 60
+    },
+    "timestamp": "2025-10-27T18:57:08.792984+00:00",
+    "strength": 0.22876792454961012
+  },
+  "agent_2_result_2025-10-27T18:57:08.795827+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Analyze and process distributed AI swarm intelligence patterns' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 61
+    },
+    "timestamp": "2025-10-27T18:57:08.795827+00:00",
+    "strength": 0.22876792454961012
+  },
+  "agent_3_result_2025-10-27T18:57:08.796462+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 61
+    },
+    "timestamp": "2025-10-27T18:57:08.796462+00:00",
+    "strength": 0.22876792454961012
+  },
+  "quorum_decision_2025-10-27T18:57:08.800543+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:57:08.800543+00:00",
+    "strength": 0.22876792454961012
+  },
+  "manager_plan_2025-10-27T18:57:21.587293+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:21.587287+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:21.587293+00:00",
+    "strength": 0.25418658283290013
+  },
+  "agent_1_result_2025-10-27T18:57:21.590891+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:57:21.590891+00:00",
+    "strength": 0.25418658283290013
+  },
+  "agent_3_result_2025-10-27T18:57:21.594707+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:21.594707+00:00",
+    "strength": 0.25418658283290013
+  },
+  "agent_2_result_2025-10-27T18:57:21.594210+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:21.594210+00:00",
+    "strength": 0.25418658283290013
+  },
+  "quorum_decision_2025-10-27T18:57:21.599147+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:21.599147+00:00",
+    "strength": 0.25418658283290013
+  },
+  "manager_plan_2025-10-27T18:57:22.104614+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_1",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:22.104607+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:22.104614+00:00",
+    "strength": 0.28242953648100017
+  },
+  "agent_1_result_2025-10-27T18:57:22.107916+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 66
+    },
+    "timestamp": "2025-10-27T18:57:22.107916+00:00",
+    "strength": 0.28242953648100017
+  },
+  "agent_3_result_2025-10-27T18:57:22.111502+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:22.111502+00:00",
+    "strength": 0.28242953648100017
+  },
+  "agent_2_result_2025-10-27T18:57:22.110995+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:22.110995+00:00",
+    "strength": 0.28242953648100017
+  },
+  "quorum_decision_2025-10-27T18:57:22.115945+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:22.115945+00:00",
+    "strength": 0.28242953648100017
+  },
+  "manager_plan_2025-10-27T18:57:22.621502+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_2",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:22.621497+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:22.621502+00:00",
+    "strength": 0.31381059609000017
+  },
+  "agent_1_result_2025-10-27T18:57:22.624851+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 69
+    },
+    "timestamp": "2025-10-27T18:57:22.624851+00:00",
+    "strength": 0.31381059609000017
+  },
+  "agent_2_result_2025-10-27T18:57:22.628065+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 70
+    },
+    "timestamp": "2025-10-27T18:57:22.628065+00:00",
+    "strength": 0.31381059609000017
+  },
+  "agent_3_result_2025-10-27T18:57:22.628733+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 70
+    },
+    "timestamp": "2025-10-27T18:57:22.628733+00:00",
+    "strength": 0.31381059609000017
+  },
+  "quorum_decision_2025-10-27T18:57:22.633394+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:22.633394+00:00",
+    "strength": 0.31381059609000017
+  },
+  "manager_plan_2025-10-27T18:57:23.139270+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_3",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:23.139265+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:23.139270+00:00",
+    "strength": 0.34867844010000015
+  },
+  "agent_1_result_2025-10-27T18:57:23.142706+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 66
+    },
+    "timestamp": "2025-10-27T18:57:23.142706+00:00",
+    "strength": 0.34867844010000015
+  },
+  "agent_3_result_2025-10-27T18:57:23.146450+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:23.146450+00:00",
+    "strength": 0.34867844010000015
+  },
+  "agent_2_result_2025-10-27T18:57:23.145912+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:23.145912+00:00",
+    "strength": 0.34867844010000015
+  },
+  "quorum_decision_2025-10-27T18:57:23.151351+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:23.151351+00:00",
+    "strength": 0.34867844010000015
+  },
+  "manager_plan_2025-10-27T18:57:23.657452+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_4",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:23.657447+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:23.657452+00:00",
+    "strength": 0.38742048900000015
+  },
+  "agent_1_result_2025-10-27T18:57:23.661216+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 66
+    },
+    "timestamp": "2025-10-27T18:57:23.661216+00:00",
+    "strength": 0.38742048900000015
+  },
+  "agent_2_result_2025-10-27T18:57:23.664560+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:23.664560+00:00",
+    "strength": 0.38742048900000015
+  },
+  "agent_3_result_2025-10-27T18:57:23.665306+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:23.665306+00:00",
+    "strength": 0.38742048900000015
+  },
+  "quorum_decision_2025-10-27T18:57:23.670459+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:23.670459+00:00",
+    "strength": 0.38742048900000015
+  },
+  "manager_plan_2025-10-27T18:57:24.176649+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_5",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:24.176641+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:24.176649+00:00",
+    "strength": 0.43046721000000016
+  },
+  "agent_1_result_2025-10-27T18:57:24.180620+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 66
+    },
+    "timestamp": "2025-10-27T18:57:24.180620+00:00",
+    "strength": 0.43046721000000016
+  },
+  "agent_3_result_2025-10-27T18:57:24.184529+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:24.184529+00:00",
+    "strength": 0.43046721000000016
+  },
+  "agent_2_result_2025-10-27T18:57:24.183892+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 67
+    },
+    "timestamp": "2025-10-27T18:57:24.183892+00:00",
+    "strength": 0.43046721000000016
+  },
+  "quorum_decision_2025-10-27T18:57:24.189762+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:24.189762+00:00",
+    "strength": 0.43046721000000016
+  },
+  "manager_plan_2025-10-27T18:57:24.696265+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_6",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:24.696259+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:24.696265+00:00",
+    "strength": 0.47829690000000014
+  },
+  "agent_1_result_2025-10-27T18:57:24.699927+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:57:24.699927+00:00",
+    "strength": 0.47829690000000014
+  },
+  "agent_3_result_2025-10-27T18:57:24.703976+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:24.703976+00:00",
+    "strength": 0.47829690000000014
+  },
+  "agent_2_result_2025-10-27T18:57:24.703472+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:24.703472+00:00",
+    "strength": 0.47829690000000014
+  },
+  "quorum_decision_2025-10-27T18:57:24.710335+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:24.710335+00:00",
+    "strength": 0.47829690000000014
+  },
+  "manager_plan_2025-10-27T18:57:25.216888+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_7",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:25.216882+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:25.216888+00:00",
+    "strength": 0.5314410000000002
+  },
+  "agent_1_result_2025-10-27T18:57:25.220784+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:57:25.220784+00:00",
+    "strength": 0.5314410000000002
+  },
+  "agent_3_result_2025-10-27T18:57:25.224766+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:25.224766+00:00",
+    "strength": 0.5314410000000002
+  },
+  "agent_2_result_2025-10-27T18:57:25.224275+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:25.224275+00:00",
+    "strength": 0.5314410000000002
+  },
+  "quorum_decision_2025-10-27T18:57:25.230411+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:25.230411+00:00",
+    "strength": 0.5314410000000002
+  },
+  "manager_plan_2025-10-27T18:57:25.737408+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_8",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:25.737403+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:25.737408+00:00",
+    "strength": 0.5904900000000002
+  },
+  "agent_1_result_2025-10-27T18:57:25.741481+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Test distributed swarm intelligence coordination' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:57:25.741481+00:00",
+    "strength": 0.5904900000000002
+  },
+  "agent_3_result_2025-10-27T18:57:25.745419+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:25.745419+00:00",
+    "strength": 0.5904900000000002
+  },
+  "agent_2_result_2025-10-27T18:57:25.744857+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Test distributed swarm intelligence coordination' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:25.744857+00:00",
+    "strength": 0.5904900000000002
+  },
+  "quorum_decision_2025-10-27T18:57:25.751201+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:57:25.751201+00:00",
+    "strength": 0.5904900000000002
+  },
+  "manager_plan_2025-10-27T18:57:26.258055+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_9",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Test distributed swarm intelligence coordination",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Test distributed swarm intelligence coordination",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Test distributed swarm intelligence coordination",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:57:26.258049+00:00"
+    },
+    "timestamp": "2025-10-27T18:57:26.258055+00:00",
+    "strength": 0.6561000000000001
+  },
+  "agent_1_result_2025-10-27T18:57:26.261874+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Test distributed swarm intelligence coordination' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:57:26.261874+00:00",
+    "strength": 0.6561000000000001
+  },
+  "agent_2_result_2025-10-27T18:57:26.265511+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Test distributed swarm intelligence coordination' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:26.265511+00:00",
+    "strength": 0.6561000000000001
+  },
+  "agent_3_result_2025-10-27T18:57:26.266052+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Test distributed swarm intelligence coordination' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:57:26.266052+00:00",
+    "strength": 0.6561000000000001
+  },
+  "quorum_decision_2025-10-27T18:57:26.271921+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:57:26.271921+00:00",
+    "strength": 0.6561000000000001
+  },
+  "manager_plan_2025-10-27T18:59:20.400088+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_0",
+      "mode": "explore",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:59:20.400082+00:00"
+    },
+    "timestamp": "2025-10-27T18:59:20.400088+00:00",
+    "strength": 0.7290000000000001
+  },
+  "agent_1_result_2025-10-27T18:59:20.404558+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Explored new approach for 'Analyze and process distributed AI swarm intelligence patterns' - found innovative pattern",
+      "confidence": 0.7,
+      "mode": "explore",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:59:20.404558+00:00",
+    "strength": 0.7290000000000001
+  },
+  "agent_3_result_2025-10-27T18:59:20.409476+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' with novel criteria - found potential improvement",
+      "confidence": 0.75,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:59:20.409476+00:00",
+    "strength": 0.7290000000000001
+  },
+  "agent_2_result_2025-10-27T18:59:20.408978+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Tested experimental processing for 'Analyze and process distributed AI swarm intelligence patterns' - discovered edge case",
+      "confidence": 0.6,
+      "mode": "explore",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:59:20.408978+00:00",
+    "strength": 0.7290000000000001
+  },
+  "quorum_decision_2025-10-27T18:59:20.415425+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "REJECTED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "reject",
+          "confidence": 0.7
+        },
+        {
+          "agent": "agent_2",
+          "vote": "reject",
+          "confidence": 0.6
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.75
+        }
+      ],
+      "avg_confidence": 0.6833333333333332
+    },
+    "timestamp": "2025-10-27T18:59:20.415425+00:00",
+    "strength": 0.7290000000000001
+  },
+  "manager_plan_2025-10-27T18:59:20.922597+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_1",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:59:20.922591+00:00"
+    },
+    "timestamp": "2025-10-27T18:59:20.922597+00:00",
+    "strength": 0.81
+  },
+  "agent_1_result_2025-10-27T18:59:20.927437+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Analyze and process distributed AI swarm intelligence patterns' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:59:20.927437+00:00",
+    "strength": 0.81
+  },
+  "agent_2_result_2025-10-27T18:59:20.931413+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Analyze and process distributed AI swarm intelligence patterns' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:59:20.931413+00:00",
+    "strength": 0.81
+  },
+  "agent_3_result_2025-10-27T18:59:20.932054+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:59:20.932054+00:00",
+    "strength": 0.81
+  },
+  "quorum_decision_2025-10-27T18:59:20.945236+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:59:20.945236+00:00",
+    "strength": 0.81
+  },
+  "manager_plan_2025-10-27T18:59:21.452594+00:00": {
+    "agent_id": "manager",
+    "type": "plan",
+    "data": {
+      "task_id": "task_2",
+      "mode": "exploit",
+      "subtasks": [
+        {
+          "id": "subtask_1",
+          "description": "Analyze: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_1"
+        },
+        {
+          "id": "subtask_2",
+          "description": "Process: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_2"
+        },
+        {
+          "id": "subtask_3",
+          "description": "Validate: Analyze and process distributed AI swarm intelligence patterns",
+          "agent": "agent_3"
+        }
+      ],
+      "timestamp": "2025-10-27T18:59:21.452589+00:00"
+    },
+    "timestamp": "2025-10-27T18:59:21.452594+00:00",
+    "strength": 0.9
+  },
+  "agent_1_result_2025-10-27T18:59:21.457546+00:00": {
+    "agent_id": "agent_1",
+    "type": "result",
+    "data": {
+      "agent": "agent_1",
+      "result": "Agent 1: Applied proven analysis method to 'Analyze and process distributed AI swarm intelligence patterns' - high confidence result",
+      "confidence": 0.9,
+      "mode": "exploit",
+      "context_traces": 63
+    },
+    "timestamp": "2025-10-27T18:59:21.457546+00:00",
+    "strength": 0.9
+  },
+  "agent_3_result_2025-10-27T18:59:21.462574+00:00": {
+    "agent_id": "agent_3",
+    "type": "result",
+    "data": {
+      "agent": "agent_3",
+      "result": "Agent 3: Validated 'Analyze and process distributed AI swarm intelligence patterns' against standard criteria - passed all checks",
+      "confidence": 0.92,
+      "mode": "exploit",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:59:21.462574+00:00",
+    "strength": 0.9
+  },
+  "agent_2_result_2025-10-27T18:59:21.462084+00:00": {
+    "agent_id": "agent_2",
+    "type": "result",
+    "data": {
+      "agent": "agent_2",
+      "result": "Agent 2: Used standard processing pipeline for 'Analyze and process distributed AI swarm intelligence patterns' - reliable output",
+      "confidence": 0.95,
+      "mode": "exploit",
+      "context_traces": 64
+    },
+    "timestamp": "2025-10-27T18:59:21.462084+00:00",
+    "strength": 0.9
+  },
+  "quorum_decision_2025-10-27T18:59:21.469455+00:00": {
+    "agent_id": "quorum",
+    "type": "decision",
+    "data": {
+      "decision": "APPROVED",
+      "votes": [
+        {
+          "agent": "agent_1",
+          "vote": "approve",
+          "confidence": 0.9
+        },
+        {
+          "agent": "agent_2",
+          "vote": "approve",
+          "confidence": 0.95
+        },
+        {
+          "agent": "agent_3",
+          "vote": "approve",
+          "confidence": 0.92
+        }
+      ],
+      "avg_confidence": 0.9233333333333333
+    },
+    "timestamp": "2025-10-27T18:59:21.469455+00:00",
+    "strength": 0.9
+  }
+}

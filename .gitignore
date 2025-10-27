@@ -3,3 +3,21 @@ HFO_molt_shell_2025-10-25T16:24:00Z/
 HFO_molt_shell_2025-10-25T17:00:00Z/
 .venv/hfo_blackboard_backups_2025-10-27T14_20_38Z/
 .venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temp files
+*.tmp
+*.log
+.DS_Store
