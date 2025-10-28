@@ -1,1 +1,1 @@
-{"timestamp": "2025-10-27T12:00:00Z", "event": "setup_complete", "role": "swarmlord", "summary": "Blackboard initialized", "artifacts": "[]"}
+{"timestamp": "2025-10-27T21:52:34Z", "role": "debug", "event": "v11_critique_yield", "summary": "Red/Challenger: Overload in OBSID/meta-loops; gaps in triad/blackboard. v12 prunings: Cynefin/CBR/facade/stigmergy/hourglass. Plasticity 0.75 (moderate, prune for reliability).", "plasticity": 0.75, "ttl": 3600}
