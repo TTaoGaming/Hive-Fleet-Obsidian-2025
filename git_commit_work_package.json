@@ -5,7 +5,7 @@
     "Step2: git status",
     "Step3: git checkout -b testing",
     "Step4: git add .",
-    "Step5: git commit -m \"PettingZoo regen baseline complete\"",
+    "Step5: git commit -m ...",
     "Step6: git push origin testing",
     "Step7: git log/status confirm"
   ],
