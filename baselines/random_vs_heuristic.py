@@ -39,29 +39,30 @@ def mask_obs(obs, local_ratio=0.5):
 
 def get_action_for_adversary(obs_adversary):
     obs_adversary = mask_obs(obs_adversary)
-    # Obs structure for adversary: vel(2) + own_pos(2) + landmarks(4) + other agents relative(6 for 3 others) + other_vel(2) = 16
-    # Other agents relative positions: indices 8:14, reshape to 3x2
-    relative_pos = obs_adversary[8:14].reshape(3, 2)
+    # Obs structure for adversary: vel(2) + own_pos(2) + landmarks(4) + other agents relative(6 for 3 others: 2 adv + 1 good) + other_vel(2 for good) = 16
+    # Prey (good) rel pos is always the last 2 of other_pos: indices 12:14
+    # Prey vel: 14:16
+    prey_rel = obs_adversary[12:14]
+    prey_vel = obs_adversary[14:16]
     
-    # Own position not needed for relative direction, since relative_pos are already relative to own
-    distances = np.linalg.norm(relative_pos, axis=1)
+    # Simple lead pursuit: predict prey position
+    predicted_rel = prey_rel + prey_vel  # assume dt=1
+    pred_dist = np.linalg.norm(predicted_rel)
     
-    # Find closest non-zero distance
-    valid_distances = distances[distances > 0]
-    if len(valid_distances) == 0:
-        # No visible agents, stay still
-        direction = np.array([0.0, 0.0])
+    if pred_dist > 0:
+        direction = predicted_rel / pred_dist
     else:
-        closest_idx = np.argmin(valid_distances)
-        direction = relative_pos[closest_idx]
-        dist = distances[closest_idx]
+        # Fallback to current position
+        dist = np.linalg.norm(prey_rel)
         if dist > 0:
-            direction = direction / dist
+            direction = prey_rel / dist
         else:
             direction = np.array([0.0, 0.0])
     
-    # Action: 5D - movement (2) + communication (3 zeros)
-    action = np.array([direction[0], direction[1], 0.0, 0.0, 0.0])
+    # Action: 5D - map direction [-1,1] to [0,1] for movement + communication (3 zeros)
+    action = np.zeros(5)
+    action[0] = (direction[0] + 1) / 2
+    action[1] = (direction[1] + 1) / 2
     return action
 
 episodes = []
@@ -91,7 +92,7 @@ for episode in range(100):
         
         # Count captures (terminated good agents)
         for agent, terminated in terminations.items():
-            if terminated and 'good' in agent:
+            if terminated and 'agent' in agent:
                 captures += 1
         
         done = all(terminations.values()) or all(truncations.values())
@@ -107,7 +108,7 @@ for episode in range(100):
     episodes.append(episode_data)
 
 # Save to JSON
-with open("baselines/random_vs_heuristic_3pred1prey_local0.5.json", "w") as f:
+with open("heuristic_pred_vs_random_prey_3pred1prey_local0.5.json", "w") as f:
     json.dump(episodes, f, indent=2)
 
 print(f"Completed {len(episodes)} episodes. Average captures: {np.mean([e['captures'] for e in episodes]):.2f}")

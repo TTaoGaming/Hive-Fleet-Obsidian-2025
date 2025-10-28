@@ -37,7 +37,7 @@ for episode in range(100):
         if any(terminations.values()):
             # Count terminated good agents (preys)
             for agent, terminated in terminations.items():
-                if terminated and 'good' in agent:  # Assuming agent names like 'adversary_0', 'good_0'
+                if terminated and 'agent' in agent:  # agent names: 'adversary_*', 'agent_*'
                     captures += 1
         
         done = all(terminations.values()) or all(truncations.values())
@@ -53,7 +53,7 @@ for episode in range(100):
     episodes.append(episode_data)
 
 # Save to JSON
-with open("baselines/random_vs_random_3pred1prey_local0.5.json", "w") as f:
+with open("random_vs_random_3pred1prey_local0.5.json", "w") as f:
     json.dump(episodes, f, indent=2)
 
 print(f"Completed {len(episodes)} episodes. Average captures: {np.mean([e['captures'] for e in episodes]):.2f}")
