@@ -1,0 +1,12 @@
+{
+  "random_rate": 0.0,
+  "heuristic_rate": 0.0,
+  "params": {
+    "num_adversaries": 3,
+    "num_good": 1,
+    "max_cycles": 25,
+    "continuous_actions": true,
+    "local_ratio": 0.5
+  },
+  "passes": 1
+}
