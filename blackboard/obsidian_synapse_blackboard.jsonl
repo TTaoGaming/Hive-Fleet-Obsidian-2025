@@ -1,1 +1,8 @@
 {"timestamp": "2025-10-27T21:52:34Z", "role": "debug", "event": "v11_critique_yield", "summary": "Red/Challenger: Overload in OBSID/meta-loops; gaps in triad/blackboard. v12 prunings: Cynefin/CBR/facade/stigmergy/hourglass. Plasticity 0.75 (moderate, prune for reliability).", "plasticity": 0.75, "ttl": 3600}
+{"event": "vision_revised", "plasticity_score": 0.9, "triad": {"past":"GEM/v11 lineage","present":"Cynefin fix","future":"meta nesting"}}
+{"event": "vision_revised_cynefin", "plasticity_score": 0.95, "triad": {"past":"prior lineage","present":"official terms","future":"swim lane nesting"}}
+{"event": "swimlane_artifact", "plasticity_score": 0.95, "triad": {"past":"prior vision","present":"facade fix","future":"MD artifact"}}\n
+{"event": "swimlane_md_created", "plasticity_score": 0.96, "triad": {"past":"mental vision lineage","present":"facade artifact","future":"great swimlane validation"}}
+{"event": "swimlane_fixed", "plasticity_score": 0.97, "triad": {"past":"parse error lineage","present":"syntax fix","future":"valid artifact"}}
+{"event":"mermaid_fixed","plasticity_score":0.98,"triad":{"past":"parse error","present":"syntax corrected","future":"valid visualization"}}
+{"event": "mermaid_parse_fixed", "plasticity_score": 0.98, "triad": {"past":"parse error","present":"syntax validated","future":"error-free artifact"}}
