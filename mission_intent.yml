@@ -1,33 +1,7 @@
-goal: |
-  Resolve nested .git issues in PettingZoo backups (e.g., rm -rf pettingzoo_backup_2025-10-28T16:44Z/hfo_petting_zoo_backup/.git if present to prevent repo corruption), then commit all current changes to the 'testing' branch (add ., commit with message "PettingZoo regen baseline complete", push to origin/testing).
-
-constraints: |
-  - Operate in /home/tommytai3/HiveFleetObsidian; respect .gitignore for large dirs like envs (e.g., exclude pettingzoo_env_fresh if ignored).
-  - Ensure 'testing' branch exists (create if not).
-  - Use exact commit message "PettingZoo regen baseline complete".
-  - Push to origin remote.
-  - Check for conflicts before commit/push.
-
-success_criteria: |
-  - Nested .git dirs removed from backups (e.g., no .git in pettingzoo_backup_2025-10-28T16:44Z/hfo_petting_zoo_backup/).
-  - Git status clean post-commit.
-  - Commit includes all new files (results/, blackboard/, mission_intent.yml, baseline_sim.py, etc.).
-  - Push succeeds to origin/testing.
-  - Verify with git log --oneline -1 and git status (clean).
-
+goal: Safely remove nested .git directories from backups to prevent repo corruption, then commit and push changes to testing branch.
+constraints: Respect .gitignore (e.g., exclude large env dirs); no deletions outside backups.
+success_criteria: No nested .git found after cleanup; clean git status with no conflicts; successful push to origin/testing.
 safety:
-  tripwire_conditions:
-    - Any rm non-zero exit or permission error.
-    - Git status shows conflicts or unclean state pre-commit.
-    - Push fails (auth/network error).
-  canary_plan: |
-    - Dry-run: git add --dry-run .; git commit --dry-run -m "test".
-    - Test nested removal on one backup subdir first (e.g., rm -rf pettingzoo_backup_2025-10-28T16:44Z/hfo_petting_zoo_backup/.git if exists).
-  revert_plan: |
-    - For nested rm: No change if not done; if done, backups are already safe.
-    - For git: git reset --hard HEAD~1 (undo commit if pushed not yet); git push --delete origin testing if needed.
-    - Full revert: cp -r git_backup/* . (pre-op .git backup).
-
-created_at: 2025-10-28T19:40Z
-
-mission_id: git-save-post-regen
+  tripwire: if rm fails or .git not found, abort
+  canary_plan: dry-run ls before rm
+  revert_plan: git reset --hard HEAD~1 if push fails.
