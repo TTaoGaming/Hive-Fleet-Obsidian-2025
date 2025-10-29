@@ -236,6 +236,21 @@ def main() -> None:
         avg_str = f"{avg:.2f}" if not np.isnan(avg) else "nan"
         print(f"{cell}: catch_rate={cr:.3f}, avg_steps={avg_str} caught={c}/{args.episodes}")
 
+    # Build verification checks for expected ordering
+    cr_rvr = results.get("RvsR", {}).get("catch_rate", float("nan"))
+    cr_hvr = results.get("HvsR", {}).get("catch_rate", float("nan"))
+    cr_rvh = results.get("RvsH", {}).get("catch_rate", float("nan"))
+    checks = {
+        "HvsR_ge_RvsR": (cr_hvr >= cr_rvr),
+        "RvsH_le_RvsR": (cr_rvh <= cr_rvr),
+    }
+    verify = {
+        "expected_ordering": checks,
+        "passed": bool(all(checks.values())),
+        "episodes_per_cell": int(args.episodes),
+        "seed": int(args.seed),
+    }
+
     payload = {
         "env": "mpe.simple_tag_v3",
         "policy_matrix": {
@@ -256,6 +271,7 @@ def main() -> None:
             "numpy": np.__version__,
         },
         "results": results,
+        "verification": verify,
         "timestamps": {
             "run_end_iso": run_end.isoformat(),
         },
