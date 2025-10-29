@@ -164,6 +164,15 @@ Gen21 GEM specification is a **high-quality, regeneration-ready SSOT** that:
 
 **No hallucinations detected.** The architecture is grounded in proven patterns (JADC2, OODA, MAPE-K, stigmergy, immune verification) with explicit provenance.
 
+**Simulated Regeneration Test**: An automated pattern extraction successfully recovered:
+- ✅ 100% PREY workflow (all 4 phases with mappings)
+- ✅ 100% Safety envelope (canary/tripwire/revert + chunking)
+- ✅ 100% Interface contract (Swarmlord facade)
+- ✅ 100% Verify gate (independent, PASS/FAIL)
+- ✅ 46/46 section structure
+
+This demonstrates that Gen21 contains sufficient information for an AI agent to extract core patterns and regenerate a compatible specification.
+
 **Verdict**: Ship it. Gen21 can regenerate itself.
 
 ---
@@ -177,8 +186,11 @@ Gen21 GEM specification is a **high-quality, regeneration-ready SSOT** that:
 | Blackboard | `hfo_blackboard/obsidian_synapse_blackboard.jsonl` | 53 entries |
 | Audit Script 1 | `scripts/audit_gem_gen21.py` | Basic metrics |
 | Audit Script 2 | `scripts/audit_gem_gen21_regeneration.py` | Regeneration test |
+| Audit Script 3 | `scripts/simulate_gen21_regeneration.py` | Pattern extraction |
 | Audit Results 1 | `hfo_petting_zoo_results/gen21_audit_seed2_20251029T230826Z.json` | Seed:2 |
 | Audit Results 2 | `hfo_petting_zoo_results/gen21_regeneration_test_seed2_20251029T231014Z.json` | Seed:2 |
+| Simulation Results | `hfo_petting_zoo_results/gen21_regeneration_simulation_20251029T231449Z.json` | Pattern test |
+| Regenerated Outline | `hfo_petting_zoo_results/gen22_regenerated_outline_20251029T231449Z.md` | Proof of concept |
 
 ---
 

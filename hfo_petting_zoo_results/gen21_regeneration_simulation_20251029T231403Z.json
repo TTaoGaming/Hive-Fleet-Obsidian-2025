@@ -1,0 +1,16 @@
+{
+  "mission_id": "gen21_regeneration_simulation_20251029T231403Z",
+  "timestamp": "2025-10-29T23:14:03.904282+00:00",
+  "similarity": {
+    "section_coverage": 0.32608695652173914,
+    "prey_coverage": 0,
+    "safety_coverage": 1.0,
+    "overall": 0.4304347826086956
+  },
+  "grade": "D (Needs Work)",
+  "extracted_patterns_summary": {
+    "sections": 46,
+    "prey_phases": 0,
+    "safety_components": 3
+  }
+}
