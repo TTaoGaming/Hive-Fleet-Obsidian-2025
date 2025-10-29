@@ -9,4 +9,4 @@ Key pieces:
 
 from .policy_base import BasePolicy, RandomPolicy, FnPolicy
 from .controllers import MultiAgentController, Coordinator
-from .heuristics import HeuristicChasePolicy
+from .heuristics import HeuristicChasePolicy, PreyFleePolicy
