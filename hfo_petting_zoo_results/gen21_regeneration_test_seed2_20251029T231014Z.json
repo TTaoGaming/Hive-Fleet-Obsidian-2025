@@ -1,0 +1,106 @@
+{
+  "mission_id": "gen21_regen_test_seed2_20251029T231014Z",
+  "timestamp": "2025-10-29T23:10:14.980485+00:00",
+  "seed": 2,
+  "explore_exploit": {
+    "explore": 0.2,
+    "exploit": 0.8
+  },
+  "tests": {
+    "ssot_parsability": {
+      "name": "SSOT Parsability",
+      "category": "exploit",
+      "pass": true,
+      "evidence": {
+        "section_count": 46,
+        "has_toc": true,
+        "prey_defined": true,
+        "safety_defined": true,
+        "swarmlord_ops_defined": true
+      }
+    },
+    "workflow_extraction": {
+      "name": "Workflow Extraction",
+      "category": "exploit",
+      "pass": true,
+      "evidence": {
+        "prey_phases": {
+          "Perceive": true,
+          "React": true,
+          "Engage": true,
+          "Yield": true
+        },
+        "all_prey_phases": true,
+        "verify_mentions": 74,
+        "verify_gate_exists": true,
+        "digest_fields_found": "6/6",
+        "digest_complete": true
+      }
+    },
+    "safety_mechanisms": {
+      "name": "Safety Mechanisms",
+      "category": "exploit",
+      "pass": true,
+      "evidence": {
+        "has_canary": true,
+        "has_tripwire": true,
+        "has_revert": true,
+        "chunk_200_limit": true,
+        "evidence_refs_required": true,
+        "placeholder_ban": true
+      }
+    },
+    "interface_contract": {
+      "name": "Interface Contract",
+      "category": "exploit",
+      "pass": true,
+      "evidence": {
+        "single_interface_specified": true,
+        "no_worker_prompts": true,
+        "facade_pattern": true
+      }
+    },
+    "regeneration_completeness": {
+      "name": "Regeneration Completeness",
+      "category": "exploit",
+      "pass": true,
+      "evidence": {
+        "has_bootstrap": true,
+        "has_regen_protocol": true,
+        "has_tooling_spec": true,
+        "has_blackboard_spec": true,
+        "line_count": 1008,
+        "meets_1000_lines": true
+      }
+    },
+    "drift_detection": {
+      "name": "Drift Detection",
+      "category": "explore",
+      "pass": true,
+      "evidence": {
+        "actual_placeholders": [],
+        "actual_placeholder_count": 0,
+        "prey_case_consistency": {
+          "PREY": 55,
+          "Prey": 0
+        },
+        "contradictions": []
+      }
+    },
+    "agents_md_alignment": {
+      "name": "AGENTS.md Alignment",
+      "category": "explore",
+      "pass": true,
+      "evidence": {
+        "agents_uses_prey": true,
+        "agents_has_safety": true,
+        "agents_has_blackboard": true,
+        "agents_mentions_swarmlord": true
+      }
+    }
+  },
+  "drift_analysis": {},
+  "hallucination_check": {},
+  "overall_grade": "A (Excellent)",
+  "quality_score": 100.0
+}

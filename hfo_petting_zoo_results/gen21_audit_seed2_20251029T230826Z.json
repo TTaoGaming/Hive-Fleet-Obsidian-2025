@@ -1,0 +1,151 @@
+{
+  "mission_id": "gen21_audit_seed2_20251029T230826Z",
+  "timestamp": "2025-10-29T23:08:26.228359+00:00",
+  "seed": 2,
+  "explore_exploit_ratio": "2/8",
+  "metrics": {
+    "completeness": {
+      "exists": true,
+      "line_count": 1008,
+      "target_min": 1000,
+      "meets_target": true,
+      "char_count": 46493,
+      "word_count": 6440,
+      "section_count": 41,
+      "sections_found": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "missing_sections": []
+    },
+    "quality": {
+      "placeholders": {
+        "TODO": 5,
+        "FIXME": 0,
+        "XXX": 0,
+        "...": 3,
+        "omitted": 4,
+        "TBD": 0
+      },
+      "total_placeholders": 12,
+      "placeholder_free": false,
+      "mermaid_diagram_count": 10,
+      "evidence_ref_mentions": 24
+    },
+    "prey_terminology": {
+      "prey_term_counts": {
+        "Perceive": 14,
+        "React": 18,
+        "Engage": 16,
+        "Yield": 22
+      },
+      "prey_all_present": true,
+      "workflow_counts": {
+        "HIVE": 9,
+        "GROWTH": 8,
+        "SWARM": 10,
+        "PREY": 55
+      },
+      "workflow_hierarchy_present": true
+    },
+    "safety_envelope": {
+      "safety_terms": {
+        "canary": 21,
+        "tripwire": 39,
+        "revert": 20,
+        "safety_envelope": 14
+      },
+      "safety_comprehensive": true,
+      "chunk_size_limits": [
+        200,
+        200
+      ],
+      "chunk_size_200_enforced": true
+    },
+    "blackboard": {
+      "exists": true,
+      "entry_count": 53,
+      "valid_json_entries": 53,
+      "unique_missions": 16,
+      "phases_logged": [
+        "assemble_review_bundle",
+        "verify",
+        "engage",
+        "classify_and_plan",
+        "yield"
+      ],
+      "all_entries_valid": true
+    },
+    "swarmlord_interface": {
+      "swarmlord_mentions": 6,
+      "single_interface_mentions": 6,
+      "facade_mentions": 15,
+      "interface_contract_specified": true
+    },
+    "verify_gate": {
+      "verify_terms": {
+        "Verify": 74,
+        "independent": 19,
+        "PASS": 33,
+        "FAIL": 20
+      },
+      "verify_gate_specified": true,
+      "verification_checklist_exists": true
+    },
+    "structural_hash": "19549fe248a596be"
+  },
+  "findings": [
+    "WARNING: 12 placeholders found: {'TODO': 5, 'FIXME': 0, 'XXX': 0, '...': 3, 'omitted': 4, 'TBD': 0}"
+  ],
+  "recommendations": [
+    "Re-run PREY loop with chunked generation (\u2264200 lines per write)",
+    "Enforce tripwires: line_count \u22650.9\u00d7target, placeholders=0"
+  ],
+  "pass_fail": {
+    "line_count_target": true,
+    "placeholder_free": false,
+    "prey_terms_present": true,
+    "safety_comprehensive": true,
+    "verify_gate_specified": true
+  },
+  "overall_pass": false
+}
