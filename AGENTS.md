@@ -23,7 +23,7 @@ This lightweight guide tells any agent (workers, tools, scripts, LLMs) how to ac
 
 ### Diagram
 ```mermaid
-flowchart TB
+graph TD
   subgraph Context
     H[HIVE] --> G[GROWTH]
     G --> S[SWARM]
@@ -31,24 +31,24 @@ flowchart TB
   end
   MI[Mission Intent (Z)] --> P
   P --> V[Verify (independent)]
-  V -->|PASS| PS[Persist + Digest]
-  V -->|FAIL| RG[Re-run chunk (shrink/narrow)]
-  P -. receipts .-> BB[(Blackboard JSONL)]
-  V -. receipts .-> BB
+  V -->|PASS| PS[Persist & Digest]
+  V -->|FAIL| RG[Re-run chunk]
+  P -.-> BB[(Blackboard JSONL)]
+  V -.-> BB
 ```
 
 ### Contents
-- Core principles (#core-principles)
-- Workflow map (keep these labels) (#workflow-map-keep-these-labels)
-- Agent contract (tiny) (#agent-contract-tiny)
-- Blackboard protocol (append-only JSONL) (#blackboard-protocol-append-only-jsonl)
-- PREY loop for agents (how to act) (#prey-loop-for-agents-how-to-act)
-- Safety envelope (operational) (#safety-envelope-operational)
-- Verify gate (independent) (#verify-gate-independent)
-- Prompts policy (no babysitting) (#prompts-policy-no-babysitting)
-- Quickstart for a new agent (#quickstart-for-a-new-agent)
-- Paths and artifacts (#paths-and-artifacts)
-- Acronyms quick reference (#acronyms-quick-reference)
+- [Core principles](#core-principles)
+- [Workflow map (keep these labels)](#workflow-map-keep-these-labels)
+- [Agent contract (tiny)](#agent-contract-tiny)
+- [Blackboard protocol (append-only JSONL)](#blackboard-protocol-append-only-jsonl)
+- [PREY loop for agents (how to act)](#prey-loop-for-agents-how-to-act)
+- [Safety envelope (operational)](#safety-envelope-operational)
+- [Verify gate (independent)](#verify-gate-independent)
+- [Prompts policy (no babysitting)](#prompts-policy-no-babysitting)
+- [Quickstart for a new agent](#quickstart-for-a-new-agent)
+- [Paths and artifacts](#paths-and-artifacts)
+- [Acronyms quick reference](#acronyms-quick-reference)
 
 ## Core principles
 

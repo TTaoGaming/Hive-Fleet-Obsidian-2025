@@ -18,6 +18,7 @@
 
 {"mission_id":"gen21_agents_guide_2025-10-29","phase":"engage","summary":"Created lightweight AGENTS.md aligned to Gen21 architecture and operating rules.","evidence_refs":["AGENTS.md:1-123","hfo_gem/gen_21/gpt5-attempt-3-gem.md:60-100,140-170,174-205"],"safety_envelope":{"chunk_size_max":200,"line_target_min":0},"blocked_capabilities":[],"timestamp":"2025-10-29T00:00:00Z","chunk_id":{"index":1,"total":1},"regen_flag":false}
 {"mission_id":"gen21_agents_guide_2025-10-29","phase":"yield","summary":"AGENTS.md ready for handoff: PREY loop, blackboard protocol, safety/verify, prompts policy, and workflow map included.","evidence_refs":["AGENTS.md:1-123"],"safety_envelope":{"policy":"single-interface autonomy; mid_loop_prompts forbidden"},"blocked_capabilities":[],"timestamp":"2025-10-29T00:05:00Z"}
+{"mission_id":"gen21_agents_guide_2025-10-29","phase":"engage","summary":"Fixed Mermaid diagram parse error in AGENTS.md and aligned Contents with section anchors for quick scanning.","evidence_refs":["AGENTS.md:1-200"],"safety_envelope":{"chunk_size_max":200},"blocked_capabilities":[],"timestamp":"2025-10-29T00:10:00Z","regen_flag":false}
 
 {"event": "swimlane_md_created", "plasticity_score": 0.96, "triad": {"past":"mental vision lineage","present":"facade artifact","future":"great swimlane validation"}}
 {"event": "swimlane_fixed", "plasticity_score": 0.97, "triad": {"past":"parse error lineage","present":"syntax fix","future":"valid artifact"}}
