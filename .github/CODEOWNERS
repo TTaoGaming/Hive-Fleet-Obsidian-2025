@@ -1,0 +1,7 @@
+# Default owners
+* @TTaoGaming
+
+# Critical data paths require owner review
+hfo_blackboard/** @TTaoGaming
+hfo_mission_intent/** @TTaoGaming
+hfo_gem/** @TTaoGaming
