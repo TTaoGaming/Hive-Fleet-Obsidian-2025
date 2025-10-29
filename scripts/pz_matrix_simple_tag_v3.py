@@ -203,6 +203,17 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--outdir", type=str, default="hfo_petting_zoo_results")
+    parser.add_argument(
+        "--no-fail-on-bad-ordering",
+        action="store_true",
+        help="Do not exit non-zero when expected ordering checks fail.",
+    )
+    parser.add_argument(
+        "--min-hvsr",
+        type=float,
+        default=None,
+        help="If set, enforce that HvsR catch_rate >= this threshold (exit non-zero if violated).",
+    )
     args = parser.parse_args()
 
     run_end = datetime.now(timezone.utc)
@@ -240,9 +251,11 @@ def main() -> None:
     cr_rvr = results.get("RvsR", {}).get("catch_rate", float("nan"))
     cr_hvr = results.get("HvsR", {}).get("catch_rate", float("nan"))
     cr_rvh = results.get("RvsH", {}).get("catch_rate", float("nan"))
+    cr_hvh = results.get("HvsH", {}).get("catch_rate", float("nan"))
     checks = {
         "HvsR_ge_RvsR": (cr_hvr >= cr_rvr),
         "RvsH_le_RvsR": (cr_rvh <= cr_rvr),
+        "HvsH_le_HvsR": (cr_hvh <= cr_hvr),
     }
     verify = {
         "expected_ordering": checks,
@@ -289,6 +302,16 @@ def main() -> None:
         json.dump(payload, f, indent=2, sort_keys=True)
 
     print("Matrix results written:", fpath)
+
+    # Optional hard gates for automation (CI / pre-commit)
+    should_fail_on_ordering = not args.no_fail_on_bad_ordering
+    if should_fail_on_ordering and not verify["passed"]:
+        print("ERROR: Expected ordering checks FAILED:", checks)
+        raise SystemExit(2)
+    if args.min_hvsr is not None and not np.isnan(cr_hvr):
+        if cr_hvr < float(args.min_hvsr):
+            print(f"ERROR: HvsR catch_rate {cr_hvr:.3f} is below minimum {args.min_hvsr:.3f}")
+            raise SystemExit(3)
 
 
 if __name__ == "__main__":

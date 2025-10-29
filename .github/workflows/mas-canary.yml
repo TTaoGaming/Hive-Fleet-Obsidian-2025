@@ -1,0 +1,60 @@
+name: MAS Canary - PettingZoo simple_tag_v3
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'hfo_petting_zoo_mas/**'
+      - 'scripts/**'
+      - 'requirements.txt'
+      - '.github/workflows/mas-canary.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'hfo_petting_zoo_mas/**'
+      - 'scripts/**'
+      - 'requirements.txt'
+      - '.github/workflows/mas-canary.yml'
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run 2x2 matrix (20 eps, seed 42)
+        run: |
+          python scripts/pz_matrix_simple_tag_v3.py \
+            --episodes 20 \
+            --seed 42 \
+            --outdir hfo_petting_zoo_results \
+            --min-hvsr 0.70
+
+      - name: Summarize latest results
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os, glob
+          files = sorted(glob.glob('hfo_petting_zoo_results/simple_tag_v3_matrix_*.json'))
+          if not files:
+              print('No result JSON found')
+              raise SystemExit(0)
+          latest = files[-1]
+          with open(latest, 'r', encoding='utf-8') as f:
+              data = json.load(f)
+          print('Latest:', latest)
+          print('Catch rates:', {k: v['catch_rate'] for k,v in data['results'].items()})
+          print('Verification:', data.get('verification', {}))
+          PY

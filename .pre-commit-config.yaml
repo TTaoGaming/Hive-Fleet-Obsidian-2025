@@ -2,6 +2,36 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-yaml
+
+  - repo: local
+    hooks:
+      - id: validate-jsonl
+        name: Validate JSONL files
+        entry: python scripts/validate_jsonl.py
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+      - id: pz-matrix-ordering
+        name: PettingZoo simple_tag_v3 matrix ordering canary
+        entry: python scripts/pz_matrix_simple_tag_v3.py --episodes 10 --seed 42 --outdir hfo_petting_zoo_results --min-hvsr 0.60
+        language: system
+        pass_filenames: false
+        stages: [commit]
+        additional_dependencies: []
+        # Allow skipping locally via environment variable
+        #   SKIP_PZ_CANARY=1 git commit -m "..."
+        # Pre-commit supports `SKIP` to skip hooks by id
+        #   SKIP=pz-matrix-ordering git commit -m "..."
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
       - id: check-json
       - id: check-yaml
       - id: end-of-file-fixer
