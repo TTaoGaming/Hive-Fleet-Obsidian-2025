@@ -1,0 +1,171 @@
+# AGENTS.md — Operating Guide for Agents in Hive Fleet Obsidian (Gen21)
+
+This lightweight guide tells any agent (workers, tools, scripts, LLMs) how to act in this repo so behavior aligns with the Gen21 SSOT. If you do one thing: follow PREY, log receipts to the blackboard, and don’t talk to the human directly.
+
+## At a glance
+
+### BLUF
+- Speak through the Swarmlord facade only; never prompt the human mid-loop.
+- Use PREY as the canonical loop: Perceive → React → Engage → Yield.
+- Enforce the safety envelope: canary first, measurable tripwires, explicit revert.
+- Append receipts to the blackboard JSONL for every material action (with evidence_refs).
+- Nothing persists or ships until an independent Verify PASS.
+
+### Matrix (TL;DR)
+| Topic | You do | Tooling | Gate |
+|---|---|---|---|
+| Interface | Swarmlord-only facade | Ops section (Swarmlord) | Required |
+| Workflow | HIVE → GROWTH → SWARM → PREY | Gen21 mappings | Required |
+| Safety | Canary • Tripwires • Revert | Line counts, placeholder scan | Required |
+| Evidence | Append JSONL receipts | hfo_blackboard/…/blackboard.jsonl | Required |
+| Chunking | ≤200 lines per write | line_count tripwire | Required |
+| Verify | Independent PASS before persist | Verify checklist | Hard gate |
+
+### Diagram
+```mermaid
+flowchart TB
+  subgraph Context
+    H[HIVE] --> G[GROWTH]
+    G --> S[SWARM]
+    S --> P[PREY]
+  end
+  MI[Mission Intent (Z)] --> P
+  P --> V[Verify (independent)]
+  V -->|PASS| PS[Persist + Digest]
+  V -->|FAIL| RG[Re-run chunk (shrink/narrow)]
+  P -. receipts .-> BB[(Blackboard JSONL)]
+  V -. receipts .-> BB
+```
+
+### Contents
+- Core principles (#core-principles)
+- Workflow map (keep these labels) (#workflow-map-keep-these-labels)
+- Agent contract (tiny) (#agent-contract-tiny)
+- Blackboard protocol (append-only JSONL) (#blackboard-protocol-append-only-jsonl)
+- PREY loop for agents (how to act) (#prey-loop-for-agents-how-to-act)
+- Safety envelope (operational) (#safety-envelope-operational)
+- Verify gate (independent) (#verify-gate-independent)
+- Prompts policy (no babysitting) (#prompts-policy-no-babysitting)
+- Quickstart for a new agent (#quickstart-for-a-new-agent)
+- Paths and artifacts (#paths-and-artifacts)
+- Acronyms quick reference (#acronyms-quick-reference)
+
+## Core principles
+
+- Sole interface: Only the Swarmlord facade speaks to the human once online. Workers never prompt the human mid-loop.
+- Canonical workflow: PREY terms are mandatory in code/docs/logs.
+- Safety envelope: Canary first; tripwires measurable; must have a revert plan.
+- Evidence discipline: Every material action gets a blackboard JSONL receipt with evidence_refs.
+- Chunking: Write in chunks of ≤200 lines; enforce line_count tripwires; avoid truncation.
+- Verify gate: Nothing persists or ships until Verify PASS. Verify is independent of the authoring step.
+- Placeholder ban: Don’t leave TODO/…/omitted in committed artifacts.
+
+## Workflow map (keep these labels)
+
+- HIVE = Double Diamond + Meta-Evolution
+  - Discover → Define → Develop → Deliver overlaid with Gen19 H.I.V.E: Hunt → Integrate → Verify → Evolve
+- GROWTH = F3EAD
+  - Find → Fix → Finish → Exploit → Analyze → Disseminate (aka “Harvest”)
+- SWARM = D3A + Mutate
+  - Decide → Detect → Deliver → Assess → Mutate (maintain a quality-diverse portfolio)
+- PREY = Sense → Make Sense → Act → Yield (canonical)
+  - In repo terms: Perceive → React → Engage → Yield
+
+## Agent contract (tiny)
+
+- Inputs: mission_intent (UTC Z), relevant repo files, blackboard path, chunk plan, safety limits.
+- Outputs: artifacts (code/docs/config), blackboard receipts, optional review bundles.
+- Success: Tripwires not tripped; Verify PASS; receipts include evidence_refs; chunk limits respected; no human prompts.
+- Failure: Any tripwire hit; placeholder left; invalid JSON receipt; missing evidence_refs. Set regen_flag, shrink chunk, narrow scope, and continue.
+
+## Blackboard protocol (append-only JSONL)
+
+- File: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
+- One JSON object per line. Do not edit previous lines. Never rewrite history.
+- Required fields:
+  - mission_id: string
+  - phase: string (e.g., perceive, react, engage, yield, verify, digest)
+  - summary: short human-readable description
+  - evidence_refs: array of strings (paths, line ranges, hashes, or report IDs)
+  - safety_envelope: object (chunk_size_max, line_target_min, tripwire status)
+  - blocked_capabilities: array of strings (e.g., "network", "npm", "pip")
+  - timestamp: ISO 8601 Z
+- Optional fields:
+  - chunk_id: { index:int, total:int }
+  - regen_flag: boolean (true if regenerating after a FAIL)
+
+Example: engage receipt
+```json
+{"mission_id":"gem21_gpt5_attempt3_2025-10-29","phase":"engage","summary":"Wrote AGENTS.md draft (chunk 1)","evidence_refs":["AGENTS.md:1-120"],"safety_envelope":{"chunk_size_max":200,"line_target_min":1000},"blocked_capabilities":[],"timestamp":"2025-10-29T16:00:00Z","chunk_id":{"index":1,"total":1},"regen_flag":false}
+```
+
+Example: verify PASS receipt
+```json
+{"mission_id":"gem21_gpt5_attempt3_2025-10-29","phase":"verify","summary":"AGENTS.md Verify PASS: lint/render ok, no placeholders","evidence_refs":["verify_report:ok"],"timestamp":"2025-10-29T16:05:00Z"}
+```
+
+## PREY loop for agents (how to act)
+
+- Perceive
+  - Read mission intent (Z) and scan the repo for relevant context.
+  - Capture constraints and targets (line counts, chunk size, policies) in a receipt.
+- React
+  - Classify domain/complexity; pick approach; plan chunk size ≤200; define tripwires.
+  - Append a react receipt with chunk plan and safety parameters.
+- Engage
+  - Do the work in planned chunks. After each chunk, check line_count and placeholder bans.
+  - Append an engage receipt with evidence_refs to files/lines/hashes.
+- Yield
+  - Assemble outputs into a review bundle; request Verify; append a yield receipt.
+
+Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, narrow scope, repeat PREY.
+
+## Safety envelope (operational)
+
+- Canary: Start with limited scope; prefer dry-runs and linters before large writes.
+- Tripwires (examples):
+  - line_count < 0.9× target
+  - placeholders found ("TODO", "...", "omitted")
+  - tests or policy checks fail
+  - missing evidence_refs in material actions
+- Revert: Restore last good artifact or the known-good baseline; reduce chunk size; try again.
+
+## Verify gate (independent)
+
+- Don’t claim done without Verify PASS. Keep authoring and verification logically separate.
+- Quick checklist:
+  - No placeholders
+  - Chunk limits respected (≤200 lines per write)
+  - Mermaid/markdown render (if applicable)
+  - JSON receipts valid and complete
+  - Canary/tripwires/revert status recorded
+
+## Prompts policy (no babysitting)
+
+- Workers do not prompt the human mid-loop. All dialogue goes through the Swarmlord facade.
+- If you detect a worker→human prompt attempt, log a tripwire receipt with regen_flag=true and continue autonomously.
+
+## Quickstart for a new agent
+
+1) Read these SSOT sections for context: 3 (workflow map), 5 (blackboard), 8 (Swarmlord Ops), 12 (evidence/receipts), 17 (procedures), 25 (end-to-end).
+2) Set a chunk plan (≤200 lines). Define your tripwires.
+3) Append a Perceive receipt with mission_id and safety plan.
+4) Run PREY loop. After each chunk, append an Engage receipt with evidence_refs.
+5) On Yield, request Verify and wait for PASS before persistence/digest claims.
+
+## Paths and artifacts
+
+- Mission intent (Z): `hfo_mission_intent/mission_intent_YYYY-MM-DD.yml`
+- Blackboard JSONL: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
+- SSOT (reference): `hfo_gem/gen_21/gpt5-attempt-3-gem.md`
+
+## Acronyms quick reference
+
+- D3A — Decide, Detect, Deliver, Assess
+- F3EAD — Find, Fix, Finish, Exploit, Analyze, Disseminate (aka “Harvest”)
+- H.I.V.E — Hunt, Integrate, Verify, Evolve (Double Diamond overlay)
+- QD — Quality Diversity (maintain diverse, high-fitness solutions)
+
+---
+
+BLUF for agents: Use PREY, log to blackboard, respect chunk/tripwires, never ping the human, and don’t ship before Verify PASS. Align labels with HIVE/GROWTH/SWARM/PREY to stay in-family with Gen21.
