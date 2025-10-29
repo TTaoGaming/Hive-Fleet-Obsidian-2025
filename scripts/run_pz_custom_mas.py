@@ -5,6 +5,7 @@ import argparse
 from typing import List
 
 from hfo_petting_zoo_mas.policy_base import RandomPolicy, FnPolicy
+from hfo_petting_zoo_mas.heuristics import HeuristicChasePolicy
 from hfo_petting_zoo_mas.controllers import Coordinator
 from hfo_petting_zoo_mas.simple_tag_runner import run_episodes
 
@@ -23,12 +24,14 @@ def parse_args():
 
 
 def build_policy_list(spec: str) -> List[RandomPolicy]:
-    # For now only 'random' built-in. Extend here or wire to a registry.
+    # Built-ins: random, heuristic_chase
     names = [s.strip() for s in spec.split(',') if s.strip()]
     out = []
     for name in names:
         if name == 'random':
             out.append(RandomPolicy())
+        elif name in ('heuristic', 'heuristic_chase', 'chase'):
+            out.append(HeuristicChasePolicy())
         else:
             raise ValueError(f"Unknown policy name: {name}")
     return out
