@@ -167,6 +167,14 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
     - Custom: `bash scripts/run_pz_simple_tag_random.sh <episodes> <seed> [outdir]`
   - Output: Prints metrics and saves `simple_tag_v3_random-vs-random_<TIMESTAMP>_seed<seed>_eps<episodes>.json` in the outdir.
 
+- 2x2 Random and Heuristic test:
+  - Path: `scripts/run_pz_simple_tag_matrix.sh`
+  - Purpose: Run a 2×2 matrix on MPE simple_tag_v3 with continuous actions: RvsR, HvsR, RvsH, HvsH.
+  - Usage:
+    - Default (100 episodes, seed 42): `bash scripts/run_pz_simple_tag_matrix.sh`
+    - Custom: `bash scripts/run_pz_simple_tag_matrix.sh <episodes> <seed> [outdir]`
+  - Output: Prints per-cell metrics and saves `simple_tag_v3_matrix_<TIMESTAMP>_seed<seed>_eps<episodes>.json` in the outdir.
+
 ## Acronyms quick reference
 
 - D3A — Decide, Detect, Deliver, Assess
