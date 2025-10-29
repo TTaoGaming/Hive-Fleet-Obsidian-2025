@@ -1,0 +1,25 @@
+mission_id: MIS-2025-10-29-CLEANUP1
+intent_version: 1
+created_at: 2025-10-29T00:09:08Z
+expires_at: null
+locked: true
+scope_hash: a87534ecea5c19618af2b971c0678992f570f31c0cfbc4156164ca62a02db1a4
+goal: Clean up all mission_intent*.yml files by adding timestamps to filenames (format: mission_intent.<mission_id>.<RFC3339>.yml) and moving them into a new/ existing 'mission_intent/' folder from wherever they are scattered.
+constraints:
+  - Do not modify file contents
+  - create 'mission_intent/' if missing
+  - rename using creation/mod time if no mission_id
+  - exclude non-yml files
+success_criteria:
+  - Folder contains all renamed files
+  - mission_intent.latest.yml points to newest
+  - git status shows only adds/moves, no deletes
+safety:
+  tripwires:
+    - Any file content mismatch post-move (checksum fail)
+    - >10 files processed without pause
+  canary_plan:
+    - Rename/move one file, verify manually
+  revert_plan:
+    - Git checkout originals
+    - delete new folder if needed

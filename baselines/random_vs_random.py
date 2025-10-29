@@ -8,14 +8,20 @@ np.random.seed(42)
 
 env = simple_tag_v3.parallel_env(
     continuous_actions=True,
-    max_cycles=25,
+    max_cycles=100,
     num_adversaries=3,
     num_good=1
 )
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--episodes', type=int, default=100)
+args = parser.parse_args()
+
 episodes = []
 
-for episode in range(100):
+for episode in range(args.episodes):
     obs = env.reset()
     episode_rewards = {agent: 0 for agent in env.agents}
     captures = 0
@@ -33,12 +39,10 @@ for episode in range(100):
         for agent in env.agents:
             episode_rewards[agent] += rewards[agent]
         
-        # Check for captures (prey terminations)
-        if any(terminations.values()):
-            # Count terminated good agents (preys)
-            for agent, terminated in terminations.items():
-                if terminated and 'agent' in agent:  # agent names: 'adversary_*', 'agent_*'
-                    captures += 1
+        # Check for captures based on predator rewards (>=10 per step)
+        capture_this_step = any(rewards.get(agent, 0) >= 10 for agent in env.agents if 'adversary' in agent)
+        if capture_this_step:
+            captures += 1
         
         done = all(terminations.values()) or all(truncations.values())
     
@@ -53,7 +57,8 @@ for episode in range(100):
     episodes.append(episode_data)
 
 # Save to JSON
-with open("random_vs_random_3pred1prey_local0.5.json", "w") as f:
+filename = f"random_vs_random_3pred1prey_local0.5_canary_{args.episodes}.json"
+with open(filename, "w") as f:
     json.dump(episodes, f, indent=2)
 
 print(f"Completed {len(episodes)} episodes. Average captures: {np.mean([e['captures'] for e in episodes]):.2f}")

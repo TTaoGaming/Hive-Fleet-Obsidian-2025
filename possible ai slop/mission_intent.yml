@@ -1,0 +1,23 @@
+goal: Research simple research-grade heuristics for prey evasion and predator pursuit in simple_tag_v3 (3 predators, 1 prey, continuous map, local_obs=0.5). Run 2x2 matrix tests: random prey vs random predator, random prey vs heuristic predator, heuristic prey vs random predator, heuristic prey vs heuristic predator, using baselines/ scripts in pettingzoo_env_fresh. Verify non-zero catches in at least some tests to baseline setup correctness.
+
+constraints:
+  - Reuse existing random/heuristic agents in baselines/ without major code changes.
+  - Run 100 episodes per test.
+  - Output JSON stats for catches, rewards, etc.
+  - Activate pettingzoo_env_fresh for all runs (source bin/activate).
+  - No modifications to env or core code.
+
+success_criteria:
+  - Non-zero average catches in ≥2/4 matrix cells.
+  - Results verifiable via JSON/logs (e.g., avg_catches >0, grounded in simulation outputs).
+  - No hallucinations: All claims backed by run evidence.
+  - Setup confirmed correct if not 0 catches in all 4.
+
+safety:
+  tripwires:
+    - 0 catches in all 4 matrix cells: Indicates setup failure; stop and rollback (escalate to human).
+    - Any simulation hangs >5min per test: Interrupt and log error.
+  canary_plan: Run random vs random first (1 test, 10 episodes initial) to limit blast radius; proceed only if non-zero catches.
+  revert_plan: Discard all generated JSON/results; restore any temp files via cp from pettingzoo_backup_2025-10-28T16:44Z/; no persistent changes.
+
+created_at: 2025-10-28T20:35:23Z
