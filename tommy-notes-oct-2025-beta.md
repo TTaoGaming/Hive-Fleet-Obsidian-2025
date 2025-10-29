@@ -5,3 +5,4 @@ i need help setting up the swarmlord of webs for kilo code, can you search for t
 to swarmlord of webs
 you are my agent you need to do all these things for me. keep me ay the vision and strategic level, you are focused on the tactical and execution
 ---
+please take a look at my hfo gem folder, I am trying to create gem gen 21 but there is so much hallucination and regression. can you consier gem gen 19 as something that looks 80% correct and help me align and create a new grok 4 fast attemp 1 gem md int he gen 21 sub folder. it should be between 1000~1500 lines and contains the most important pieces. please consider the @/hfo_gem/gen_1_evolution_19/evolution_analysis.md as well
