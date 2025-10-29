@@ -70,29 +70,28 @@ def run_episodes(
     steps_to_first_catch: List[int] = []
 
     for ep in range(episodes):
-        env.reset(seed=int(rng.integers(0, 2**31 - 1)))
+        reset_ret = env.reset(seed=int(rng.integers(0, 2**31 - 1)))
+        obs = reset_ret[0] if isinstance(reset_ret, tuple) else reset_ret
         shared: Dict[str, Any] = {"roles": roles}
         controller.coordinator.before_episode(ep, shared)
 
         t = 0
         first_catch_step: Optional[int] = None
-        done = {agent: False for agent in env.agents}
-
-        while not all(done.values()):
+        
+        # Parallel API loop: act on current obs keys until env is done (env.agents becomes empty)
+        while True:
             controller.coordinator.before_step(t, shared)
 
+            if not obs:
+                break
             actions = {}
-            obs = env.observe_dict(env.agents) if hasattr(env, "observe_dict") else {a: env.observe(a) for a in env.agents}
-            for agent in env.agents:
-                if done[agent]:
-                    continue
+            for agent in list(obs.keys()):
                 a_space = env.action_space(agent)
                 o_space = env.observation_space(agent)
                 action = controller.act_for(agent, obs[agent], a_space, o_space, t=t, episode=ep, shared=shared)
                 actions[agent] = action
 
             next_obs, rewards, terminated, truncated, info = env.step(actions)
-            done = {a: terminated.get(a, False) or truncated.get(a, False) for a in env.agents}
 
             # Check catch event: in simple_tag, predators get positive reward on catch.
             # We'll consider any positive reward for any predator as a catch signal.
@@ -103,6 +102,9 @@ def run_episodes(
                         break
 
             controller.coordinator.after_step(t, shared)
+            obs = next_obs
+            if not env.agents:
+                break
             t += 1
 
         controller.coordinator.after_episode(ep, shared)
