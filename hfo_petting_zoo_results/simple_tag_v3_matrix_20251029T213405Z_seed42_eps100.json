@@ -1,0 +1,62 @@
+{
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "continuous_actions": true,
+    "episodes": 100,
+    "seed": 42
+  },
+  "policy_matrix": {
+    "HvsH": "heuristic predators vs heuristic prey",
+    "HvsR": "heuristic predators vs random prey",
+    "RvsH": "random predators vs heuristic prey",
+    "RvsR": "random predators vs random prey"
+  },
+  "results": {
+    "HvsH": {
+      "avg_steps_to_first_catch": 2.5,
+      "catch_rate": 0.02,
+      "caught_episodes": 2,
+      "total_episodes": 100
+    },
+    "HvsR": {
+      "avg_steps_to_first_catch": 9.05050505050505,
+      "catch_rate": 0.99,
+      "caught_episodes": 99,
+      "total_episodes": 100
+    },
+    "RvsH": {
+      "avg_steps_to_first_catch": 3.5,
+      "catch_rate": 0.02,
+      "caught_episodes": 2,
+      "total_episodes": 100
+    },
+    "RvsR": {
+      "avg_steps_to_first_catch": 10.416666666666666,
+      "catch_rate": 0.12,
+      "caught_episodes": 12,
+      "total_episodes": 100
+    }
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-29T21:34:05.064801+00:00"
+  },
+  "verification": {
+    "episodes_per_cell": 100,
+    "expected_ordering": {
+      "HvsR_ge_RvsR": true,
+      "RvsH_le_RvsR": true
+    },
+    "passed": true,
+    "seed": 42
+  }
+}
