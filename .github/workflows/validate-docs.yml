@@ -1,0 +1,37 @@
+name: Validate docs and data
+
+on:
+  push:
+    branches: [ "main", "mission-*", "*" ]
+  pull_request:
+    branches: [ "main", "*" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate JSON/JSONL
+        run: |
+          python scripts/validate_jsonl.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install mermaid runtime
+        run: |
+          npm --version
+          npm i mermaid@^10 --no-audit --no-fund --silent
+
+      - name: Validate Mermaid diagrams
+        run: |
+          node scripts/check_mermaid.mjs

@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-json
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+
+  - repo: local
+    hooks:
+      - id: validate-jsonl
+        name: Validate JSON/JSONL (incl. blackboard JSONL)
+        entry: python scripts/validate_jsonl.py
+        language: system
+        pass_filenames: false
+        stages: [commit]
+
+# Optional (requires Node + mermaid installed locally):
+#  - repo: local
+#    hooks:
+#      - id: check-mermaid
+#        name: Validate Mermaid diagrams in Markdown
+#        entry: node scripts/check_mermaid.mjs
+#        language: system
+#        pass_filenames: false
+#        stages: [commit]
