@@ -175,6 +175,13 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
     - Custom: `bash scripts/run_pz_simple_tag_matrix.sh <episodes> <seed> [outdir]`
   - Output: Prints per-cell metrics and saves `simple_tag_v3_matrix_<TIMESTAMP>_seed<seed>_eps<episodes>.json` in the outdir.
 
+- HFO PettingZoo MAS scaffold:
+  - Package: `hfo_petting_zoo_mas/`
+  - Runner: `scripts/run_pz_custom_mas.py`
+  - Purpose: Plug in per-agent predator/prey logic (heterogeneous or hierarchical via Coordinator) for `mpe.simple_tag_v3`.
+  - Quick run:
+    - `PYTHONPATH=. python3 scripts/run_pz_custom_mas.py --episodes 5 --seed 7 --continuous --pred-policies random,random --prey-policy random`
+
 ## Acronyms quick reference
 
 - D3A — Decide, Detect, Deliver, Assess

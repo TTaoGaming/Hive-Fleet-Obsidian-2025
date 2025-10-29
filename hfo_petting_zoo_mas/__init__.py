@@ -1,4 +1,4 @@
-"""Minimal MAS scaffold for PettingZoo MPE simple_tag_v3.
+"""PettingZoo MAS scaffold for MPE simple_tag_v3.
 
 Key pieces:
 - BasePolicy: per-agent policy contract (act)

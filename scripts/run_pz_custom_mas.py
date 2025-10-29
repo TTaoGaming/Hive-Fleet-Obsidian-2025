@@ -4,9 +4,9 @@ from __future__ import annotations
 import argparse
 from typing import List
 
-from hfo_mas.policy_base import RandomPolicy, FnPolicy
-from hfo_mas.controllers import Coordinator
-from hfo_mas.simple_tag_runner import run_episodes
+from hfo_petting_zoo_mas.policy_base import RandomPolicy, FnPolicy
+from hfo_petting_zoo_mas.controllers import Coordinator
+from hfo_petting_zoo_mas.simple_tag_runner import run_episodes
 
 
 def parse_args():
