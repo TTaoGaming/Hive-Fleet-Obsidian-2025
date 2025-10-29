@@ -1,0 +1,29 @@
+{
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "episodes": 100,
+    "render_mode": null,
+    "seed": 42
+  },
+  "policy": "random_vs_random",
+  "results": {
+    "avg_steps_to_first_catch": 9.777777777777779,
+    "catch_rate": 0.09,
+    "caught_episodes": 9,
+    "total_episodes": 100
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-29T19:09:40.297643+00:00",
+    "run_start_iso": "2025-10-29T19:09:40.297643+00:00"
+  }
+}
