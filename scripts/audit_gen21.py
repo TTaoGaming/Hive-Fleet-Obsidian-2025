@@ -349,12 +349,13 @@ class Gen21Auditor:
             }
         }
     
-    def run_full_audit(self) -> Dict[str, Any]:
+    def run_full_audit(self, quiet: bool = False) -> Dict[str, Any]:
         """Run all audit checks and compile results."""
-        print("🔍 Starting Gen21 Architecture Audit...")
-        print(f"   Timestamp: {self.timestamp}")
-        print(f"   Explore/Exploit Target: {self.explore_ratio:.0%}/{self.exploit_ratio:.0%}")
-        print()
+        if not quiet:
+            print("🔍 Starting Gen21 Architecture Audit...")
+            print(f"   Timestamp: {self.timestamp}")
+            print(f"   Explore/Exploit Target: {self.explore_ratio:.0%}/{self.exploit_ratio:.0%}")
+            print()
         
         results = {
             "timestamp": self.timestamp,
@@ -589,7 +590,7 @@ def main():
     args = parser.parse_args()
     
     auditor = Gen21Auditor(args.repo, args.explore_ratio)
-    results = auditor.run_full_audit()
+    results = auditor.run_full_audit(quiet=args.json)
     
     if args.json:
         output = json.dumps(results, indent=2)
