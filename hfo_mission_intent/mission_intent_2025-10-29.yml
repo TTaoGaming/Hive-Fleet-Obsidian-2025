@@ -1,0 +1,213 @@
+mission_id: gem21_gpt5_attempt3_2025-10-29
+created_at: 2025-10-29T14:38:00Z  # Zulu (UTC)
+timezone: Z
+owner: TTao
+orchestrator: Swarmlord of Webs  # sole human interface once online
+operating_mode: complex
+status: active
+
+goal: |
+  Create a new Generation 21 SSOT markdown (≥1000 lines) that can be dropped into any clean repo
+  to bootstrap and bring the Swarmlord of Webs online as the single human interface. Swarmlord will
+  clarify mission intent with the human, orchestrate PREY, run an independent Verify gate, and—only
+  after PASS—deliver a digest in the format: BLUF, operating_mode, tradeoff_matrix, diagram_stub,
+  safety summary, and blockers. Gen19 is the structural/content base; Gen1 intent is honored; v15
+  YAML is a usable reference (manual-heavy); v19 YAML is hallucinated and excluded from use.
+
+scope:
+  - Draft and validate Gen21 SSOT (≥1000 lines) with a dedicated "Swarmlord of Webs Operations" section
+  - Enforce single-interface contract (Swarmlord only talks to human)
+  - Enforce Verify PASS before any digest to the human
+  - Prepare for downstream regeneration of Swarmlord Kilo Code Mode v20 (after SSOT locks)
+
+artifacts:
+  ssot_path: hfo_gem/gen_21/gpt5-attempt-3-gem.md
+  mission_intent_path: hfo_mission_intent/mission_intent_2025-10-29.yml
+  blackboard_path: hfo_blackboard/obsidian_synapse_blackboard.jsonl
+
+constraints:
+  timebox_intent_phase: 30m
+  lineage: "Gen19 base; Gen1 intent honored; explicit evolutions only"
+  tooling: "Real tools/services only (internet, MCP servers, VS Code extensions, package managers); no simulated tools"
+  privacy_and_compliance: "No secrets in repo/logs; respect licenses; use env/secret managers for credentials"
+
+success_criteria:
+  - SSOT ≥1000 lines; no placeholders (no TODO/..., no omitted)
+  - Cold-start: ≤3 manual steps to bring Swarmlord online
+  - Verify: Independent, non-editing; PASS required before digest
+  - Digest shape: BLUF, operating_mode, tradeoff_matrix, diagram_stub, safety summary, blockers
+  - Evidence discipline: All claims in blackboard with evidence_refs and chunk logs
+  - Lineage: ≥95% reuse from Gen19 where applicable; explicit evolutions documented
+
+safety_envelope:
+  canary:
+    - Limited-scope probes first (small reads/writes)
+    - Per-write chunk size ≤200 lines
+    - Dry-run/lint where available before full generation
+  tripwires:
+    - line_count < 0.9 * target for any planned chunk or final artifact
+    - placeholders present (e.g., "TODO", "...", "omitted")
+    - lint/tests/policy checks fail
+    - claims without evidence_refs in blackboard
+    - mid_loop_human_prompt encountered (policy violation)
+  revert_plan:
+    - Restore last known good artifact or Gen19 baseline
+    - Reduce chunk size and retry (e.g., 200 → 100 lines)
+    - Narrow scope to regenerate subsection only
+    - Log regen_flag and chunk_id in blackboard entries
+
+line_targets:
+  ssot_min_lines: 1000
+  chunk_max_lines: 200
+  verify_max_loops_per_section: 5
+
+workflow:
+  swim_lanes_order:
+    - User
+    - Loader
+    - Webs (C2)
+    - PREY workers
+    - Verifier (independent)
+    - Blackboard (append-only JSONL)
+    - Webs (C2)
+    - User
+  single_interface: true  # human only interacts with Swarmlord after online
+  verify_gate: mandatory
+
+interaction_policy:
+  human_windows:
+    - clarification
+    - post_verify
+  mid_loop_prompts: forbidden
+  progress_reporting: blackboard_only
+  autonomy_level: strict
+  ask_for_review_mid_loop: false
+
+PREY_terms:
+  canonical:
+    - Perceive
+    - React
+    - Engage
+    - Yield
+  mappings:
+    Perceive:
+      - Sense
+      - Observe
+      - Monitor
+    React:
+      - Make Sense
+      - Orient+Decide
+      - Analyze+Plan
+    Engage:
+      - Act  # OODA/JADC2
+      - Act  # Sense→Act loop nomenclature
+      - Execute  # MAPE-K
+    Yield:
+      - Feedback
+      - Knowledge
+  provenance_frameworks:
+    - JADC2 (Sense → Make Sense → Act → Feedback)
+    - OODA (Observe → Orient → Decide → Act)
+    - MAPE-K (Monitor → Analyze → Plan → Execute → Knowledge)
+
+interfaces:
+  human_facing_facade: "Swarmlord of Webs"
+  contract:
+    - Workers never address the human directly
+    - Swarmlord delegates tasks and assembles review bundles
+    - Swarmlord runs Verify via independent verifier
+    - Only after Verify PASS does Swarmlord deliver the digest
+
+digest_contract:
+  fields:
+    - BLUF (≤5 lines)
+    - operating_mode (clear/complicated/complex/chaotic/confused)
+    - tradeoff_matrix
+    - diagram_stub (Mermaid)
+    - safety summary (tripwire/canary/revert status)
+    - blockers (blocked_capabilities and unresolved gaps)
+
+tooling_policy:
+  allowed:
+    - Internet access for docs/deps/examples
+    - MCP servers
+    - VS Code extensions
+    - Package managers (pip/uv/npm/etc.)
+  forbidden:
+    - Simulated/mock tools that fabricate results
+  receipts:
+    - Log evidence_refs for material actions in blackboard
+    - Lock dependency versions where feasible (requirements.txt/lockfiles)
+
+references:
+  gen1_intent: "Generation 1 handcrafted intent (honored)"
+  gen19_baseline: hfo_gem/gen_19/original_gem.md
+  swarmlord_yaml_v15: hfo_swarmlord_of_webs_kilo_code_mode/swarmlord-of-webs-export-v15.yaml
+  swarmlord_yaml_v19: hfo_swarmlord_of_webs_kilo_code_mode/hallucination-swarmlord-of-webs-mode-v19-2025-10-29.yaml  # reference only, do not use
+
+blockers:
+  blocked_capabilities: []
+
+diagram_stubs:
+  prey_mapping: |
+    %% Mermaid PREY mapping (canonical terms with provenance) %%
+    flowchart TB
+      subgraph PREY[PREY — canonical]
+        P1[Perceive] --> P2[React] --> P3[Engage] --> P4[Yield]
+      end
+      subgraph Frameworks[Mappings]
+        S[Sense] --> MS[Make Sense] --> A[Act] --> F[Feedback]
+        O1[Observe] --> O2[Orient] --> O3[Decide] --> O4[Act]
+        M1[Monitor] --> M2[Analyze] --> M3[Plan] --> M4[Execute] --> M5[Knowledge]
+      end
+      P1 --- S
+      P2 --- MS
+      P3 --- A
+      P4 --- F
+      P1 -. provenance .- O1
+      P2 -. provenance .- O2
+      P3 -. provenance .- O3
+      P4 -. provenance .- O4
+      P1 -. provenance .- M1
+      P2 -. provenance .- M2
+      P3 -. provenance .- M3
+      P3 -. also executes .- M4
+      P4 -. feedback informs .- M5
+  swimlanes: |
+    %% Mermaid swim lanes overview %%
+    flowchart LR
+      subgraph U[User]
+        U1[Give/Confirm Intent]
+      end
+      subgraph L[Loader]
+        L1[Env Snapshot / Persist]
+      end
+      subgraph W[Webs (C2)]
+        W1[Clarify x3 if New]
+        W2[Plan PREY]
+        W3[Assemble Review Bundle]
+        W4[Final Digest]
+      end
+      subgraph P[PREY Workers]
+        P1[Perceive]
+        P2[React]
+        P3[Engage]
+        P4[Yield]
+      end
+      subgraph V[Verifier]
+        V1[Lint/Tests/Policy]
+        V2[Risk/Blockers Audit]
+        V3[Approve / Request Fixes]
+      end
+      subgraph B[Blackboard]
+        B1[(Append-only JSONL)]
+      end
+      U1 --> W1
+      W1 --> W2 --> P1 --> P2 --> P3 --> P4 --> W3 --> V1 --> V2 --> V3
+      V3 -->|Fail| W2
+      V3 -->|Pass| L1 --> B1 --> W4 --> U1
+
+notes:
+  - Use UTC (Z) timestamps in all entries
+  - Remove babysitting; no tactical copy/paste asks of the human
+  - New pain recorded: "Too many manual touches + simulated fake tools that gaslight" (forbid)
