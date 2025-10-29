@@ -1,0 +1,29 @@
+# Merge Log: Standardized and merged unique elements from 5 archive files on 2025-10-29T01:08:30Z.
+# Files processed:
+# 1. mission_intent_backup.yml (PettingZoo baselines: goal focused on env setup, constraints on venv/Python, success on JSON outputs/error fixes, safety on import/JSON checks).
+# 2. mission_intent-consolidate-v1.0.yml (File consolidation: goal on moving files, constraints on no-alter/preserve, success on counts/MD5/git, safety on mismatch/git status).
+# 3. mission_intent.MIS-2025-10-29-CLEANUP1.2025-10-29T00-09-08Z.yml (Cleanup/rename: goal on timestamping/moving, constraints on no-modify/exclude, success on folder/git, safety on checksum/file count).
+# 4. mission_intent.MIS-2025-10-29-DRIFT-AUDIT.yml (Drift audit: goal on correcting drifts/versioning, constraints on time/scope, success on corrections/checks, safety on scope exceed).
+# 5. mission_intent.MIS-GEM-GEN20-2025-10-29T00-28-18Z.yml (GEM Gen20 update: goal on new gen integration, constraints on YAML/compatibility/additive, success on file creation/dry-run, safety on dry-run/claims).
+# Unique elements unioned into sections below for daily template use; non-matching/irrelevant ignored (e.g., mission_id fields not core structure).
+# Ensures one-per-day policy: Use this as base, version daily (e.g., append date), archive priors.
+
+goal: Unified daily mission intent template for HiveFleetObsidian projects, merging patterns from archive for standardization in code/research/system tasks (e.g., env setups, file management, audits, updates) to prevent proliferation and enable one active per day.
+
+constraints:
+  - Environment compatibility: Use existing venvs (e.g., pettingzoo_env), Python 3.11, specific envs (e.g., simple_tag_v3); limit to YAML format.
+  - No alterations: Preserve original contents, timestamps, permissions; do not merge/overwrite without backups; exclude non-matching files (e.g., non-yml, non-relevant).
+  - Scoped operations: Time limits (e.g., 1 hour max); file patterns (mission_intent*.yml); additive changes only; git-aware (no uncommitted starts).
+  - Verification focus: MD5/checksum integrity; dry-runs before full; isolated testing (e.g., archive/subsets).
+
+success_criteria:
+  - Full coverage: 100% unique content from archives integrated (e.g., JSON outputs for baselines, file counts/MD5 for moves, dry-run success for updates, corrections for audits).
+  - Integrity checks: Master file valid YAML; parses without errors; documented merge log; post-op verification (e.g., ls -lt, git status clean, <20% capture in baselines if applicable).
+  - Operational readiness: Folder structures clean (e.g., hfo_mission_intent/ with latest pointer); enforced versioning/checks; one active daily template with no data loss (diff originals vs merged uniques).
+
+safety:
+  tripwires:
+    - Data integrity fail: Checksum/MD5 mismatch, missing unique elements (e.g., diff shows loss), import/env errors, dry-run failures, ungrounded claims.
+    - Scope breach: File count > expected, time exceed (e.g., >10 files without pause), non-swarmlord files touched, git uncommitted changes.
+  canary_plan: Limit initial blast: Test on subset (e.g., 20% files/single episode/one test file/isolated dir); read-only analysis first; validate draft before full merge.
+  revert_plan: No changes to originals; delete invalid drafts (e.g., rm master_mission_intent.yml); git checkout . or restore from backups (e.g., archive copies, blackboard backups); deactivate/recreate venvs if needed; log incident in blackboard.
