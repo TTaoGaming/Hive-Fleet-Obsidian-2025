@@ -1,0 +1,25 @@
+goal: Update the hfo_gem/ directory to generation 20 by creating gen-20.yml that incorporates the latest Swarmlord of Webs v15 work (including PREY loop, blackboard state, safety envelopes, and delegation patterns), enabling downstream regeneration from this new gem version.
+
+constraints:
+  - Use YAML format exclusively.
+  - Preserve compatibility with existing downstream regeneration processes and scripts.
+  - Do not overwrite or modify existing generation files (e.g., gen-19) without explicit backups.
+  - Limit changes to additive integrations of Swarmlord v15 elements; avoid structural breaks.
+
+success_criteria:
+  - File hfo_gem/gen-20.yml is created and validated to include key Swarmlord v15 components (e.g., mission_intent drafting, PREY orchestration, Verify Gate).
+  - Successful dry-run regeneration of at least one test project using the new gen-20 template, confirming no errors in project generation.
+
+safety:
+  tripwires:
+    - Dry-run regeneration fails (e.g., syntax errors, missing dependencies, or incompatibility flags).
+    - Any ungrounded claims or hallucinations in integrated Swarmlord elements detected during verification.
+  canary_plan: Perform initial integration and dry-run in an isolated test directory (e.g., hfo_gem/test-regen/), limiting scope to a single template regeneration without affecting production downstream.
+  revert_plan: 
+    - Backup existing hfo_gem/gen-19.yml to hfo_gem/gen-19.backup.yml before any writes.
+    - If tripwire triggered, delete hfo_gem/gen-20.yml and restore from backup; log incident in blackboard.
+
+created_at: '2025-10-29T00:28:18Z'
+
+version: 1.0
+mission_id: GEM-GEN20-UPDATE

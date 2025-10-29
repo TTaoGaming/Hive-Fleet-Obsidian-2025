@@ -1,0 +1,21 @@
+goal: Merge and standardize all hfo_mission_intent/archive/mission_intent*.yml files into one master template with common structure (goal, constraints, success_criteria, safety) to enable one-per-day usage going forward.
+
+constraints:
+  - Standardize keys to exact format: goal (string), constraints (list), success_criteria (list), safety (object with tripwires, canary_plan, revert_plan)
+  - Ignore non-matching files (e.g., non-YAML or missing required keys)
+
+success_criteria:
+  - 100% coverage of unique content from all .yml files in archive/
+  - Master file parses as valid YAML
+  - Documented merge log in comments
+
+safety:
+  tripwires:
+    - Halt if data loss detected (e.g., diff shows missing unique elements)
+  canary_plan:
+    - Validate draft on 20% of files first; limit to read-only analysis
+  revert_plan:
+    - No changes to originals; delete draft master if invalid; restore from archive backups
+
+created_at: 2025-10-29T01:08:00Z
+version: "1.0"

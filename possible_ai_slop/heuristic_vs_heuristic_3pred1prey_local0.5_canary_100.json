@@ -1,0 +1,1102 @@
+[
+  {
+    "episode": 0,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -542.8482296789349
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 1,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -739.5526546004988
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 2,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -284.9106342497806
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 3,
+    "rewards": {
+      "adversary_0": 70.0,
+      "adversary_1": 70.0,
+      "adversary_2": 70.0,
+      "agent_0": -739.4033844380402
+    },
+    "captures": 7,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 4,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -757.907726572212
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 5,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -819.4503839277002
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 6,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -775.5157359386905
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 7,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -873.3897046660105
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 8,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -773.8142922384638
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 9,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -627.5895181705066
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 10,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -824.173462347193
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 11,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -779.5049336935484
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 12,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -854.0942266265143
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 13,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -700.9603155535683
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 14,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -827.0112723866279
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 15,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -829.4298273202953
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 16,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -629.399956630386
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 17,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -737.973893261055
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 18,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": 0.0
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 19,
+    "rewards": {
+      "adversary_0": 70.0,
+      "adversary_1": 70.0,
+      "adversary_2": 70.0,
+      "agent_0": -827.7945237139967
+    },
+    "captures": 7,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 20,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -774.3350575998757
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 21,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -842.0126045300794
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 22,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -674.4009021917757
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 23,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -634.8170956113033
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 24,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -620.7369135683134
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 25,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -811.061712864438
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 26,
+    "rewards": {
+      "adversary_0": 10.0,
+      "adversary_1": 10.0,
+      "adversary_2": 10.0,
+      "agent_0": -823.9203236713588
+    },
+    "captures": 1,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 27,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -763.9492541669415
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 28,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -735.7482141511346
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 29,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -856.6682032185764
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 30,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -725.626352147747
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 31,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -773.0392472700786
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 32,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -685.7143327598777
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 33,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": 0.0
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 34,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -347.97227578503794
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 35,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -710.6525543409006
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 36,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -186.675878163928
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 37,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -747.915353141516
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 38,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -657.3667604303466
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 39,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -785.4673709256508
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 40,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -599.8543038260897
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 41,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -754.7499885774155
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 42,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -648.4250075892027
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 43,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -614.9375413835653
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 44,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -675.0294060524466
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 45,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -655.0273089089072
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 46,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -760.5315002097534
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 47,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -648.9147894596219
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 48,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -879.7110252961115
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 49,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -723.7372908696894
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 50,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -62.78249182777048
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 51,
+    "rewards": {
+      "adversary_0": 10.0,
+      "adversary_1": 10.0,
+      "adversary_2": 10.0,
+      "agent_0": -863.8266182799503
+    },
+    "captures": 1,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 52,
+    "rewards": {
+      "adversary_0": 20.0,
+      "adversary_1": 20.0,
+      "adversary_2": 20.0,
+      "agent_0": -765.0907562231218
+    },
+    "captures": 2,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 53,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -808.8762362328644
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 54,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -792.7294625617681
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 55,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -851.4871764287403
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 56,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -817.8289819692396
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 57,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -787.4430156010529
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 58,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": 0.0
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 59,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -829.3394103630285
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 60,
+    "rewards": {
+      "adversary_0": 10.0,
+      "adversary_1": 10.0,
+      "adversary_2": 10.0,
+      "agent_0": -678.8932310048519
+    },
+    "captures": 1,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 61,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -630.1470261754991
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 62,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -705.8556082693827
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 63,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -740.3945498541825
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 64,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -734.2058805846124
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 65,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -715.4369019909697
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 66,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -841.240571491267
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 67,
+    "rewards": {
+      "adversary_0": 30.0,
+      "adversary_1": 30.0,
+      "adversary_2": 30.0,
+      "agent_0": -780.5485614168659
+    },
+    "captures": 3,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 68,
+    "rewards": {
+      "adversary_0": 60.0,
+      "adversary_1": 60.0,
+      "adversary_2": 60.0,
+      "agent_0": -819.1656208568204
+    },
+    "captures": 6,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 69,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -218.7989937182536
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 70,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -798.1203891516836
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 71,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -623.7915036443558
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 72,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -801.1303144305
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 73,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -524.1970643218948
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 74,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -706.4308220849712
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 75,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -626.0597804988029
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 76,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -724.3041363744437
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 77,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -747.9393040186482
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 78,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -643.127467989559
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 79,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -980.3441074888274
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 80,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -759.3674016782784
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 81,
+    "rewards": {
+      "adversary_0": 10.0,
+      "adversary_1": 10.0,
+      "adversary_2": 10.0,
+      "agent_0": -773.5855667315598
+    },
+    "captures": 1,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 82,
+    "rewards": {
+      "adversary_0": 10.0,
+      "adversary_1": 10.0,
+      "adversary_2": 10.0,
+      "agent_0": -968.1823524796528
+    },
+    "captures": 1,
+    "done_reason": "capture"
+  },
+  {
+    "episode": 83,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -259.15343319221597
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 84,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -850.9379470169996
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 85,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -866.8682715609973
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 86,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -618.9976459929421
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 87,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -3.9837819925729003
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 88,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -748.4619324408808
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 89,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -855.9311430715047
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 90,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -903.2172323999858
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 91,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -653.8926945405358
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 92,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -844.6769869204568
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 93,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -632.0624719301152
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 94,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -809.6034988845361
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 95,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -834.2000746506781
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 96,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -851.6774437332663
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 97,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -675.4677685042136
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 98,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -710.8666966680713
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  },
+  {
+    "episode": 99,
+    "rewards": {
+      "adversary_0": 0.0,
+      "adversary_1": 0.0,
+      "adversary_2": 0.0,
+      "agent_0": -869.2654625351514
+    },
+    "captures": 0,
+    "done_reason": "max_cycles"
+  }
+]

@@ -1,0 +1,8 @@
+goal: ""
+constraints: []
+success_criteria: []
+safety:
+  tripwires: []
+  canary_plan: ""
+  revert_plan: ""
+created_at: '2025-10-28T16:19:51Z'

@@ -1,0 +1,44 @@
+Metadata-Version: 2.1
+Name: mpe2
+Version: 0.0.1
+Summary: Multi Particle Environments Version 2
+Author-email: Farama Foundation <contact@farama.org>
+License: MIT License
+Keywords: Reinforcement Learning,game,RL,AI,gymnasium
+Classifier: Development Status :: 1 - Planning
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pettingzoo >=1.24.3
+Requires-Dist: pygame >=2.6.0
+Provides-Extra: testing
+Requires-Dist: pynput ==1.7.6 ; extra == 'testing'
+Requires-Dist: pytest ==8.0.0 ; extra == 'testing'
+Requires-Dist: pytest-cov ==4.1.0 ; extra == 'testing'
+Requires-Dist: pytest-xdist ==3.5.0 ; extra == 'testing'
+Requires-Dist: pre-commit ==3.5.0 ; extra == 'testing'
+Requires-Dist: pytest-markdown-docs ==0.5.0 ; extra == 'testing'
+
+# MPE2
+
+## Installation Steps
+
+```bash
+# create venv
+conda create -n mpe2_env python=3.10
+conda activate mpe2_env
+
+# clone repo
+git clone https://github.com/Farama-Foundation/MPE2.git
+
+# for development
+python3 -m pip install -e .[testing, documentation]
+
+# for usage
+python3 -m pip install -e .
+```

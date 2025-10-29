@@ -1,0 +1,21 @@
+version: 12
+created_at: '2025-10-28T15:50:00Z-v12'
+goal: "Deliver a working PettingZoo setup with research parity settings for simple_tag (continuous_actions=True, max_cycles=25, n_predators=3, n_preys=1, local_ratio=0.5 from Lowe et al. 2017); implement baselines (random vs random, random vs heuristic) with <20% capture rate over 100 episodes; output JSON files for independent script verification to reduce hallucinations; resolve recent error; adjust to 3 predators vs 1 prey per top MARL literature (Lowe 2017, Foerster 2018, Rashid 2018: num_adversaries=3, num_good=1, max_cycles=25).; confirmed 3 predators vs 1 prey from top MARL literature (Lowe 2017, Foerster 2018, Rashid 2018); re-run baselines with num_adversaries=3, num_good=1, max_cycles=25.; confirmed 3 predators vs 1 prey from literature; re-run baselines with verified settings.; implement 2x2 baseline matrix with research-grade heuristic for accurate comparison."
+constraints:
+  - Use existing pettingzoo_env virtual environment
+  - Ensure compatibility with Python 3.11
+  - Limit to simple_tag_v3 environment
+success_criteria:
+  - Clean venv with PettingZoo[all] installed, simple_tag_v3 (mpe2 if needed) imports and runs 100 episodes error-free.
+  - Baselines produce JSON files (e.g., random_vs_random.json) with episode data (rewards, captures, params, env_config) for independent verification, matching research (<20% capture).
+  - Recent error diagnosed, fixed, and logged in JSON.
+  - Baselines adjusted to 3 predators vs 1 prey, re-run 100 episodes, verify <20% capture in JSON.
+  - Baselines re-run with 3 predators vs 1 prey, 100 episodes, verify <20% capture in JSON.
+  - Baselines re-run with literature-confirmed settings, 100 episodes, verify <20% capture in JSON.
+  - 2x2 matrix run 100 episodes each, JSON outputs with capture rates; heuristic achieves > random but <20% for parity.
+safety:
+  tripwires:
+    - Baseline JSON outputs missing or invalid trigger halt and re-run.
+    - Import failure or env creation error halts execution.
+  canary_plan: Run single episode test before full 100-episode baseline runs to limit scope.
+  revert_plan: Deactivate venv and reactivate from backup or recreate with pip install --force-reinstall.

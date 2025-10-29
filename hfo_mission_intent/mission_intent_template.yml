@@ -1,0 +1,30 @@
+# Mission Intent Template for HiveFleetObsidian
+# Usage Instructions:
+# - Copy this template to create a new daily file named: mission_intent.YYYY-MM-DD.yml (e.g., mission_intent.2025-10-29.yml)
+# - Fill in goal, constraints, success_criteria, safety for the day's mission.
+# - Ensure only ONE file per day: Archive or delete any duplicates with the same date.
+# - Existing format preserved: goal (string), constraints (list), success_criteria (list), safety (object with tripwires, canary_plan, revert_plan), created_at (ISO timestamp), version (string).
+# - For standardization: All mission intents must follow this structure; non-compliant files go to archive/.
+# - Ready for today's new one: Duplicate to mission_intent.2025-10-29.yml and customize.
+
+goal: [Describe the primary goal for today's mission here. Keep concise and actionable.]
+
+constraints:
+  - [List constraints, e.g., - Scope limited to specific directories/files]
+  - [e.g., - No modifications to existing code without backups]
+  - [e.g., - Time/effort limits]
+
+success_criteria:
+  - [List measurable success points, e.g., - File created/updated with valid YAML]
+  - [e.g., - Verification passes (lint, tests, dry-run)]
+  - [e.g., - No data loss or errors in logs]
+
+safety:
+  tripwires:
+    - [Measurable stop conditions, e.g., - Halt if checksum mismatch detected]
+    - [e.g., - Stop if scope breach (e.g., > expected files touched)]
+  canary_plan: [Limited initial exposure, e.g., - Test on subset (20% files) or isolated dir first]
+  revert_plan: [Fast rollback, e.g., - Delete changes; git checkout .; restore from backups]
+
+created_at: [YYYY-MM-DDTHH:MM:SSZ, e.g., 2025-10-29T01:10:00Z]
+version: "1.0"  # Increment for updates to this daily intent

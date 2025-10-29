@@ -1,0 +1,19 @@
+goal: Audit and correct past mission intent drifts in current missions within swarmlord-of-webs mode files, and implement enforced versioning checks to prevent future drifts.
+
+constraints:
+  - Maximum effort: 1 hour total
+  - Scope limited to swarmlord-of-webs mode files only (e.g., archive directories like hfo-swarmlord-of-webs-kilo-code-mode-2025-10-27T21-32-26Z/archive/)
+
+success_criteria:
+  - All identified past drifts in current missions corrected with versioned mission_intent.yml files
+  - Enforced checks (e.g., via blackboard appends or mode instructions) in place to ensure no future silent drifts occur
+
+safety:
+  tripwires:
+    - Scope exceed: Stop immediately if any non-swarmlord-of-webs mode file is touched or if total effort approaches 1 hour without completion
+  canary_plan: Apply all audits and changes exclusively to archive files first (e.g., hfo-swarmlord-of-webs-kilo-code-mode-2025-10-27T21-32-26Z/archive/) to limit blast radius
+  revert_plan: Manually delete any new or modified files created during this mission within 1 hour; restore from existing backups if available (e.g., blackboard/deduplicated_blackboard_backup_20251027.jsonl)
+
+created_at: 2025-10-29T00:25:08Z
+
+mission_id: MIS-2025-10-29-DRIFT-AUDIT

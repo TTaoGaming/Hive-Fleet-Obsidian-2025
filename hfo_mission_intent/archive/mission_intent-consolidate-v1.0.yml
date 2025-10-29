@@ -1,0 +1,25 @@
+goal: Consolidate all mission_intent*.yml files scattered across the repo into a new dedicated hfo_mission_intent/ folder, preserving original filenames, timestamps, and contents (including duplicates without merging). Create a root-level mission_intent.latest.yml file that references the path and timestamp of the most recent file in hfo_mission_intent/ by modification time for easy discovery.
+
+constraints:
+  - Only target files matching 'mission_intent*.yml' pattern repo-wide.
+  - Do not merge or alter contents of any files; keep all versions as-is.
+  - Create a fresh hfo_mission_intent/ folder (do not rename existing mission_intent/).
+  - Exclude any non-matching .yml files or other artifacts.
+  - Preserve file permissions and timestamps during moves.
+
+success_criteria:
+  - Pre- and post-operation file counts match exactly (use find or ls to verify).
+  - MD5 checksums of all moved files match originals (no corruption).
+  - All files are in hfo_mission_intent/ verifiable by ls -lt.
+  - Root mission_intent.latest.yml accurately points to the newest file by mod time (e.g., contains path: hfo_mission_intent/latest_file.yml, mod_time: ISO timestamp).
+  - Folder structure is clean: no orphans, no overwrites.
+
+safety:
+  tripwires:
+    - File count mismatch or MD5 failure after any move: halt immediately and log error.
+    - Git status shows uncommitted changes before starting: abort.
+  canary_plan: Move and verify a single test file (e.g., the current mission_intent.latest.yml) first, check integrity before batch processing.
+  revert_plan: Switch to git branch 'mission-consolidate-backup' created pre-operation; run 'git checkout .' to restore; rm -rf hfo_mission_intent/ if partially created.
+
+created_at: 2025-10-29T00:57:00Z
+version: "1.0"
