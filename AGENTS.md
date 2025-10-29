@@ -159,6 +159,14 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
 - Blackboard JSONL: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
 - SSOT (reference): `hfo_gem/gen_21/gpt5-attempt-3-gem.md`
 
+- PettingZoo verification wrapper:
+  - Path: `scripts/run_pz_simple_tag_random.sh`
+  - Purpose: Run MPE simple_tag_v3 random-vs-random verification and write a JSON results file under `hfo_petting_zoo_results/`.
+  - Usage:
+    - Default (100 episodes, seed 42): `bash scripts/run_pz_simple_tag_random.sh`
+    - Custom: `bash scripts/run_pz_simple_tag_random.sh <episodes> <seed> [outdir]`
+  - Output: Prints metrics and saves `simple_tag_v3_random-vs-random_<TIMESTAMP>_seed<seed>_eps<episodes>.json` in the outdir.
+
 ## Acronyms quick reference
 
 - D3A — Decide, Detect, Deliver, Assess
