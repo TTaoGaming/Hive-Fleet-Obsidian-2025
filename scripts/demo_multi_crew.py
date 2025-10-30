@@ -95,8 +95,12 @@ def demo_verification(config, results):
     
     print("\nValidator Results:")
     for ev in evidence:
-        validator_name, status = ev.split("=")
-        print(f"  {validator_name:15} : {status}")
+        parts = ev.split("=", 1)
+        if len(parts) == 2:
+            validator_name, status = parts
+            print(f"  {validator_name:15} : {status}")
+        else:
+            print(f"  {ev}")  # Fallback if format is unexpected
     
     print(f"\n{summary}")
     print(f"\nFinal Result: {'✅ PASS' if quorum_pass else '❌ FAIL'}")

@@ -12,6 +12,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 from blackboard_logger import append_receipt, ChunkId
 
 
+# Constants
+MISSION_ID = "verify_blackboard_2025-10-30"
+
+
 def verify_blackboard():
     """Verify blackboard JSONL logging."""
     print("🔍 Verifying Blackboard JSONL Logging")
@@ -20,7 +24,7 @@ def verify_blackboard():
     # Test receipt 1: Perceive
     print("\n1. Writing Perceive receipt...")
     path = append_receipt(
-        mission_id="verify_blackboard_2025-10-30",
+        mission_id=MISSION_ID,
         phase="perceive",
         summary="Starting verification test",
         evidence_refs=[__file__],
@@ -33,7 +37,7 @@ def verify_blackboard():
     # Test receipt 2: React
     print("\n2. Writing React receipt...")
     append_receipt(
-        mission_id="verify_blackboard_2025-10-30",
+        mission_id=MISSION_ID,
         phase="react",
         summary="Planning test execution",
         evidence_refs=[__file__, "scripts/blackboard_logger.py"],
@@ -46,7 +50,7 @@ def verify_blackboard():
     # Test receipt 3: Engage
     print("\n3. Writing Engage receipt...")
     append_receipt(
-        mission_id="verify_blackboard_2025-10-30",
+        mission_id=MISSION_ID,
         phase="engage",
         summary="Executing verification checks",
         evidence_refs=[__file__],
@@ -75,7 +79,7 @@ def verify_blackboard():
             continue
         try:
             receipt = json.loads(line)
-            if isinstance(receipt, dict) and receipt.get('mission_id') == 'verify_blackboard_2025-10-30':
+            if isinstance(receipt, dict) and receipt.get('mission_id') == MISSION_ID:
                 test_receipts.append(receipt)
         except (json.JSONDecodeError, TypeError):
             # Skip invalid lines (may be from old format)
