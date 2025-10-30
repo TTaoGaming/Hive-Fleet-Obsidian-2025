@@ -730,8 +730,8 @@ graph TB
     DEPLOY --> MONITOR[OpenTelemetry Monitor]
     MONITOR --> ANALYZE[Metric Analysis]
     ANALYZE --> DECISION{SLO Met}
-    DECISION -->|Yes| PROMOTE[Promote to Production]
-    DECISION -->|No| ROLLBACK[Auto Rollback]
+    DECISION --> PROMOTE[Promote to Production]
+    DECISION --> ROLLBACK[Auto Rollback]
   end
   
   subgraph Knowledge Layer
@@ -848,22 +848,22 @@ graph LR
 graph TB
   START[Start Change] --> CANARY[Canary Test]
   CANARY --> T1{Line Count Check}
-  T1 -->|Pass| T2{Placeholder Check}
-  T1 -->|Fail| REJECT[Reject: Chunk Too Large]
-  T2 -->|Pass| T3{Policy Check}
-  T2 -->|Fail| REJECT2[Reject: Placeholders Found]
-  T3 -->|Pass| T4{Static Analysis}
-  T3 -->|Fail| REJECT3[Reject: Policy Violation]
-  T4 -->|Pass| T5{Signature Verify}
-  T4 -->|Fail| REJECT4[Reject: Security Issue]
-  T5 -->|Pass| DEPLOY[Deploy to Canary]
-  T5 -->|Fail| REJECT5[Reject: Invalid Signature]
+  T1 --> T2{Placeholder Check}
+  T1 --> REJECT[Reject: Chunk Too Large]
+  T2 --> T3{Policy Check}
+  T2 --> REJECT2[Reject: Placeholders Found]
+  T3 --> T4{Static Analysis}
+  T3 --> REJECT3[Reject: Policy Violation]
+  T4 --> T5{Signature Verify}
+  T4 --> REJECT4[Reject: Security Issue]
+  T5 --> DEPLOY[Deploy to Canary]
+  T5 --> REJECT5[Reject: Invalid Signature]
   DEPLOY --> MONITOR[Monitor Metrics]
   MONITOR --> M1{Error Rate OK}
-  M1 -->|Yes| M2{Latency OK}
-  M1 -->|No| ROLLBACK[Auto Rollback]
-  M2 -->|Yes| PROMOTE[Promote]
-  M2 -->|No| ROLLBACK
+  M1 --> M2{Latency OK}
+  M1 --> ROLLBACK[Auto Rollback]
+  M2 --> PROMOTE[Promote]
+  M2 --> ROLLBACK
 ```
 
 ## Why This Stops Compounding Hallucinations
