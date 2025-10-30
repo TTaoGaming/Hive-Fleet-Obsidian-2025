@@ -193,3 +193,30 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
 ---
 
 BLUF for agents: Use PREY, log to blackboard, respect chunk/tripwires, never ping the human, and don’t ship before Verify PASS. Align labels with HIVE/GROWTH/SWARM/PREY to stay in-family with Gen21.
+
+## Diagram rendering (Mermaid) — parser-safe conventions
+
+To keep diagrams rendering across strict Mermaid parsers and various viewers:
+
+- Prefer `graph LR` or `graph TB` over `flowchart`.
+- Keep node labels simple: avoid parentheses `()`, plus `+`, semicolons `;`, pipes `|`, and other punctuation in labels. Use plain words instead.
+- Avoid Unicode symbols in labels (e.g., ≥, →). Prefer ASCII words (e.g., "minimum 3 passes", "to").
+- Do not use edge labels like `-- PASS -->`. Instead, create explicit nodes (e.g., `PASS`) or describe logic in prose.
+- Split chained edges into single steps (one arrow per line) for clarity and compatibility.
+- When using `subgraph`, always close with `end` and keep indentation consistent.
+- Wrap diagrams in triple backticks with `mermaid` for proper highlighting.
+
+Minimal safe template:
+
+```mermaid
+graph LR
+  A[Start] --> B[Perceive]
+  B --> C[React]
+  C --> D[Engage]
+  D --> E[Yield]
+  E --> V[Verify]
+  V --> J[Digest]
+  V --> R[Re-run]
+```
+
+Note: If a renderer still errors, simplify labels further and remove punctuation; then log a receipt to the blackboard with the evidence refs to the affected file and lines.
