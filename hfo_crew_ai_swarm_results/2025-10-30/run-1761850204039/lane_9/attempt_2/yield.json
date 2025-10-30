@@ -1,0 +1,53 @@
+{
+  "mission_id": "mi_parallel_10lanes_2025-10-30",
+  "lane": "lane_9",
+  "attempt": 2,
+  "timestamp": "2025-10-30T18:50:43Z",
+  "use_llm": true,
+  "problems": 5,
+  "correct": 0,
+  "accuracy": 0.0,
+  "verify_threshold": 0.6,
+  "details": [
+    {
+      "q": "12 + 7 = ?",
+      "expected": 19,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null
+    },
+    {
+      "q": "8 * 9 = ?",
+      "expected": 72,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null
+    },
+    {
+      "q": "144 / 12 = ?",
+      "expected": 12,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null
+    },
+    {
+      "q": "(3 + 5) * 2 = ?",
+      "expected": 16,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null
+    },
+    {
+      "q": "2^5 = ?",
+      "expected": 32,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null
+    }
+  ]
+}

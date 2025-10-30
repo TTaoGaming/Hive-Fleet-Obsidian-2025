@@ -19,13 +19,22 @@ This repo includes a minimal, parser-safe Crew AI pilot that runs two parallel P
 - Prerequisites (local)
   - `.env` at repo root with `OPENROUTER_API_KEY` (optional for no-cost dry-runs) and optional `OPENROUTER_MODEL_HINT` (e.g., `haiku`).
   - Python environment with dependencies from `requirements.txt`.
+  - Model allowlist (enforced):
+    - Default priority: `openai/gpt-oss-120b`
+    - Also allowed for testing: `deepseek/deepseek-chat-v3-0324`, `qwen/qwen3-235b-a22b-2507`, `x-ai/grok-code-fast-1`, `openai/gpt-oss-20b`
+    - If `OPENROUTER_MODEL_HINT` is not one of the above, the system falls back to `openai/gpt-oss-120b`.
 
 - Run
-  - Optional model hint for a cheap/fast model is supported via env.
+  - Concurrency: lanes execute in parallel (thread pool) and emit OTEL spans per phase/agent and per-lane LLM call.
+  - Optional model hint (must be in the allowlist) is supported via env.
 
 ```bash
-# optional: constrain model to a cheap/fast allowlisted model
-OPENROUTER_MODEL_HINT=haiku \
+# default (no hint): uses openai/gpt-oss-120b
+python3 scripts/crew_ai/runner.py \
+  --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+
+# or select an allowed model explicitly
+OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
   python3 scripts/crew_ai/runner.py \
   --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
 ```
@@ -39,10 +48,25 @@ OPENROUTER_MODEL_HINT=haiku \
   - Bounded tokens and allowlisted models for Engage LLM calls; presence-only secret audit (never logs key).
   - Chunk-size limit (≤200 lines per write), placeholder ban, canary-first, measurable tripwires, explicit revert.
 
+- Verifying lanes and model selection
+  - Check parallelism and LLM model in spans:
+    - Spans file: `temp/otel/trace-*.jsonl` with entries like `name: lane_a:engage_llm` and attributes `model`, `latency_ms`.
+    - Helper tool: `scripts/crew_ai/analyze_traces.py` prints lane windows and "Parallel detected: True/False".
+      ```bash
+      python3 scripts/crew_ai/analyze_traces.py temp/otel/<trace-file>.jsonl
+      ```
+  - Quick LLM math sanity check (low token cost):
+    ```bash
+    # defaults to gpt-oss-120b; or set an allowed OPENROUTER_MODEL_HINT
+    python3 scripts/crew_ai/math_bench.py
+    ```
+
 - References
   - Mission intent: `hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
   - Crew README: `scripts/crew_ai/README.md`
   - Runner: `scripts/crew_ai/runner.py`
+  - Trace analyzer: `scripts/crew_ai/analyze_traces.py`
+  - Math sanity bench: `scripts/crew_ai/math_bench.py`
 
 # AGENTS.md — Operating Guide for Agents in Hive Fleet Obsidian (Gen21)
 

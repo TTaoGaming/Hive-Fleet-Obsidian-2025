@@ -19,6 +19,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import yaml
 from dotenv import load_dotenv
@@ -291,9 +292,12 @@ def run(intent_path: Path) -> int:
 
     trace_id = f"trace-{mission_id}-{int(time.time()*1000)}"
 
+    # Execute lanes concurrently to achieve true parallel swarm behavior
     lane_results: List[Dict[str, Any]] = []
-    for name in names[:count]:
-        lane_results.append(lane_prey_cycle(mission, name, trace_id))
+    with ThreadPoolExecutor(max_workers=count) as executor:
+        futures = {executor.submit(lane_prey_cycle, mission, name, trace_id): name for name in names[:count]}
+        for fut in as_completed(futures):
+            lane_results.append(fut.result())
 
     verify_result = verify_quorum(mission, lane_results, trace_id)
 

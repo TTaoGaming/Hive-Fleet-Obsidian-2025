@@ -22,14 +22,16 @@ import requests
 
 DEFAULT_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 
-# Conservative allowlist of cheap/fast models (updated over time as needed)
+# Strict allowlist (user-defined)
+# Note: Only these models can be selected. Hints outside this set will fall back to the first entry.
 ALLOWLIST = [
-    # Common fast/cheap options across providers
-    "openai/gpt-4o-mini",
-    "openai/gpt-4o-mini-2024-07-18",
-    "google/gemini-1.5-flash",
-    "google/gemini-1.5-flash-8b",
-    "anthropic/claude-3-haiku",
+    # Default priority: use OSS 120B unless a different allowed hint is provided
+    "openai/gpt-oss-120b",
+    # Remaining models are available for testing/backup
+    "deepseek/deepseek-chat-v3-0324",
+    "qwen/qwen3-235b-a22b-2507",
+    "x-ai/grok-code-fast-1",
+    "openai/gpt-oss-20b",
 ]
 
 
