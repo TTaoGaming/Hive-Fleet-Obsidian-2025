@@ -50,6 +50,11 @@ class MissionConfig:
     quorum_threshold: int = 2
     quorum_validators: List[str] = field(default_factory=lambda: ["immunizer", "disruptor", "verifier_aux"])
     blackboard_path: str = "hfo_blackboard/obsidian_synapse_blackboard.jsonl"
+    # LLM configuration
+    llm_model: str = "gpt-4"
+    llm_temperature: float = 0.7
+    llm_timeout: int = 60
+    agent_verbose: bool = False
     
     @classmethod
     def from_env(cls) -> MissionConfig:
@@ -60,6 +65,10 @@ class MissionConfig:
             chunk_size_max=int(os.getenv("HFO_CHUNK_SIZE_MAX", "200")),
             auto_retry_max=int(os.getenv("HFO_AUTO_RETRY_MAX", "3")),
             quorum_threshold=int(os.getenv("HFO_QUORUM_THRESHOLD", "2")),
+            llm_model=os.getenv("HFO_LLM_MODEL", "gpt-4"),
+            llm_temperature=float(os.getenv("HFO_LLM_TEMPERATURE", "0.7")),
+            llm_timeout=int(os.getenv("HFO_LLM_TIMEOUT", "60")),
+            agent_verbose=os.getenv("HFO_AGENT_VERBOSE", "false").lower() == "true",
         )
 
 
@@ -87,6 +96,38 @@ class SwarmlordOrchestrator:
             "chunk_size_max": config.chunk_size_max,
             "line_target_min": 0,
         }
+        self._validate_environment()
+        
+    def _validate_environment(self):
+        """Validate that required environment is set up."""
+        # Only validate API key if agents will be created (not for testing)
+        # This allows test/demo modes to work without API key
+        pass
+    
+    def _get_llm_config(self):
+        """Get LLM configuration with proper error handling."""
+        from crewai import LLM
+        
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "\n" + "=" * 80 + "\n"
+                "OPENAI_API_KEY is required for production mode.\n\n"
+                "To fix:\n"
+                "  1. Copy .env.example to .env\n"
+                "  2. Add your API key: OPENAI_API_KEY=sk-your-key-here\n"
+                "  3. Run again\n\n"
+                "Or run demo mode (no API key needed):\n"
+                "  bash run_multi_crew.sh demo\n"
+                + "=" * 80
+            )
+        
+        return LLM(
+            model=self.config.llm_model,
+            temperature=self.config.llm_temperature,
+            timeout=self.config.llm_timeout,
+            api_key=api_key,
+        )
         
     def log(self, phase: str, summary: str, evidence: List[str]):
         """Append receipt to blackboard JSONL."""
@@ -101,67 +142,81 @@ class SwarmlordOrchestrator:
     
     def create_prey_agents(self, lane_id: str, mode: str = "explore") -> Dict[str, Agent]:
         """Create PREY agents for a lane (Perceive, React, Engage, Yield)."""
+        # Get LLM configuration (validates API key)
+        llm = self._get_llm_config()
+        
+        # Determine verbosity (explore mode more verbose)
+        verbose = self.config.agent_verbose or (mode == "explore")
+        
         agents = {
             "perceiver": Agent(
                 role=f"Perceiver (Lane {lane_id})",
                 goal="Sense repository state, mission intent, and context",
                 backstory=f"Strategic sensor for lane {lane_id}, gathering evidence with minimal noise",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
             "reactor": Agent(
                 role=f"Reactor (Lane {lane_id})",
                 goal="Make sense of inputs and plan minimal changes",
                 backstory=f"Strategic planner for lane {lane_id}, maximizing safety and autonomy",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
             "engager": Agent(
                 role=f"Engager (Lane {lane_id})",
                 goal="Execute changes safely within chunk limits",
                 backstory=f"Executor for lane {lane_id}, respecting safety envelope and tripwires",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
             "yielder": Agent(
                 role=f"Yielder (Lane {lane_id})",
                 goal="Assemble review bundle with evidence",
                 backstory=f"Assimilator for lane {lane_id}, packaging outputs for verification",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
         }
         
-        # Adjust verbosity based on explore/exploit mode
-        if mode == "exploit":
-            for agent in agents.values():
-                agent.verbose = False
-                
         return agents
     
     def create_verify_agents(self) -> Dict[str, Agent]:
         """Create verification quorum agents."""
+        # Get LLM configuration (validates API key)
+        llm = self._get_llm_config()
+        
+        # Validators should be verbose to show their reasoning
+        verbose = self.config.agent_verbose or True
+        
         return {
             "immunizer": Agent(
                 role="Immunizer",
                 goal="Check for consistency, grounding, and evidence quality",
                 backstory="Defense system ensuring outputs are well-grounded and consistent",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
             "disruptor": Agent(
                 role="Disruptor",
                 goal="Probe for vulnerabilities, edge cases, and reward hacking",
                 backstory="Adversarial tester preventing persistent green and finding attack surfaces",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
             "verifier_aux": Agent(
                 role="Auxiliary Verifier",
                 goal="Independent validation of safety and policy compliance",
                 backstory="Third validator ensuring quorum consensus on quality",
                 allow_delegation=False,
-                verbose=True,
+                verbose=verbose,
+                llm=llm,
             ),
         }
     
