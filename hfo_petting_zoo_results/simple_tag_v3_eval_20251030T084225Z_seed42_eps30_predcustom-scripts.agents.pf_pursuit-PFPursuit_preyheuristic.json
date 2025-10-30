@@ -1,0 +1,41 @@
+{
+  "diagnostics": {
+    "pred_near_boundary_frac": 0.020444444444444446,
+    "pred_near_boundary_steps": 46,
+    "pred_total_steps": 2250,
+    "prey_near_boundary_frac": 0.7493333333333333,
+    "prey_near_boundary_steps": 562,
+    "prey_total_steps": 750,
+    "threshold_abs": 0.98
+  },
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "continuous_actions": true,
+    "episodes": 30,
+    "seed": 42
+  },
+  "policies": {
+    "baseline": "research",
+    "pred": "custom:scripts.agents.pf_pursuit:PFPursuit",
+    "prey": "heuristic"
+  },
+  "results": {
+    "avg_steps_to_first_catch": null,
+    "catch_rate": 0.0,
+    "caught_episodes": 0,
+    "total_episodes": 30
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-30T08:42:25.631506+00:00"
+  }
+}
