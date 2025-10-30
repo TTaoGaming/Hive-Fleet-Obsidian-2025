@@ -6,6 +6,7 @@ orchestrator: Swarmlord of Webs (sole human interface)
 - Success means: minimal-to-zero babysitting mid-loop, safe autonomous retries, and independently verified fixes delivered on a schedule.
 - Defaults: TDD-first, GitOps-style flow, strict safety envelope, and quorum-based Verify before any digest to the user.
 - Scale path: multiple PREY lanes run in parallel behind the Swarmlord; you author intent, then return later to a verified bundle.
+- Verification stance: persistent green is a code smell; the disruptor must probe attack surfaces; favor 80/20 high-leverage checks and guard against reward hacking.
 
 ---
 
@@ -47,7 +48,38 @@ orchestrator: Swarmlord of Webs (sole human interface)
   - Backpressure and fairness: lane queue with time-sliced budgets; stalled lanes auto-shrunk (smaller chunks, narrower scope).
 - Verify gate
   - Independent validators run checks (grounding, consistency, hallucination rate, SLO conformance).
+  - Adversarial heuristics
+    - Persistent green smell: always run disruptor probes to find attack surfaces; require at least one adversarial attempt per lane cycle.
+    - 80/20 verification: emphasize high-leverage checks (tests that fail when real regressions occur; negative controls; seed variance; diff-based policy checks) to minimize noise and human pain.
+    - Reward-hacking guards: cross-evidence requirements, seed randomization, metric consistency checks, and anti-cheat sentinels (e.g., detect noop tests, brittle mocks, or disabled checks).
   - Outcomes: PASS → digest; FAIL → targeted re-run (reduce chunk, add canary, tighten tripwires).
+
+## Matrix — verification strategy (80/20 focus)
+
+| Option | Leverage | Pain | Risk | When to use |
+|---|---|---|---|---|
+| Unit tests critical paths | High | Low | Low | Always; TDD entry point |
+| Negative controls (should fail) | High | Low | Low | Catch reward hacking and false greens |
+| Seed variance (non-deterministic runs) | Medium | Low | Medium | Detect flaky or overfit behavior |
+| Static checks (lint/type/policy) | Medium | Low | Low | Cheap signal before heavy runs |
+| Adversarial probes (disruptor) | High | Medium | Medium | Each lane cycle; minimum one probe |
+| Chaos/perturb (bounds, timeouts) | Medium | Medium | Medium | Periodic canary; not every cycle |
+| Full end-to-end soak | Very High | High | Medium | Pre-digest or on risky changes |
+
+## Diagram — Verify with immunizer and disruptor
+
+```mermaid
+graph LR
+  Y[Yield bundle] --> VQ[Verify quorum]
+  VQ --> IM[Immunizer checks]
+  VQ --> DR[Disruptor probes]
+  IM --> AG[Verify aggregate]
+  DR --> AG
+  AG --> PASS[Pass]
+  AG --> FAIL[Fail]
+  PASS --> DIG[Digest to user]
+  FAIL --> RETRY[Targeted re run]
+```
 - Retry and escalation policy
   - Max 3 targeted re-runs. On 3× FAIL, escalate to a synthesis lane that proposes alternatives or requests new constraints in the next clarification window (not mid-loop).
 
