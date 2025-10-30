@@ -49,6 +49,7 @@ pydantic==2.12.3
 pydantic-settings==2.11.0
 pydantic_core==2.41.4
 pygame==2.6.1
+Pillow==10.4.0
 python-dotenv==1.2.1
 PyYAML==6.0.3
 requests==2.32.5

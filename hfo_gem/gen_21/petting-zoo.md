@@ -40,6 +40,13 @@ python3 scripts/pz_matrix_simple_tag_v3.py \
   --min-hvsr 0.70
 ```
 
+- Generate a 2×2 animated GIF (3 episodes/cell by default):
+
+```bash
+python3 scripts/pz_make_matrix_gif.py --episodes 3 --seed 42 --max-cycles 25 --duration-ms 120 --outdir hfo_petting_zoo_results/gifs
+```
+Output file: `hfo_petting_zoo_results/gifs/simple_tag_v3_matrix_<TS>_seed<seed>_eps<episodes>.gif`
+
 Flags in `pz_matrix_simple_tag_v3.py`:
 - `--min-hvsr <float>`: fail if HvsR catch_rate falls below this threshold
 - `--no-fail-on-bad-ordering`: disable failure on ordering violations (default is to fail)
@@ -89,6 +96,6 @@ If `main` regresses, prefer a revert PR to return to `8a9e1c6` (history-preservi
 
 ## Notes
 
-- Requirements pinned in `requirements.txt` (includes `pettingzoo`, `gymnasium`, `mpe2`, `numpy`, `pygame`).
+- Requirements pinned in `requirements.txt` (includes `pettingzoo`, `gymnasium`, `mpe2`, `numpy`, `pygame`, `Pillow`).
 - Environment differences (library versions/OS/Python) can slightly shift catch rates; rely on ordering and thresholds to judge pass/fail.
 - JSON result filenames encode parameters: `hfo_petting_zoo_results/simple_tag_v3_matrix_<TIMESTAMP>_seed<seed>_eps<episodes>.json`.
