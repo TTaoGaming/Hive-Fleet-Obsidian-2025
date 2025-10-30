@@ -1,0 +1,19 @@
+{"id":"logic-1","category":"logic","type":"mc","prompt":"If A implies B, and B is false, what can we conclude about A?","options":["A is true","A is false","Cannot conclude"],"expect":"C"}
+{"id":"dyck-1","category":"dyck","type":"bool","prompt":"Is the bracket string balanced? []()[()]","expect":true}
+{"id":"dyck-2","category":"dyck","type":"bool","prompt":"Is the bracket string balanced? ([)]","expect":false}
+{"id":"table-1","category":"table","type":"int","prompt":"Given the table (CSV):\nname,dept,qty\nAnn,Sales,3\nBob,Sales,4\nCara,Eng,5\nDan,Sales,2\n\nCompute the total qty for dept=Sales.","expect":9}
+{"id":"json-1","category":"json","type":"json","prompt":"Extract product, quantity, unit_price, and total from: 'Order 3 widgets at $7.50 each; total before tax is $22.50'. Keys: product (singular noun), quantity (int), unit_price (float), total (float).","expect":{"product":"widget","quantity":3,"unit_price":7.5,"total":22.5}}
+{"id":"follow-1","category":"follow","type":"string","prompt":"Answer only the single character 'B'. Do not include punctuation or spaces.","expect":"B"}
+{"id":"date-1","category":"date","type":"int","prompt":"How many days are between the ISO dates 2020-02-28 and 2020-03-01? Answer end minus start in whole days.","expect":2}
+{"id":"string-1","category":"string","type":"string","prompt":"Convert the snake_case name 'fast_fourier_transform' to kebab-case.","expect":"fast-fourier-transform"}
+{"id":"string-2","category":"string","type":"string","prompt":"Given the list of words: 'pear, Apple, banana, apple'. Lowercase all words, remove duplicates, sort alphabetically, and output as 'w1, w2, w3'.","expect":"apple, banana, pear"}
+{"id":"int-1","category":"math","type":"int","prompt":"Compute the 10th Fibonacci number with F1=1 and F2=1.","expect":55}
+{"id":"bool-1","category":"math","type":"bool","prompt":"Is the count of primes between 1 and 10 equal to 4?","expect":true}
+{"id":"logic-2","category":"logic","type":"mc","prompt":"All squares are rectangles. Some rectangles are red. Which statement is necessarily true?","options":["Some squares are red","Some red things are squares","No squares are red","None of the above"],"expect":"D"}
+{"id":"table-2","category":"table","type":"int","prompt":"Given the table (CSV):\nitem,price,qty\npen,1.50,10\nbook,12.00,2\nkit,15.00,3\ncard,3.00,5\n\nCompute the total revenue (price*qty) for rows with price > 10.","expect":69}
+{"id":"json-2","category":"json","type":"json","prompt":"From the text 'Values are a=2 and b=3', output keys a, b, and sum (a+b). Types: a int, b int, sum int.","expect":{"a":2,"b":3,"sum":5}}
+{"id":"follow-2","category":"follow","type":"string","prompt":"Reply with exactly YES in uppercase. No punctuation, no spaces, no quotes.","expect":"YES"}
+{"id":"string-3","category":"string","type":"string","prompt":"Reverse the string 'stressed'.","expect":"desserts"}
+{"id":"dyck-3","category":"dyck","type":"bool","prompt":"Is the bracket string balanced? {[()]}[]","expect":true}
+{"id":"date-2","category":"date","type":"int","prompt":"How many days are between the ISO dates 2019-12-31 and 2020-01-01? Answer end minus start in whole days.","expect":1}
+{"id":"int-2","category":"math","type":"int","prompt":"Compute floor(7.9) + ceil(-2.1).","expect":5}

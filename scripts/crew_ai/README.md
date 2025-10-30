@@ -43,3 +43,54 @@ Notes:
 - Add budgeting/rate limits per mission to cap LLM calls.
 - Externalize model allowlist and limits into mission intent or policy file.
 - Expand Verify to assert per-lane engage_llm spans when keys are present.
+
+## Mixed lightweight eval (harder than simple math)
+
+Use `scripts/crew_ai/mixed_light_eval.py` to run a tiny mixed benchmark that stresses logic, strict formatting, table math, JSON extraction, dates, and string transforms. It uses the same OpenRouter client and stays low-cost by default.
+
+Dataset: `scripts/crew_ai/evals/mini_mix_eval.jsonl`
+
+Examples:
+
+```bash
+# default: uses env OPENROUTER_MODEL_HINT if set
+python3 scripts/crew_ai/mixed_light_eval.py
+
+# pick a model explicitly via env
+OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
+  python3 scripts/crew_ai/mixed_light_eval.py --limit 0
+
+# write JSON output somewhere
+python3 scripts/crew_ai/mixed_light_eval.py --output temp/evals/mixed_eval_results.json
+```
+
+Scoring notes:
+- Enforces strict outputs (e.g., letter-only, True/False, integer-only, or JSON-only) to catch instruction-following drift.
+- Reports per-category accuracy and format-failure rate to surface brittle behavior beyond raw correctness.
+
+## ARC-Challenge (research-grade, MCQ)
+
+Evaluate models on the official AI2 ARC-Challenge dataset (validation split by default). This is a standard, widely-used benchmark for non-trivial reasoning.
+
+Single-model run:
+```bash
+# uses env OPENROUTER_MODEL_HINT if set
+python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
+
+# or pick a model explicitly
+OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
+  python3 scripts/crew_ai/arc_challenge_eval.py --limit 0
+```
+
+Swarm run (one lane per allowlisted model):
+```bash
+python3 scripts/crew_ai/arc_swarm_runner.py --limit 200
+```
+
+Outputs:
+- Digest: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md`
+- JSON: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/arc_swarm_results.json`
+
+Notes:
+- Limit defaults to 200 for cost control; set `--limit 0` for the full split.
+- Accuracy is computed on the validation split for easy, labeled scoring.

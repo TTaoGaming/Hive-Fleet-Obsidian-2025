@@ -217,11 +217,14 @@ def call_openrouter(
             "status_code": resp.status_code,
         }
 
+    usage = None
     try:
         data = resp.json()
         content = _extract_content(data)
+        usage = data.get("usage") if isinstance(data, dict) else None
     except Exception:
         content = ""
+        usage = None
 
     return {
         "ok": True,
@@ -230,4 +233,5 @@ def call_openrouter(
         "content": content,
         "error": None,
         "status_code": resp.status_code,
+        "usage": usage,
     }
