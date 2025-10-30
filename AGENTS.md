@@ -336,3 +336,22 @@ Note: If a renderer still errors, simplify labels further and remove punctuation
 - Safety remains unchanged
   - Chunk size ≤200 lines; placeholder ban; receipts appended to blackboard; Verify quorum required before digest.
 
+## ARC-Challenge eval — operational note (2025-10-30)
+
+- What: Research-grade, low-cost benchmark (AI2 ARC-Challenge, validation split) to compare allowlisted models in parallel lanes.
+- How to run (single model):
+  - `python3 scripts/crew_ai/arc_challenge_eval.py --limit 200`
+- Swarm (one model per lane; arbitrary lanes per model):
+  - `python3 scripts/crew_ai/arc_swarm_runner.py --limit 50 --lanes-per-model 2 --split validation`
+  - Filter models (e.g., only GPT‑OSS family): `--models gpt-oss`
+- Outputs:
+  - Digest: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md`
+  - JSON: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/arc_swarm_results.json`
+- Cost metrics (optional; env-driven):
+  - Default: `OPENROUTER_PRICE_DEFAULT_PER_1K=<usd>`
+  - Per-model override (sanitized): `OPENROUTER_PRICE_OPENAI_GPT_OSS_20B_PER_1K=<usd>`
+- Transport resiliency (OSS models):
+  - Client retries once on empty content and drops `response_format` on retry. Metrics include `empty_content` and `format_fails`.
+- Model selection (Swarmlord):
+  - Prefer the best accuracy at acceptable latency and price. Use aggregated results across lanes; consider accuracy-per-dollar.
+

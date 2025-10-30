@@ -132,6 +132,10 @@ def call_openrouter(
     system_prompt: Optional[str] = None,
     enable_reasoning: Optional[bool] = None,
     reasoning_effort: Optional[str] = None,
+    # Transport resilience
+    retry_on_empty: bool = False,
+    retry_max: int = 1,
+    retry_alt_format: bool = True,
 ) -> Dict[str, Any]:
     """
     Make a single, bounded LLM call. Returns a result dict with shape:
@@ -193,45 +197,69 @@ def call_openrouter(
     if enable_reasoning and any(m in model for m in REASONING_MODELS):
         payload["reasoning"] = {"effort": reasoning_effort}
 
-    t0 = time.time()
-    try:
-        resp = requests.post(url, json=payload, headers=headers, timeout=timeout_seconds)
-        latency_ms = int((time.time() - t0) * 1000)
-    except requests.RequestException as e:
-        return {
-            "ok": False,
-            "model": model,
-            "latency_ms": int((time.time() - t0) * 1000),
-            "content": None,
-            "error": f"request_error: {type(e).__name__}",
-            "status_code": None,
-        }
+    attempts = 0
+    last_error: Optional[str] = None
+    total_latency = 0
+    while True:
+        attempts += 1
+        t0 = time.time()
+        try:
+            resp = requests.post(url, json=payload, headers=headers, timeout=timeout_seconds)
+            latency_ms = int((time.time() - t0) * 1000)
+            total_latency += latency_ms
+        except requests.RequestException as e:
+            last_error = f"request_error: {type(e).__name__}"
+            if attempts <= retry_max:
+                # Retry on transport errors too
+                if retry_alt_format:
+                    payload.pop("response_format", None)
+                continue
+            return {
+                "ok": False,
+                "model": model,
+                "latency_ms": total_latency,
+                "content": None,
+                "error": last_error,
+                "status_code": None,
+            }
 
-    if resp.status_code != 200:
-        return {
-            "ok": False,
-            "model": model,
-            "latency_ms": latency_ms,
-            "content": None,
-            "error": f"http_{resp.status_code}",
-            "status_code": resp.status_code,
-        }
+        if resp.status_code != 200:
+            last_error = f"http_{resp.status_code}"
+            if attempts <= retry_max:
+                if retry_alt_format:
+                    payload.pop("response_format", None)
+                continue
+            return {
+                "ok": False,
+                "model": model,
+                "latency_ms": total_latency,
+                "content": None,
+                "error": last_error,
+                "status_code": resp.status_code,
+            }
 
-    usage = None
-    try:
-        data = resp.json()
-        content = _extract_content(data)
-        usage = data.get("usage") if isinstance(data, dict) else None
-    except Exception:
-        content = ""
         usage = None
+        try:
+            data = resp.json()
+            content = _extract_content(data)
+            usage = data.get("usage") if isinstance(data, dict) else None
+        except Exception:
+            content = ""
+            usage = None
 
-    return {
-        "ok": True,
-        "model": model,
-        "latency_ms": latency_ms,
-        "content": content,
-        "error": None,
-        "status_code": resp.status_code,
-        "usage": usage,
-    }
+        # If content is empty and retry is allowed, try once more (possibly without response_format)
+        if (content is None or not str(content).strip()) and retry_on_empty and attempts <= retry_max:
+            if retry_alt_format:
+                payload.pop("response_format", None)
+            # slight jitter via no-op sleep avoided to keep fast
+            continue
+
+        return {
+            "ok": True,
+            "model": model,
+            "latency_ms": total_latency if attempts > 1 else latency_ms,
+            "content": content,
+            "error": None,
+            "status_code": resp.status_code,
+            "usage": usage,
+        }

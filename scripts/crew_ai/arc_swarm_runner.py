@@ -123,6 +123,7 @@ def main() -> None:
     ap.add_argument("--max-tokens", type=int, default=12)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--timeout-seconds", type=int, default=25)
+    ap.add_argument("--models", type=str, default="", help="Comma-separated substrings to filter allowlisted models (e.g., 'gpt-oss,deepseek')")
     args = ap.parse_args()
 
     load_dotenv(dotenv_path=ROOT / ".env", override=False)
@@ -131,6 +132,9 @@ def main() -> None:
         return
 
     allowlist = list(llm_client.ALLOWLIST)
+    if args.models.strip():
+        filters = [s.strip().lower() for s in args.models.split(",") if s.strip()]
+        allowlist = [m for m in allowlist if any(f in m.lower() for f in filters)]
     mission_id = f"arc_challenge_swarm_{int(time.time()*1000)}"
 
     date_dir = RESULTS_ROOT / datetime.now(timezone.utc).strftime("%Y-%m-%d")

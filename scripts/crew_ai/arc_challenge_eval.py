@@ -120,6 +120,9 @@ def run_eval(
             timeout_seconds=timeout_seconds,
             response_format_type="text",
             system_prompt="Answer with the letter only. Be exact.",
+            retry_on_empty=True,
+            retry_max=1,
+            retry_alt_format=True,
         )
         model_used = model_used or res.get("model")
         content = res.get("content") if res.get("ok") else None
