@@ -12,3 +12,7 @@ hfo_crew_ai_swarm_results/
 
 # Ignore PettingZoo evaluation outputs
 hfo_petting_zoo_results/
+
+# Python bytecode and cache
+__pycache__/
+*.pyc
