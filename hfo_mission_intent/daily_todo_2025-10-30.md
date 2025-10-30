@@ -31,3 +31,21 @@ Acceptance criteria
 - No exceeded-bound events observed → conclude boundary hugging is within expected dynamics, not an escape bug.
 - If co-near-boundary spikes with low catch rate, prioritize wall-tangent and lead pursuit to address closing.
 - Provide short summary with metrics and next-step recommendations.
+
+Updates (later 2025-10-30)
+- Added Stationary prey and near-wall forcing to validate boundary reachability → 100% captures with both heuristic and PF predators when prey is static near wall.
+- Implemented predator variants to break corner stalemates vs heuristic prey:
+  - WallTangentPursuit, LeadTTIPursuit, SpreadTangentPursuit, CornerClampPursuit.
+  - 30 eps, seed 42 @25 cycles: all 0.00 catch.
+  - Re-ran @100 cycles: still 0.00 catch for all variants.
+- Extended evaluator diagnostics:
+  - Added global_min_dist across all steps and episodes; per-episode ep_min_dist and episodes_close_dist (min dist <= close_thr=0.03).
+  - Heuristic vs heuristic, 100 eps, seed 42, max_cycles=300 → catch_rate=0.01 (1/100; first-step tag), global_min_dist≈0.0345 (> close_thr), episodes_close_dist=0.
+  - PF (k_rep_wall=0.0) vs heuristic, 100 eps, seed 42, max_cycles=300 → catch_rate=0.01, global_min_dist≈0.0345, episodes_close_dist=0.
+  - Interpretation: rare instant tags at spawn; otherwise persistent plateau beyond ~0.034—consistent with geometric jam at corners.
+- Note: OOB counters very high under current bound=1.0 check, suggesting our OOB criterion is mis-specified for this mpe2 build. Diagnostics still useful for relative comparisons; will calibrate bound from env (todo).
+
+Next steps
+- Calibrate dynamic world bound from env (state range) to fix OOB metrics and near-boundary thresholding.
+- Prototype minimal role coordination (assign one pusher + two flankers) to break jams; incorporate stateful phase switching (tangent pulses alternating with inward pushes).
+- Optional: probe environment speed ratio; if predators are not faster, closures against wall-hugging prey may be measure-zero without spawn adjacency.
