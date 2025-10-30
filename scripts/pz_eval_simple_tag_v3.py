@@ -227,8 +227,9 @@ def detect_tag_event(rewards: Dict[str, float], infos: Dict[str, dict], adversar
 # --------- Runner ---------
 
 def run_eval(episodes: int, seed: int, pred_spec: str, prey_spec: str, baseline: str,
-             pred_kwargs: dict | None = None, prey_kwargs: dict | None = None) -> Tuple[float, float, int]:
-    penv = simple_tag_v3.parallel_env(continuous_actions=True, render_mode=None)
+             pred_kwargs: dict | None = None, prey_kwargs: dict | None = None,
+             max_cycles: int | None = None) -> Tuple[float, float, int]:
+    penv = simple_tag_v3.parallel_env(continuous_actions=True, render_mode=None, max_cycles=int(max_cycles or 25))
     obs, infos = penv.reset(seed=seed)
 
     pred_policy = parse_policy(pred_spec, role='pred', baseline=baseline, extra_kwargs=pred_kwargs)
@@ -287,6 +288,7 @@ def main() -> None:
     parser.add_argument("--diag-close-dist", type=float, default=0.03, help="Distance threshold to consider predators 'close' to prey (default 0.03)")
     parser.add_argument("--force-prey-near-wall", action="store_true", help="On reset, repeat until prey spawns within diag-boundary-thr of wall (max attempts)")
     parser.add_argument("--force-prey-near-wall-max", type=int, default=50, help="Max reset attempts to place prey near wall when forced")
+    parser.add_argument("--max-cycles", type=int, default=25, help="Max cycles per episode for the env (default 25)")
     args = parser.parse_args()
 
     run_end = datetime.now(timezone.utc)
@@ -443,10 +445,10 @@ def main() -> None:
 
     def _run_eval_with_diag(episodes: int, seed: int, pred_spec: str, prey_spec: str, baseline: str):
         if not args.diag_boundary:
-            return run_eval(episodes, seed, pred_spec, prey_spec, baseline, pred_kwargs=pred_kwargs, prey_kwargs=prey_kwargs)
+            return run_eval(episodes, seed, pred_spec, prey_spec, baseline, pred_kwargs=pred_kwargs, prey_kwargs=prey_kwargs, max_cycles=int(args.max_cycles))
 
         from typing import List, Dict, Optional, Tuple
-        penv = simple_tag_v3.parallel_env(continuous_actions=True, render_mode=None)
+        penv = simple_tag_v3.parallel_env(continuous_actions=True, render_mode=None, max_cycles=int(args.max_cycles))
         obs, infos = penv.reset(seed=seed)
 
         pred_policy = parse_policy(pred_spec, role='pred', baseline=baseline, extra_kwargs=pred_kwargs)
