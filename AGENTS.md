@@ -290,3 +290,23 @@ graph LR
 ```
 
 Note: If a renderer still errors, simplify labels further and remove punctuation; then log a receipt to the blackboard with the evidence refs to the affected file and lines.
+
+## Crew AI swarm — E2E handoff note (2025-10-30)
+
+- Status
+  - Parallel PREY lanes operational at N=10 (thread pool). Verified via span overlap analysis.
+  - LLM mode: model-hint sensitivity observed. qwen hint passed 10/10; oss-120b returned empty content in this environment for math micro-tasks.
+- Artifacts
+  - Digest: `hfo_crew_ai_swarm_results/2025-10-30/run-1761850703499/swarmlord_digest.md`
+  - Spans: `temp/otel/trace-swarm_math-1761850703499.jsonl`
+  - Intent: `hfo_mission_intent/2025-10-30/mission_intent_parallel_10lanes_2025-10-30.v1.yml`
+- How to validate quickly
+  - Check spans for per-lane engage windows; analyzer should report Parallel detected: True.
+  - Inspect digest for per-lane yields, verify counts, and quorum/thresholds.
+- Safety & receipts
+  - Chunk limit ≤200 lines for docs; append-only JSONL receipts with evidence_refs.
+  - No placeholders in committed artifacts; revert by removing the last JSONL line if a malformed append occurs.
+- Next tweaks (low risk)
+  - Harden client parsing for oss-120b: multi-shape content parsing and retry-on-empty; optional response_format JSON when supported.
+  - Add optional CSV/metrics: wall-clock vs. sum speedup and pass/fail tallies per run.
+
