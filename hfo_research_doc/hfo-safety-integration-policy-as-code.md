@@ -8,6 +8,18 @@
 
 Adopt the stack used by top platform teams to prevent unsafe diffs from reaching humans and enable data-driven rollback. This integrates with HFO's existing safety envelope (canary, tripwires, revert) and strengthens the Independent Verify gate.
 
+## ⚠️ Important Disclaimer
+
+**This is a research document, not production-ready code.** All code examples (OPA policies, Semgrep rules, Python snippets, YAML configs) are **illustrative templates** based on tool documentation. They require:
+
+1. **Testing in HFO environment** before production use
+2. **Adaptation to actual HFO codebase** (function names, schemas, etc.)
+3. **Validation of effectiveness** through pilot implementations
+
+**Use Case:** Decision support and implementation guidance, not copy-paste deployment.
+
+**Self-Audit:** See `self-audit-safety-integration.md` for detailed verification of all claims and identification of templates vs. verified facts.
+
 ### Core Thesis
 
 **Compounded hallucinations are stopped when:**
@@ -490,49 +502,262 @@ Docs-as-code captures accepted truth at merge. The GEM SSOT + TechDocs ensure:
 - Diátaxis structure prevents documentation drift
 - Updates require Independent Verify PASS
 
-## Implementation Roadmap
+## Implementation Roadmap: Cold Start to State of the Art
 
-### Phase 1: Policy Gates (Week 1-2)
-- [ ] Add OPA/Conftest to CI
-- [ ] Define HFO merge requirements policy
-- [ ] Integrate with GitHub branch protection
-- [ ] Add CodeQL security scanning
-- [ ] Add Semgrep with HFO-specific rules
+**Optimistic Timeline:** 12 weeks (as shown)  
+**Realistic Timeline:** 16-20 weeks (with buffer for learning, debugging, team coordination)
 
-### Phase 2: Progressive Delivery (Week 3-4)
-- [ ] Integrate OpenFeature SDK
-- [ ] Define feature flags for risky behaviors
-- [ ] Set up Argo Rollouts (if K8s available)
-- [ ] Create AnalysisTemplates for canary validation
-- [ ] Configure auto-rollback on metrics
+### Week 0: Cold Start Prerequisites
 
-### Phase 3: Observability (Week 5-6)
-- [ ] Instrument PREY loop with OpenTelemetry
-- [ ] Set up metrics backend (Prometheus/etc)
-- [ ] Create dashboards for DORA Four Keys
-- [ ] Wire canary analysis to OTel queries
-- [ ] Add alerting on tripwires
+**Goal:** Establish baseline capability to run tests and CI/CD
 
-### Phase 4: Supply Chain (Week 7-8)
-- [ ] Generate SLSA attestations in CI
-- [ ] Integrate Cosign signing
-- [ ] Add signature verification to deploy
-- [ ] Extend blackboard schema for provenance
-- [ ] Create audit trail reports
+**Entry State:** Fresh HFO repository clone
+**Activities:**
+- [ ] Verify GitHub repo with CI/CD (GitHub Actions)
+- [ ] Confirm Python/Node.js environment working
+- [ ] Run existing test suite successfully (`npm test` or `pytest`)
+- [ ] Review HFO Gen21 GEM and AGENTS.md
+- [ ] Identify repository owner/maintainer with merge rights
 
-### Phase 5: Docs-as-Code (Week 9-10)
-- [ ] Set up TechDocs with MkDocs
-- [ ] Organize docs by Diátaxis
-- [ ] Create ADR template
-- [ ] Require ADR link in merge policy
-- [ ] Integrate docs build into CI
+**Exit Criteria:** 
+- ✅ Can run `git clone && cd repo && npm install && npm test` successfully
+- ✅ Have GitHub admin access for branch protection settings
+- ✅ Team agrees on safety integration as goal
 
-### Phase 6: LLM Safety (Week 11-12)
-- [ ] Map OWASP LLM Top-10 to OPA rules
-- [ ] Add prompt injection detection
-- [ ] Enforce output validation
-- [ ] Limit excessive agency
-- [ ] Document NIST AI RMF controls
+**Time Investment:** 2-4 hours
+
+---
+
+### Phase 1: Foundation - Policy Gates & Static Analysis (Weeks 1-2)
+
+**Goal:** Block bad PRs before they reach humans (hard gates)
+
+**Maturity Level:** Basic → Intermediate
+
+**Activities:**
+- [ ] Install OPA/Conftest locally (`brew install conftest` or equivalent)
+- [ ] Create `.conftest/policy/hfo_merge_requirements.rego` with basic policies
+- [ ] Test policies locally: `conftest test --policy .conftest/policy .`
+- [ ] Add GitHub Actions workflow for policy checks
+- [ ] Enable CodeQL in GitHub Security settings
+- [ ] Commit `.github/workflows/codeql.yml` workflow
+- [ ] Install Semgrep: `pip install semgrep`
+- [ ] Create `.semgrep/hfo_rules.yml` with HFO-specific rules
+- [ ] Add Semgrep to CI: `semgrep --config=.semgrep/hfo_rules.yml`
+- [ ] Configure GitHub branch protection to require all checks
+
+**Exit Criteria:**
+- ✅ First PR blocked by policy violation (intentional test)
+- ✅ CodeQL finds first security issue (or confirms clean scan)
+- ✅ Semgrep enforces HFO-specific rules (e.g., no direct human prompts)
+- ✅ Cannot merge without passing all checks
+
+**Time Investment:** 16-20 hours over 2 weeks
+
+**Receipts Required:**
+- Screenshot of blocked PR with policy violation message
+- CodeQL scan results URL
+- Semgrep results in CI logs
+- Branch protection rules screenshot
+
+---
+
+### Phase 2: Progressive Delivery Foundation (Weeks 3-4)
+
+**Goal:** Enable controlled rollout with feature flags
+
+**Maturity Level:** Intermediate → Advanced (if K8s) or Intermediate (manual canary)
+
+**Activities:**
+- [ ] Install OpenFeature SDK: `pip install openfeature-sdk` (Python example)
+- [ ] Create feature flag client in `src/feature_flags/openfeature_client.py`
+- [ ] Define first flag: `enable_experimental_verify` (boolean)
+- [ ] Use file-based provider for local dev (no external service needed initially)
+- [ ] Wrap risky Engage phase behavior with flag check
+- [ ] Test flag toggling locally
+- [ ] **(If K8s available):** Set up Argo Rollouts in cluster
+- [ ] **(If K8s available):** Create `k8s/rollouts/hfo-swarmlord-rollout.yml`
+- [ ] **(If no K8s):** Implement manual canary process with metrics monitoring
+
+**Exit Criteria:**
+- ✅ Can toggle feature flag and see behavior change
+- ✅ Flag evaluation logged to blackboard with evidence_refs
+- ✅ **(If K8s):** Argo Rollout visible in dashboard
+- ✅ **(If no K8s):** Manual canary checklist documented
+
+**Time Investment:** 12-16 hours
+
+**Receipts Required:**
+- Flag evaluation logs showing true/false paths
+- Blackboard receipt with feature flag context
+- (Optional) Argo Rollout status screenshot
+
+---
+
+### Phase 3: Observability Foundation (Weeks 5-6)
+
+**Goal:** Make PREY loop visible and measurable
+
+**Maturity Level:** Advanced
+
+**Activities:**
+- [ ] Install OpenTelemetry SDK: `pip install opentelemetry-api opentelemetry-sdk`
+- [ ] Create `src/observability/otel_config.py` with tracer setup
+- [ ] Instrument PREY loop with spans: `perceive`, `react`, `engage`, `yield`, `verify`
+- [ ] Add custom attributes: `mission_id`, `chunk_size`, `verify_status`
+- [ ] Configure exporter (console for dev, Prometheus/Jaeger for production)
+- [ ] Set up metrics: `hfo_verify_pass_total`, `hfo_verify_total`, `hfo_tripwire_hits`
+- [ ] Create basic dashboard (Grafana or similar) showing verify pass rate
+- [ ] Wire canary analysis to query verify metrics
+
+**Exit Criteria:**
+- ✅ Can view complete trace for one PREY loop execution
+- ✅ Metrics visible in dashboard
+- ✅ Verify pass rate calculation working (pass/total)
+- ✅ Trace IDs included in blackboard receipts
+
+**Time Investment:** 16-24 hours
+
+**Receipts Required:**
+- Screenshot of distributed trace in Jaeger/Zipkin
+- Dashboard screenshot showing verify pass rate metric
+- Blackboard receipt with trace_id field
+
+---
+
+### Phase 4: Supply Chain Integrity (Weeks 7-8)
+
+**Goal:** Cryptographically prove artifact origin
+
+**Maturity Level:** Advanced → SOTA
+
+**Activities:**
+- [ ] Enable GitHub Actions attestations (free with GitHub)
+- [ ] Create `.github/workflows/build-and-attest.yml`
+- [ ] Add build step generating HFO artifacts
+- [ ] Use `actions/attest-build-provenance@v1` to generate attestations
+- [ ] Install Cosign: `brew install cosign`
+- [ ] Sign artifacts with keyless Cosign: `cosign sign-blob --yes artifact.tar.gz`
+- [ ] Add verification step in deploy workflow
+- [ ] Extend blackboard schema to include provenance_attestation_url
+- [ ] Create audit trail report showing full artifact provenance
+
+**Exit Criteria:**
+- ✅ Attestation JSON generated for every build
+- ✅ Artifacts signed with Cosign (keyless or key-based)
+- ✅ Cannot deploy unsigned artifact (policy gate enforces)
+- ✅ Can reconstruct full provenance chain from blackboard
+
+**Time Investment:** 12-16 hours
+
+**Receipts Required:**
+- Attestation JSON from GitHub Actions artifact
+- Cosign signature file (.sig)
+- Verification pass/fail logs
+- Provenance audit trail document
+
+---
+
+### Phase 5: Docs-as-Code (Weeks 9-10)
+
+**Goal:** Stable documentation substrate for agents
+
+**Maturity Level:** Advanced
+
+**Activities:**
+- [ ] Install MkDocs: `pip install mkdocs mkdocs-material`
+- [ ] Create `mkdocs.yml` configuration
+- [ ] Organize docs by Diátaxis structure (tutorials, how-to, reference, explanation)
+- [ ] Move/create docs in appropriate folders
+- [ ] Create ADR template in `docs/adr/template.md`
+- [ ] Write first 3 ADRs (including this safety integration decision)
+- [ ] Add docs build to CI: `mkdocs build --strict`
+- [ ] Publish docs site (GitHub Pages or internal)
+- [ ] Update OPA policy to require ADR link for architectural changes
+- [ ] Integrate docs build into pre-merge checks
+
+**Exit Criteria:**
+- ✅ Docs site live and accessible
+- ✅ ADR-001 (this decision) published
+- ✅ Diátaxis structure validated (all 4 sections present)
+- ✅ Policy blocks PRs without ADR for arch changes
+
+**Time Investment:** 16-20 hours
+
+**Receipts Required:**
+- Docs site URL
+- Published ADR-001 URL
+- OPA policy requiring ADR links
+- CI logs showing docs build
+
+---
+
+### Phase 6: LLM-Specific Safety (Weeks 11-12)
+
+**Goal:** Prevent LLM-specific attack vectors
+
+**Maturity Level:** SOTA
+
+**Activities:**
+- [ ] Study OWASP LLM Top-10: https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- [ ] Map each OWASP control to HFO context
+- [ ] Create `.conftest/policy/llm_safety.rego` with OWASP rules
+- [ ] LLM01: Block prompts with system override attempts
+- [ ] LLM02: Enforce output validation (no direct eval)
+- [ ] LLM06: Limit excessive agency (require approval for tool exec)
+- [ ] Add Semgrep rules for insecure LLM output handling
+- [ ] Create prompt injection test suite
+- [ ] Document NIST AI RMF control mapping in `docs/governance/nist_ai_rmf_controls.md`
+- [ ] Add LLM safety to CI checks
+
+**Exit Criteria:**
+- ✅ Policy blocks direct human prompts (Swarmlord facade enforced)
+- ✅ Policy blocks system prompt injection attempts
+- ✅ Output validation rules prevent direct eval
+- ✅ NIST AI RMF controls mapped and documented
+
+**Time Investment:** 16-24 hours
+
+**Receipts Required:**
+- OPA policy with OWASP LLM rules
+- Test results showing prompt injection blocked
+- NIST AI RMF mapping document
+- CI logs showing LLM safety checks
+
+---
+
+### Weeks 13+: State of the Art - Continuous Improvement
+
+**Goal:** Maintain and evolve safety posture
+
+**Maturity Level:** SOTA maintained
+
+**Ongoing Activities:**
+- [ ] Monitor DORA Four Keys weekly (deployment frequency, lead time, change failure rate, time to restore)
+- [ ] Tune OPA policies based on false positive rate (target: <5%)
+- [ ] Add custom CodeQL queries for HFO-specific patterns discovered
+- [ ] Expand Semgrep rules as new anti-patterns emerge
+- [ ] Increase feature flag coverage (gate more risky behaviors)
+- [ ] Iterate on canary AnalysisTemplates based on production learnings
+- [ ] Maintain provenance audit trail (quarterly reviews)
+- [ ] Update documentation as architecture evolves
+- [ ] Conduct quarterly security reviews with OWASP LLM updates
+- [ ] Track NIST AI RMF compliance
+
+**SOTA Success Metrics:**
+- **DORA Metrics:** Elite tier (daily deploys, <1hr lead time, <5% change fail, <1hr restore)
+- **Policy Effectiveness:** <5% false positive rate on merge gates
+- **Canary Success:** >95% of canaries pass analysis without rollback
+- **Provenance Coverage:** 100% of production artifacts signed and verified
+- **Documentation Completeness:** 100% of architectural changes have ADRs
+- **LLM Safety:** Zero prompt injection incidents; all tool executions approved
+
+**Continuous Time Investment:** 4-8 hours/week
+
+**Evolution:**
+- Contribute HFO-specific patterns back to open-source tools (Semgrep registry, CodeQL community)
+- Publish case study of safety integration for other AI agent systems
+- Evolve from SOTA to defining state-of-the-art for AI agent safety
 
 ## Evidence and Provenance
 
