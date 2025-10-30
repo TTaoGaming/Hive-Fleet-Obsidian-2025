@@ -1,0 +1,111 @@
+mission_id: mi_parallel_10lanes_2025-10-30
+version: v1
+created_at: 2025-10-30T00:00:00Z
+orchestrator: Swarmlord of Webs
+interface:
+  sole_human_interface: true
+  contact_policy:
+    digest_only: true
+    on_critical_error: return_to_user
+    on_timeout: return_best_partial_with_plan
+    notes: Parallelism stress-test; workers never prompt the human.
+clarification_pass_refs:
+  - hfo_mission_intent/2025-10-30/clarification_pass4_2025-10-30.md
+  - hfo_mission_intent/2025-10-30/clarification_pass5_2025-10-30.md
+time_bound:
+  window: daily
+  date: 2025-10-30
+anytime_behavior: true
+quorum:
+  validators: [immunizer, disruptor, verifier_aux]
+  threshold: 2
+verify:
+  hallucination_rate_target: 0.05
+  adversarial_probes_per_lane_cycle: 1
+  fail_over: rerun_prey_targeted
+  reward_hacking_guards:
+    - cross_evidence_required
+    - seed_randomization
+    - metric_consistency_checks
+    - anti_cheat_sentinels
+timeouts:
+  lane_cycle_soft_minutes: 5
+  mission_soft_minutes: 30
+telemetry:
+  blackboard_path: hfo_blackboard/obsidian_synapse_blackboard.jsonl
+  emit_opentelemetry: true
+  otel_format: json
+llm:
+  # Mission-level defaults for LLM calls; can be overridden by env vars
+  max_tokens: 2048
+  temperature: 0.2
+  timeout_seconds: 60
+  response_format_type: text
+  system_prompt: |
+    You are a careful, accurate assistant helping a multi-agent system. Provide complete, actionable answers.
+  reasoning: true
+  reasoning_effort: medium
+safety:
+  chunk_size_max: 200
+  placeholder_ban: true
+  revert_plan: true
+  canary_first: true
+  tripwires:
+    - line_count
+    - placeholder_scan
+    - tests_green
+    - policy_checks
+tooling:
+  posture: maximize
+  discovery_allowed: true
+  receipts_required: true
+  real_tools_only: true
+outputs:
+  digest_shape: [BLUF, matrix, diagram, notes]
+  evidence_required: true
+slo:
+  autonomy:
+    mid_loop_prompt_rate_target: 0
+  quality:
+    verify_first_pass_rate_target: 0.80
+    verify_within_3_retries_target: 0.95
+  timeliness:
+    lane_cycle_minutes_soft: 5
+    mission_minutes_soft: 30
+lanes:
+  count: 10
+  names: [lane_1, lane_2, lane_3, lane_4, lane_5, lane_6, lane_7, lane_8, lane_9, lane_10]
+  policy:
+    auto_retries_max: 2
+    shrink_scope_on_retry: true
+    backpressure:
+      enabled: true
+      fairness: time_sliced
+  tdd_gitops:
+    tdd_first: true
+    branch_per_mission: false
+    ci_verify_gate: true
+    canary_deploys: true
+crew_manifest_stub:
+  planner: enabled
+  perceiver: enabled
+  implementer: enabled
+  assimilator: enabled
+  immunizer: enabled
+  disruptor: enabled
+  memory:
+    type: blackboard_jsonl
+    path: hfo_blackboard/obsidian_synapse_blackboard.jsonl
+  guardrails:
+    - chunk_limit
+    - placeholder_ban
+    - canary_first
+    - measurable_tripwires
+    - explicit_revert
+source_documents:
+  - AGENTS.md
+  - hfo_mission_intent/mission_intent_template.yml
+  - hfo_mission_intent/2025-10-30/clarification_pass4_2025-10-30.md
+  - hfo_mission_intent/2025-10-30/clarification_pass5_2025-10-30.md
+notes:
+  - Ten-lane parallelism stress test to verify true concurrency and telemetry overlap.

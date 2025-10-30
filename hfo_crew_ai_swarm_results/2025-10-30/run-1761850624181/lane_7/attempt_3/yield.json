@@ -1,0 +1,31 @@
+{
+  "mission_id": "mi_parallel_10lanes_2025-10-30",
+  "lane": "lane_7",
+  "attempt": 3,
+  "timestamp": "2025-10-30T18:57:52Z",
+  "use_llm": true,
+  "problems": 2,
+  "correct": 0,
+  "accuracy": 0.0,
+  "verify_threshold": 0.6,
+  "details": [
+    {
+      "q": "12 + 7 = ?",
+      "expected": 19,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "8 * 9 = ?",
+      "expected": 72,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    }
+  ]
+}

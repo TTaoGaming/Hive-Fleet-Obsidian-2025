@@ -4,3 +4,15 @@ HFO_molt_shell_2025-10-25T17:00:00Z/
 .venv/hfo_blackboard_backups_2025-10-27T14_20_38Z/
 .venv/
 git_backup*/
+.env
+temp/otel/
+
+# Ignore Crew AI swarm results (noisy run artifacts)
+hfo_crew_ai_swarm_results/
+
+# Ignore PettingZoo evaluation outputs
+hfo_petting_zoo_results/
+
+# Python bytecode and cache
+__pycache__/
+*.pyc

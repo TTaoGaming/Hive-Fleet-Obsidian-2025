@@ -1,0 +1,103 @@
+{
+  "mission_id": "mi_parallel_10lanes_2025-10-30",
+  "lane": "lane_4",
+  "attempt": 1,
+  "timestamp": "2025-10-30T18:58:46Z",
+  "use_llm": true,
+  "problems": 10,
+  "correct": 10,
+  "accuracy": 1.0,
+  "verify_threshold": 0.6,
+  "details": [
+    {
+      "q": "12 + 7 = ?",
+      "expected": 19,
+      "got": 19,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 19}"
+    },
+    {
+      "q": "8 * 9 = ?",
+      "expected": 72,
+      "got": 72,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 72}"
+    },
+    {
+      "q": "144 / 12 = ?",
+      "expected": 12,
+      "got": 12,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 12}"
+    },
+    {
+      "q": "(3 + 5) * 2 = ?",
+      "expected": 16,
+      "got": 16,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 16}"
+    },
+    {
+      "q": "2^5 = ?",
+      "expected": 32,
+      "got": 32,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 32}"
+    },
+    {
+      "q": "100 - 77 = ?",
+      "expected": 23,
+      "got": 23,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 23}"
+    },
+    {
+      "q": "15 * 0 = ?",
+      "expected": 0,
+      "got": 0,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 0}"
+    },
+    {
+      "q": "7 * 13 = ?",
+      "expected": 91,
+      "got": 91,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 91}"
+    },
+    {
+      "q": "81^(1/2) = ?",
+      "expected": 9,
+      "got": 9,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 9}"
+    },
+    {
+      "q": "(10 + 2) / 4 = ? (integer)",
+      "expected": 3,
+      "got": 3,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\": 3}"
+    }
+  ]
+}

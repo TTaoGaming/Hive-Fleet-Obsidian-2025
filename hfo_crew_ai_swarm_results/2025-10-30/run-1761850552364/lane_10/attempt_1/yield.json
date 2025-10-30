@@ -1,0 +1,103 @@
+{
+  "mission_id": "mi_parallel_10lanes_2025-10-30",
+  "lane": "lane_10",
+  "attempt": 1,
+  "timestamp": "2025-10-30T18:56:02Z",
+  "use_llm": true,
+  "problems": 10,
+  "correct": 1,
+  "accuracy": 0.1,
+  "verify_threshold": 0.6,
+  "details": [
+    {
+      "q": "12 + 7 = ?",
+      "expected": 19,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "8 * 9 = ?",
+      "expected": 72,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "144 / 12 = ?",
+      "expected": 12,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "(3 + 5) * 2 = ?",
+      "expected": 16,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "2^5 = ?",
+      "expected": 32,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "100 - 77 = ?",
+      "expected": 23,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "15 * 0 = ?",
+      "expected": 0,
+      "got": 0,
+      "ok": true,
+      "correct": true,
+      "error": null,
+      "raw": "{\"answer\":0}"
+    },
+    {
+      "q": "7 * 13 = ?",
+      "expected": 91,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "81^(1/2) = ?",
+      "expected": 9,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    },
+    {
+      "q": "(10 + 2) / 4 = ? (integer)",
+      "expected": 3,
+      "got": null,
+      "ok": true,
+      "correct": false,
+      "error": null,
+      "raw": ""
+    }
+  ]
+}

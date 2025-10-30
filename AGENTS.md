@@ -1,3 +1,81 @@
+
+## Using the Crew AI pilot (Swarm attempt 1)
+
+This repo includes a minimal, parser-safe Crew AI pilot that runs two parallel PREY lanes with OBSIDIAN roles and logs receipts to the blackboard.
+
+- Roles per lane
+  - Perceive → Observer
+  - React → Bridger
+  - Engage → Shaper
+  - Yield → Assimilator
+  - Post-lane checks → Immunizer and Disruptor (quorum verify)
+
+- What it does
+  - Reads a daily mission intent (v5) that encodes safety, quorum verify, and telemetry defaults.
+  - Executes lanes in parallel with PREY; logs receipts to `hfo_blackboard/obsidian_synapse_blackboard.jsonl`.
+  - Emits simple OpenTelemetry-like spans to `temp/otel/trace-*.jsonl`.
+  - Makes at most one small, bounded LLM call during Engage per lane (optional; skips if no key).
+
+- Prerequisites (local)
+  - `.env` at repo root with `OPENROUTER_API_KEY` (optional for no-cost dry-runs) and optional `OPENROUTER_MODEL_HINT` (e.g., `haiku`).
+  - Python environment with dependencies from `requirements.txt`.
+  - Model allowlist (enforced; top 10 active)
+    - openai/gpt-5-mini
+    - x-ai/grok-4-fast
+    - minimax/minimax-m2
+    - deepseek/deepseek-v3.2-exp
+    - deepseek/deepseek-v3.1-terminus
+    - deepseek/deepseek-chat-v3-0324
+    - qwen/qwen3-235b-a22b-2507
+    - x-ai/grok-code-fast-1
+    - openai/gpt-oss-120b
+    - openai/gpt-oss-20b
+  - Note: z-ai/glm-4.6 is temporarily removed due to failing strict integer math sanity; we’ll revisit after tuning.
+
+- Run
+  - Concurrency: lanes execute in parallel (thread pool) and emit OTEL spans per phase/agent and per-lane LLM call.
+  - Optional model hint (must be in the allowlist) is supported via env.
+
+```bash
+# default (no hint): uses openai/gpt-oss-120b
+python3 scripts/crew_ai/runner.py \
+  --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+
+# or select an allowed model explicitly
+OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
+  python3 scripts/crew_ai/runner.py \
+  --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+```
+
+- Outputs
+  - Blackboard receipts: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
+  - Spans: `temp/otel/trace-*.jsonl`
+  - Verify quorum: recorded in blackboard with votes and threshold
+
+- Safety and cost guards
+  - Bounded tokens and allowlisted models for Engage LLM calls; presence-only secret audit (never logs key).
+  - Chunk-size limit (≤200 lines per write), placeholder ban, canary-first, measurable tripwires, explicit revert.
+
+- Verifying lanes and model selection
+  - Check parallelism and LLM model in spans:
+    - Spans file: `temp/otel/trace-*.jsonl` with entries like `name: lane_a:engage_llm` and attributes `model`, `latency_ms`.
+    - Helper tool: `scripts/crew_ai/analyze_traces.py` prints lane windows and "Parallel detected: True/False".
+      ```bash
+      python3 scripts/crew_ai/analyze_traces.py temp/otel/<trace-file>.jsonl
+      ```
+  - Quick LLM math sanity check (low token cost):
+    ```bash
+    # defaults to gpt-oss-120b; or set an allowed OPENROUTER_MODEL_HINT
+    python3 scripts/crew_ai/math_bench.py
+    ```
+
+- References
+  - Mission intent: `hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
+  - Crew README: `scripts/crew_ai/README.md`
+  - Runner: `scripts/crew_ai/runner.py`
+  - Trace analyzer: `scripts/crew_ai/analyze_traces.py`
+  - Math sanity bench: `scripts/crew_ai/math_bench.py`
+
 # AGENTS.md — Operating Guide for Agents in Hive Fleet Obsidian (Gen21)
 
 This lightweight guide tells any agent (workers, tools, scripts, LLMs) how to act in this repo so behavior aligns with the Gen21 SSOT. If you do one thing: follow PREY, log receipts to the blackboard, and don’t talk to the human directly.
@@ -220,3 +298,60 @@ graph LR
 ```
 
 Note: If a renderer still errors, simplify labels further and remove punctuation; then log a receipt to the blackboard with the evidence refs to the affected file and lines.
+
+## Crew AI swarm — E2E handoff note (2025-10-30)
+
+- Status
+  - Parallel PREY lanes operational at N=10 (thread pool). Verified via span overlap analysis.
+  - LLM mode: model-hint sensitivity observed. qwen hint passed 10/10; oss-120b returned empty content in this environment for math micro-tasks.
+- Artifacts
+  - Digest: `hfo_crew_ai_swarm_results/2025-10-30/run-1761850703499/swarmlord_digest.md`
+  - Spans: `temp/otel/trace-swarm_math-1761850703499.jsonl`
+  - Intent: `hfo_mission_intent/2025-10-30/mission_intent_parallel_10lanes_2025-10-30.v1.yml`
+- How to validate quickly
+  - Check spans for per-lane engage windows; analyzer should report Parallel detected: True.
+  - Inspect digest for per-lane yields, verify counts, and quorum/thresholds.
+- Safety & receipts
+  - Chunk limit ≤200 lines for docs; append-only JSONL receipts with evidence_refs.
+  - No placeholders in committed artifacts; revert by removing the last JSONL line if a malformed append occurs.
+- Next tweaks (low risk)
+  - Harden client parsing for oss-120b: multi-shape content parsing and retry-on-empty; optional response_format JSON when supported.
+  - Add optional CSV/metrics: wall-clock vs. sum speedup and pass/fail tallies per run.
+
+## Crew AI swarm — Arbitrary lanes and per-model PREY (2025-10-30)
+
+- What’s new (pilot runner)
+  - Mission can orchestrate any number of PREY lanes; thread pool scales to lane count by default.
+  - Per-model orchestration supported via mission intent:
+    - `lanes.models: all` → one lane per allowlisted model (from `scripts/crew_ai/llm_client.py`).
+    - `lanes.models: ["gpt-5-mini", "grok-4-fast", ...]` → substring match against allowlist.
+    - Optional `lanes.max_workers` to cap concurrency (defaults to number of lanes).
+  - Each lane carries its own `model_hint` into React (Bridger) and Engage (Shaper) LLM calls.
+  - A digest file is written per PREY run: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md` with a lane↔model matrix and Verify status.
+
+- LLM behavior (mission/env overrides)
+  - Mission-level `llm` config sets `max_tokens`, `temperature`, `timeout_seconds`, `response_format_type`, `system_prompt`, and `reasoning`.
+  - Env overrides: `OPENROUTER_MAX_TOKENS`, `OPENROUTER_TEMPERATURE`, `OPENROUTER_TIMEOUT_SECONDS`, `OPENROUTER_REASONING(_EFFORT)`.
+
+- Safety remains unchanged
+  - Chunk size ≤200 lines; placeholder ban; receipts appended to blackboard; Verify quorum required before digest.
+
+## ARC-Challenge eval — operational note (2025-10-30)
+
+- What: Research-grade, low-cost benchmark (AI2 ARC-Challenge, validation split) to compare allowlisted models in parallel lanes.
+- How to run (single model):
+  - `python3 scripts/crew_ai/arc_challenge_eval.py --limit 200`
+- Swarm (one model per lane; arbitrary lanes per model):
+  - `python3 scripts/crew_ai/arc_swarm_runner.py --limit 50 --lanes-per-model 2 --split validation`
+  - Filter models (e.g., only GPT‑OSS family): `--models gpt-oss`
+- Outputs:
+  - Digest: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md`
+  - JSON: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/arc_swarm_results.json`
+- Cost metrics (optional; env-driven):
+  - Default: `OPENROUTER_PRICE_DEFAULT_PER_1K=<usd>`
+  - Per-model override (sanitized): `OPENROUTER_PRICE_OPENAI_GPT_OSS_20B_PER_1K=<usd>`
+- Transport resiliency (OSS models):
+  - Client retries once on empty content and drops `response_format` on retry. Metrics include `empty_content` and `format_fails`.
+- Model selection (Swarmlord):
+  - Prefer the best accuracy at acceptable latency and price. Use aggregated results across lanes; consider accuracy-per-dollar.
+
