@@ -87,13 +87,13 @@ def get_world_view(raw_env) -> WorldView:
 
 
 def predator_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
-    """Wall-aware pursuit: lead the prey, but clamp the target into bounds and avoid pushing into walls.
+    """Wall-aware pursuit: lead prey and allow approaching walls when needed.
 
     Behavior:
     - Predict a short-horizon future prey position.
     - Clamp target into world bounds (approx [-1, 1] per axis in MPE simple_tag_v3).
-    - If we're against a wall and the desired vector pushes further into it, zero that axis to slide along the wall.
-    - Add a tiny inward bias near walls to unstick.
+    - DO NOT zero outward components; allow moving up to the wall to reach prey.
+    - Apply a tiny inward bias only when hugging a wall AND prey is not near that wall, to unstick.
     """
     k_lead = 0.15
     bound = 1.0  # simple_tag_v3 positions are typically within [-1, 1]
@@ -104,20 +104,14 @@ def predator_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.
     desired = prey_future - my_pos
     d = unit(desired)
 
-    # Slide along wall if pushing into it
-    eps_wall = 0.02
-    for i in range(2):
-        if abs(my_pos[i]) > (bound - eps_wall):
-            # If we're at +bound and d wants to go further positive, or at -bound and wants further negative
-            if (my_pos[i] > 0 and d[i] > 0) or (my_pos[i] < 0 and d[i] < 0):
-                d[i] = 0.0
-
-    # Tiny inward bias to unstick when hugging walls
+    # Tiny inward bias to unstick when hugging walls, but only if prey isn't also near that wall.
     near = 0.01
     inward = np.zeros(2, dtype=np.float32)
     for i in range(2):
         if abs(my_pos[i]) > (bound - near):
-            inward[i] = -0.2 * np.sign(my_pos[i])
+            # If prey also near the same wall, don't pull inward; we need to reach the wall.
+            if not (abs(prey_future[i]) > (bound - near)):
+                inward[i] = -0.15 * np.sign(my_pos[i])
     d = unit(d + inward)
 
     return d
