@@ -24,6 +24,7 @@ from typing import Any, Dict, Optional, List
 import requests
 
 DEFAULT_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+DIAG_DIR = os.environ.get("OPENROUTER_DIAG_DIR")  # optional: where to write diag logs
 
 # Strict allowlist (user-defined)
 # Note: Only these models can be selected. Hints outside this set will fall back to the first entry.
@@ -62,6 +63,33 @@ def _select_model(model_hint: Optional[str]) -> str:
                 return m
     # Fallback to first allowlisted model
     return ALLOWLIST[0]
+
+
+def _should_force_no_response_format(model: str) -> bool:
+    """Return True if env OPENROUTER_FORCE_NO_RESPONSE_FORMAT_MODELS matches this model.
+    Accepts comma-separated substrings (case-insensitive).
+    """
+    raw = os.environ.get("OPENROUTER_FORCE_NO_RESPONSE_FORMAT_MODELS", "")
+    if not raw.strip():
+        return False
+    filters = [s.strip().lower() for s in raw.split(",") if s.strip()]
+    m = model.lower()
+    return any(f in m for f in filters)
+
+
+def _diag_write(event: dict) -> None:
+    if not DIAG_DIR:
+        return
+    try:
+        import json, time
+        from pathlib import Path
+        p = Path(DIAG_DIR)
+        p.mkdir(parents=True, exist_ok=True)
+        fn = p / f"diag_{int(time.time()*1000)}.jsonl"
+        with fn.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
 
 
 def _coerce_int(val: Optional[str], default: int) -> int:
@@ -184,7 +212,8 @@ def call_openrouter(
         "temperature": temperature,
     }
     # Hint to prefer plain text when supported; gracefully ignored otherwise
-    if response_format_type:
+    # Force-drop response_format for specific models if instructed by env
+    if response_format_type and not _should_force_no_response_format(model):
         payload["response_format"] = {"type": response_format_type}
 
     # Reasoning controls: enable when requested and model is in supported set
@@ -239,13 +268,32 @@ def call_openrouter(
             }
 
         usage = None
+        raw_len = None
         try:
             data = resp.json()
             content = _extract_content(data)
             usage = data.get("usage") if isinstance(data, dict) else None
+            try:
+                import json as _json
+                raw_len = len(_json.dumps(data))
+            except Exception:
+                raw_len = None
         except Exception:
             content = ""
             usage = None
+
+        # optional diagnostic log
+        _diag_write({
+            "model": model,
+            "attempt": attempts,
+            "status_code": resp.status_code,
+            "latency_ms": latency_ms,
+            "total_latency_ms": total_latency,
+            "has_usage": bool(usage),
+            "content_len": len(content or "") if content is not None else None,
+            "raw_json_len": raw_len,
+            "empty_content": not bool(str(content or "").strip()),
+        })
 
         # If content is empty and retry is allowed, try once more (possibly without response_format)
         if (content is None or not str(content).strip()) and retry_on_empty and attempts <= retry_max:
