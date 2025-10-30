@@ -317,17 +317,37 @@ def main() -> None:
             "prey_total_steps": 0,
             "pred_near_boundary_steps": 0,
             "pred_total_steps": 0,
+            # Corner occupancy (abs(x) and abs(y) beyond threshold)
+            "prey_near_corner_steps": 0,
+            "pred_near_corner_steps": 0,
+            # Co-occupancy at boundary/corner in same step
+            "co_near_boundary_steps": 0,
+            "co_near_corner_steps": 0,
             # Extended
-            "prey_oob_steps": 0,
-            "pred_oob_steps": 0,
+            "prey_oob_steps": 0,  # using fixed bound=1.0 legacy
+            "pred_oob_steps": 0,  # using fixed bound=1.0 legacy
+            # Dynamic bound observations (max abs coordinate seen)
+            "bound_obs_max_abs_x": 0.0,
+            "bound_obs_max_abs_y": 0.0,
+            # OOB using dynamic bound estimate (conservative; should be ~0)
+            "prey_oob_steps_dyn": 0,
+            "pred_oob_steps_dyn": 0,
             "near_boundary_steps": 0,  # steps where prey is near boundary
             "near_boundary_min_dists_sum": 0.0,
             "near_boundary_min_dists_min": float("inf"),
+            # Global closeness across all steps/episodes
+            "global_min_dist": float("inf"),
+            "episodes_close_dist": 0,
             # Movement clipping (predators)
             "pred_clip_steps": 0,
             "pred_clip_steps_near_boundary": 0,
             "pred_clip_total_checked": 0,
             "pred_clip_total_checked_near_boundary": 0,
+            # Delta-based movement clipping (actual delta position vs intended)
+            "pred_clip_delta_steps": 0,
+            "pred_clip_delta_steps_near_boundary": 0,
+            "pred_clip_delta_total_checked": 0,
+            "pred_clip_delta_total_checked_near_boundary": 0,
         })
 
     # Parse optional JSON kwargs for policies (used for custom policies)
@@ -348,22 +368,60 @@ def main() -> None:
         bound = 1.0
         thr = float(args.diag_boundary_thr)
         # Mark near-boundary and OOB before stepping
+        prey_near_any = False
+        prey_corner = False
+        pred_near_any = False
+        pred_corner_any = False
+        # Track previous positions for delta-based movement
+        prev_pos: dict[str, np.ndarray] = {}
         for a in w.agents:
             pos = a.state.p_pos
+            # Update dynamic bound observations
+            absx, absy = float(abs(pos[0])), float(abs(pos[1]))
+            if absx > diag["bound_obs_max_abs_x"]:
+                diag["bound_obs_max_abs_x"] = absx
+            if absy > diag["bound_obs_max_abs_y"]:
+                diag["bound_obs_max_abs_y"] = absy
             near = (abs(pos[0]) >= thr) or (abs(pos[1]) >= thr)
             oob = (abs(pos[0]) > bound + 1e-6) or (abs(pos[1]) > bound + 1e-6)
+            # Dynamic bound estimate for OOB (conservative): use current observed max
+            dyn_bound = max(1e-6, max(diag["bound_obs_max_abs_x"], diag["bound_obs_max_abs_y"]))
+            oob_dyn = (abs(pos[0]) > dyn_bound + 1e-6) or (abs(pos[1]) > dyn_bound + 1e-6)
+            corner = (abs(pos[0]) >= thr) and (abs(pos[1]) >= thr)
             if getattr(a, 'adversary', False):
                 diag["pred_total_steps"] += 1
                 if near:
                     diag["pred_near_boundary_steps"] += 1
+                if corner:
+                    diag["pred_near_corner_steps"] += 1
                 if oob:
                     diag["pred_oob_steps"] += 1
+                if oob_dyn:
+                    diag["pred_oob_steps_dyn"] += 1
+                pred_near_any = pred_near_any or near
+                pred_corner_any = pred_corner_any or corner
+                # Store prev position for delta-based analysis
+                name = getattr(a, 'name', None)
+                if name is not None:
+                    prev_pos[name] = a.state.p_pos.copy()
             else:
                 diag["prey_total_steps"] += 1
                 if near:
                     diag["prey_near_boundary_steps"] += 1
+                if corner:
+                    diag["prey_near_corner_steps"] += 1
                 if oob:
                     diag["prey_oob_steps"] += 1
+                if oob_dyn:
+                    diag["prey_oob_steps_dyn"] += 1
+                prey_near_any = prey_near_any or near
+                prey_corner = prey_corner or corner
+
+        # Co-occupancy flags
+        if prey_near_any and pred_near_any:
+            diag["co_near_boundary_steps"] += 1
+        if prey_corner and pred_corner_any:
+            diag["co_near_corner_steps"] += 1
 
         # Track movement clipping intent (predators): compare intended vector mag to later delta
         # Store intended movement per agent for the next post-step check
@@ -375,15 +433,17 @@ def main() -> None:
                 _intended[ag] = eff
             else:
                 _intended[ag] = None
-        return _intended
+        return {"intended": _intended, "prev_pos": prev_pos}
 
-    def _accum_diag_post_step(penv, intended):
+    def _accum_diag_post_step(penv, pack):
         if not args.diag_boundary:
             return
         raw = penv.unwrapped
         w = raw.world
         thr = float(args.diag_boundary_thr)
         close_thr = float(args.diag_close_dist)
+        intended = pack.get("intended") if isinstance(pack, dict) else None
+        prev_pos = pack.get("prev_pos") if isinstance(pack, dict) else None
 
         # Min predator-prey distance when prey is near boundary
         prey = [a for a in w.agents if not getattr(a, 'adversary', False)][0]
@@ -400,6 +460,12 @@ def main() -> None:
             if dmin < diag["near_boundary_min_dists_min"]:
                 diag["near_boundary_min_dists_min"] = dmin
 
+        # Update global min distance every step
+        for p in [a for a in w.agents if getattr(a, 'adversary', False)]:
+            dp = float(np.linalg.norm(prey_pos - p.state.p_pos))
+            if dp < diag["global_min_dist"]:
+                diag["global_min_dist"] = dp
+
         # Movement clipping (predators): check ratio of actual displacement vs intended
         for p in [a for a in w.agents if getattr(a, 'adversary', False)]:
             name = getattr(p, 'name', None)
@@ -407,19 +473,32 @@ def main() -> None:
             if intend is None:
                 continue
             intend_mag = float(np.linalg.norm(intend))
-            # Approximate actual step size via velocity magnitude (state has p_vel)
-            # Note: better would be delta position, but p_vel reflects applied movement this step
-            actual_mag = float(np.linalg.norm(p.state.p_vel))
+            # Legacy velocity-based approximation
+            actual_mag_vel = float(np.linalg.norm(p.state.p_vel))
             near = (abs(p.state.p_pos[0]) >= thr) or (abs(p.state.p_pos[1]) >= thr)
             if intend_mag > 0.1:  # only consider meaningful commands
                 diag["pred_clip_total_checked"] += 1
                 if near:
                     diag["pred_clip_total_checked_near_boundary"] += 1
-                ratio = actual_mag / max(intend_mag, 1e-6)
-                if ratio < 0.25:
+                ratio_v = actual_mag_vel / max(intend_mag, 1e-6)
+                if ratio_v < 0.25:
                     diag["pred_clip_steps"] += 1
                     if near:
                         diag["pred_clip_steps_near_boundary"] += 1
+                # Delta-based actual displacement using stored previous positions
+                if isinstance(prev_pos, dict) and name in prev_pos:
+                    prev = prev_pos.get(name)
+                    if prev is not None and isinstance(prev, np.ndarray):
+                        delta = p.state.p_pos - prev
+                        actual_mag_delta = float(np.linalg.norm(delta))
+                        diag["pred_clip_delta_total_checked"] += 1
+                        if near:
+                            diag["pred_clip_delta_total_checked_near_boundary"] += 1
+                        ratio_d = actual_mag_delta / max(intend_mag, 1e-6)
+                        if ratio_d < 0.25:
+                            diag["pred_clip_delta_steps"] += 1
+                            if near:
+                                diag["pred_clip_delta_steps_near_boundary"] += 1
 
     # Wrap run_eval to inject diagnostics by reusing its loop via a local copy
     def _prey_near_wall(penv, thr: float) -> bool:
@@ -471,6 +550,7 @@ def main() -> None:
             step = 0
             caught = False
             first_step: Optional[int] = None
+            ep_min_dist = float("inf")
             while True:
                 actions: Dict[str, np.ndarray | int] = {}
                 raw = penv.unwrapped
@@ -485,6 +565,15 @@ def main() -> None:
                 _intended = _accum_diag_pre_step(penv, actions)
                 obs, rewards, terms, truncs, infos = penv.step(actions)
                 _accum_diag_post_step(penv, _intended)
+                # Track per-episode min distance
+                raw = penv.unwrapped
+                w = raw.world
+                prey = [a for a in w.agents if not getattr(a, 'adversary', False)][0]
+                prey_pos = prey.state.p_pos.copy()
+                for p in [a for a in w.agents if getattr(a, 'adversary', False)]:
+                    dp = float(np.linalg.norm(prey_pos - p.state.p_pos))
+                    if dp < ep_min_dist:
+                        ep_min_dist = dp
                 step += 1
                 if not caught and detect_tag_event(rewards, infos, adversary_keys):
                     caught = True
@@ -494,6 +583,9 @@ def main() -> None:
             if caught and first_step is not None:
                 catches += 1
                 steps_to_first.append(first_step)
+            # Episode-level close distance flag
+            if ep_min_dist <= float(args.diag_close_dist):
+                diag["episodes_close_dist"] += 1
 
         catch_rate = catches / float(episodes)
         avg_steps = float(np.mean(steps_to_first)) if steps_to_first else float("nan")
@@ -520,8 +612,22 @@ def main() -> None:
             "prey_total_steps": int(diag["prey_total_steps"]),
             "pred_near_boundary_steps": int(diag["pred_near_boundary_steps"]),
             "pred_total_steps": int(diag["pred_total_steps"]),
+            # Corner occupancy
+            "prey_near_corner_steps": int(diag["prey_near_corner_steps"]),
+            "pred_near_corner_steps": int(diag["pred_near_corner_steps"]),
+            "prey_near_corner_frac": (diag["prey_near_corner_steps"] / diag["prey_total_steps"]) if diag["prey_total_steps"] else None,
+            "pred_near_corner_frac": (diag["pred_near_corner_steps"] / diag["pred_total_steps"]) if diag["pred_total_steps"] else None,
+            # Co-occupancy
+            "co_near_boundary_steps": int(diag["co_near_boundary_steps"]),
+            "co_near_corner_steps": int(diag["co_near_corner_steps"]),
             "prey_oob_steps": int(diag["prey_oob_steps"]),
             "pred_oob_steps": int(diag["pred_oob_steps"]),
+            # Dynamic bound and dynamic OOB counts
+            "bound_obs_max_abs_x": float(diag["bound_obs_max_abs_x"]),
+            "bound_obs_max_abs_y": float(diag["bound_obs_max_abs_y"]),
+            "bound_obs_max_abs": float(max(diag["bound_obs_max_abs_x"], diag["bound_obs_max_abs_y"])),
+            "prey_oob_steps_dyn": int(diag["prey_oob_steps_dyn"]),
+            "pred_oob_steps_dyn": int(diag["pred_oob_steps_dyn"]),
             "near_boundary_steps": int(diag["near_boundary_steps"]),
             "near_boundary_min_dist_avg": (
                 (diag["near_boundary_min_dists_sum"] / max(diag["near_boundary_steps"], 1))
@@ -530,6 +636,8 @@ def main() -> None:
             "near_boundary_min_dist_min": (
                 (None if diag["near_boundary_min_dists_min"] == float("inf") else float(diag["near_boundary_min_dists_min"]))
             ),
+            "global_min_dist": (None if diag["global_min_dist"] == float("inf") else float(diag["global_min_dist"])) ,
+            "episodes_close_dist": int(diag["episodes_close_dist"]),
             "pred_clip_steps": int(diag["pred_clip_steps"]),
             "pred_clip_total_checked": int(diag["pred_clip_total_checked"]),
             "pred_clip_rate": (
@@ -541,6 +649,19 @@ def main() -> None:
             "pred_clip_rate_near_boundary": (
                 (diag["pred_clip_steps_near_boundary"] / max(diag["pred_clip_total_checked_near_boundary"], 1))
                 if diag["pred_clip_total_checked_near_boundary"] else None
+            ),
+            # Delta-based clipping metrics
+            "pred_clip_delta_steps": int(diag["pred_clip_delta_steps"]),
+            "pred_clip_delta_total_checked": int(diag["pred_clip_delta_total_checked"]),
+            "pred_clip_delta_rate": (
+                (diag["pred_clip_delta_steps"] / max(diag["pred_clip_delta_total_checked"], 1))
+                if diag["pred_clip_delta_total_checked"] else None
+            ),
+            "pred_clip_delta_steps_near_boundary": int(diag["pred_clip_delta_steps_near_boundary"]),
+            "pred_clip_delta_total_checked_near_boundary": int(diag["pred_clip_delta_total_checked_near_boundary"]),
+            "pred_clip_delta_rate_near_boundary": (
+                (diag["pred_clip_delta_steps_near_boundary"] / max(diag["pred_clip_delta_total_checked_near_boundary"], 1))
+                if diag["pred_clip_delta_total_checked_near_boundary"] else None
             ),
             "threshold_abs": float(args.diag_boundary_thr),
             "close_dist_thr": float(args.diag_close_dist),

@@ -10,11 +10,19 @@ Custom 2x2 animated GIF for PettingZoo MPE simple_tag_v3 with per-cell policy sp
 import argparse
 import json
 import os
+import sys
+from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw
+
+# Ensure repo root on sys.path so 'scripts.*' imports resolve
+_THIS = Path(__file__).resolve()
+_ROOT = _THIS.parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 try:
     from mpe2 import simple_tag_v3  # type: ignore

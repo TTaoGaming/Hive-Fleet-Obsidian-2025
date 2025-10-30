@@ -49,3 +49,5 @@ Next steps
 - Calibrate dynamic world bound from env (state range) to fix OOB metrics and near-boundary thresholding.
 - Prototype minimal role coordination (assign one pusher + two flankers) to break jams; incorporate stateful phase switching (tangent pulses alternating with inward pushes).
 - Optional: probe environment speed ratio; if predators are not faster, closures against wall-hugging prey may be measure-zero without spawn adjacency.
+
+- [ ] Corner/near-wall stalemate: partial diagnostics landed; policy bugs unresolved. Defer fix to follow-up; plan pusher+flankers + small inward bias near corners; evidence refs: `hfo_petting_zoo_results/simple_tag_v3_eval_20251030T123306Z_seed42_eps100_predheuristic_preyheuristic.json`, `hfo_petting_zoo_results/simple_tag_v3_eval_20251030T132221Z_seed42_eps100_predcustom-scripts.agents.pf_pursuit-PFPursuit_preyheuristic.json`.
