@@ -1,0 +1,53 @@
+{
+  "diagnostics": {
+    "close_dist_thr": 0.03,
+    "near_boundary_min_dist_avg": 0.48897418394802267,
+    "near_boundary_min_dist_min": 0.0018714960887657494,
+    "near_boundary_steps": 639,
+    "pred_clip_rate": 0.03955555555555555,
+    "pred_clip_rate_near_boundary": 0.08258258258258258,
+    "pred_clip_steps": 89,
+    "pred_clip_steps_near_boundary": 55,
+    "pred_clip_total_checked": 2250,
+    "pred_clip_total_checked_near_boundary": 666,
+    "pred_near_boundary_frac": 0.27111111111111114,
+    "pred_near_boundary_steps": 610,
+    "pred_oob_steps": 537,
+    "pred_total_steps": 2250,
+    "prey_near_boundary_frac": 0.8666666666666667,
+    "prey_near_boundary_steps": 650,
+    "prey_oob_steps": 174,
+    "prey_total_steps": 750,
+    "threshold_abs": 0.98
+  },
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "continuous_actions": true,
+    "episodes": 30,
+    "seed": 42
+  },
+  "policies": {
+    "baseline": "research",
+    "pred": "heuristic",
+    "prey": "custom:scripts.agents.stationary:Stationary"
+  },
+  "results": {
+    "avg_steps_to_first_catch": 13.233333333333333,
+    "catch_rate": 1.0,
+    "caught_episodes": 30,
+    "total_episodes": 30
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-30T09:33:03.355671+00:00"
+  }
+}
