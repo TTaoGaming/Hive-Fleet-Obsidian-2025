@@ -86,56 +86,49 @@ def get_world_view(raw_env) -> WorldView:
     )
 
 
-def predator_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
-    """Wall-aware pursuit: lead prey and allow approaching walls when needed.
-
-    Behavior:
-    - Predict a short-horizon future prey position.
-    - Clamp target into world bounds (approx [-1, 1] per axis in MPE simple_tag_v3).
-    - DO NOT zero outward components; allow moving up to the wall to reach prey.
-    - Apply a tiny inward bias only when hugging a wall AND prey is not near that wall, to unstick.
-    """
+def predator_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    """Enhanced pursuit (previous default): short-horizon lead with gentle wall handling."""
     k_lead = 0.15
-    bound = 1.0  # simple_tag_v3 positions are typically within [-1, 1]
-
+    bound = 1.0
     prey_future = view.prey_pos + k_lead * view.prey_vel
     prey_future = np.clip(prey_future, -bound, bound)
-
     desired = prey_future - my_pos
     d = unit(desired)
-
-    # Tiny inward bias to unstick when hugging walls, but only if prey isn't also near that wall.
     near = 0.01
     inward = np.zeros(2, dtype=np.float32)
     for i in range(2):
-        if abs(my_pos[i]) > (bound - near):
-            # If prey also near the same wall, don't pull inward; we need to reach the wall.
-            if not (abs(prey_future[i]) > (bound - near)):
-                inward[i] = -0.15 * np.sign(my_pos[i])
-    d = unit(d + inward)
-
-    return d
+        if abs(my_pos[i]) > (bound - near) and not (abs(prey_future[i]) > (bound - near)):
+            inward[i] = -0.15 * np.sign(my_pos[i])
+    return unit(d + inward)
 
 
-def prey_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
-    # Repel from predators (nearest weighted more), mild repel from landmarks, small inertia
+def predator_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    """Research baseline: pure pursuit (greedy direction to current prey position)."""
+    return unit(view.prey_pos - my_pos)
+
+
+def prey_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    """Enhanced flee: inverse-distance repulsion from predators plus mild inertia."""
     k_rep_pred = 1.25
-    k_rep_land = 0.25
     k_inertia = 0.10
-
     rep = np.zeros(2, dtype=np.float32)
     for p in view.preds_pos:
         v = my_pos - p
         rep += unit(v) / (np.linalg.norm(v) + 1e-6)
-    for l in view.landmarks:
-        v = my_pos - l
-        rep += 0.5 * unit(v) / (np.linalg.norm(v) + 1e-6)
-
     d = k_rep_pred * rep + k_inertia * unit(my_vel)
     return unit(d)
 
 
-def build_actions(penv, matchup: str) -> Dict[str, np.ndarray | int]:
+def prey_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    """Research baseline: inverse-distance weighted flee from predators (no inertia/landmarks)."""
+    rep = np.zeros(2, dtype=np.float32)
+    for p in view.preds_pos:
+        v = my_pos - p
+        rep += unit(v) / (np.linalg.norm(v) + 1e-6)
+    return unit(rep)
+
+
+def build_actions(penv, matchup: str, baseline: str) -> Dict[str, np.ndarray | int]:
     raw = penv.unwrapped
     w = raw.world
     view = get_world_view(raw)
@@ -147,11 +140,19 @@ def build_actions(penv, matchup: str) -> Dict[str, np.ndarray | int]:
         my_pos = aobj.state.p_pos.copy()
         my_vel = aobj.state.p_vel.copy()
 
+        # Select heuristic set
+        if baseline == 'research':
+            pred_fn = predator_dir_research
+            prey_fn = prey_dir_research
+        else:
+            pred_fn = predator_dir_enhanced
+            prey_fn = prey_dir_enhanced
+
         if matchup == 'RvsR':
             actions[ag] = penv.action_space(ag).sample()
         elif matchup == 'HvsR':
             if is_pred:
-                d = predator_dir(view, my_pos, my_vel)
+                d = pred_fn(view, my_pos, my_vel)
                 actions[ag] = dir_to_continuous_action(d)
             else:
                 actions[ag] = penv.action_space(ag).sample()
@@ -159,13 +160,13 @@ def build_actions(penv, matchup: str) -> Dict[str, np.ndarray | int]:
             if is_pred:
                 actions[ag] = penv.action_space(ag).sample()
             else:
-                d = prey_dir(view, my_pos, my_vel)
+                d = prey_fn(view, my_pos, my_vel)
                 actions[ag] = dir_to_continuous_action(d)
         elif matchup == 'HvsH':
             if is_pred:
-                d = predator_dir(view, my_pos, my_vel)
+                d = pred_fn(view, my_pos, my_vel)
             else:
-                d = prey_dir(view, my_pos, my_vel)
+                d = prey_fn(view, my_pos, my_vel)
             actions[ag] = dir_to_continuous_action(d)
         else:
             raise ValueError(f"unknown matchup {matchup}")
@@ -188,7 +189,7 @@ def detect_tag_event(rewards: Dict[str, float], infos: Dict[str, dict], adversar
 
 # ---------- Runner ----------
 
-def run_matchup(episodes: int, seed: int, matchup: str) -> Tuple[float, float, int]:
+def run_matchup(episodes: int, seed: int, matchup: str, baseline: str) -> Tuple[float, float, int]:
     penv = simple_tag_v3.parallel_env(continuous_actions=True, render_mode=None)
     obs, infos = penv.reset(seed=seed)
     adversary_keys = {a for a in penv.agents if ("adversary" in a) or ("pursuer" in a) or ("tagger" in a)}
@@ -203,7 +204,7 @@ def run_matchup(episodes: int, seed: int, matchup: str) -> Tuple[float, float, i
         caught = False
         first_step = None
         while True:
-            actions = build_actions(penv, matchup)
+            actions = build_actions(penv, matchup, baseline)
             obs, rewards, terms, truncs, infos = penv.step(actions)
             step += 1
             if not caught and detect_tag_event(rewards, infos, adversary_keys):
@@ -225,6 +226,13 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=100)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--outdir", type=str, default="hfo_petting_zoo_results")
+    parser.add_argument(
+        "--baseline",
+        type=str,
+        choices=["research", "enhanced"],
+        default="research",
+        help="Heuristic set to use: 'research' (pure pursuit + invdist flee) or 'enhanced' (lead + inertia)",
+    )
     parser.add_argument(
         "--no-fail-on-bad-ordering",
         action="store_true",
@@ -259,7 +267,7 @@ def main() -> None:
     cells = ["RvsR", "HvsR", "RvsH", "HvsH"]
     results = {}
     for cell in cells:
-        cr, avg, c = run_matchup(args.episodes, args.seed, cell)
+        cr, avg, c = run_matchup(args.episodes, args.seed, cell, args.baseline)
         results[cell] = {
             "catch_rate": float(cr),
             "avg_steps_to_first_catch": None if np.isnan(avg) else float(avg),
@@ -298,6 +306,7 @@ def main() -> None:
             "episodes": int(args.episodes),
             "seed": int(args.seed),
             "continuous_actions": True,
+            "baseline": args.baseline,
         },
         "library_versions": {
             "pettingzoo": pz_ver,
