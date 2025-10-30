@@ -18,11 +18,14 @@ from __future__ import annotations
 
 import os
 import sys
+import logging
+import traceback
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 import random
+import time
 
 # Add scripts to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
@@ -37,6 +40,13 @@ except ImportError as e:
         f"Error: {e}"
     )
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Load environment variables
 load_dotenv()
 
@@ -45,6 +55,8 @@ MISSION_ID = os.getenv("HFO_MISSION_ID", "mi_daily_2025-10-30")
 PARALLEL_LANES = int(os.getenv("HFO_PARALLEL_LANES", "2"))
 CHUNK_SIZE_MAX = int(os.getenv("HFO_CHUNK_SIZE_MAX", "200"))
 EXPLORE_RATIO = 0.4  # 40% exploration, 60% exploitation
+LANE_TIMEOUT_SECONDS = int(os.getenv("HFO_LANE_TIMEOUT_SECONDS", "300"))  # 5 minutes
+MAX_RETRIES = int(os.getenv("HFO_MAX_RETRIES", "3"))
 
 
 @dataclass
@@ -199,64 +211,93 @@ def create_lane_crew(config: LaneConfig) -> Crew:
     return crew
 
 
-def execute_lane(config: LaneConfig) -> LaneResult:
-    """Execute a single PREY lane and return results."""
+def execute_lane_with_retry(config: LaneConfig, max_retries: int = MAX_RETRIES) -> LaneResult:
+    """Execute a single PREY lane with retry logic and return results."""
+    logger.info(f"Starting lane {config.lane_name} in {config.mode} mode")
     log_receipt(
         "engage",
         f"Starting lane {config.lane_name} in {config.mode} mode",
         [f"lane:{config.lane_id}"],
     )
     
-    try:
-        crew = create_lane_crew(config)
-        result = crew.kickoff()
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            crew = create_lane_crew(config)
+            result = crew.kickoff()
+            
+            output_str = str(result)
+            evidence = [
+                f"lane:{config.lane_id}",
+                f"mode:{config.mode}",
+                f"output_len:{len(output_str)}",
+                f"attempts:{attempt + 1}",
+            ]
+            
+            logger.info(f"Lane {config.lane_name} completed successfully on attempt {attempt + 1}")
+            log_receipt(
+                "yield",
+                f"Lane {config.lane_name} completed successfully (attempt {attempt + 1})",
+                evidence,
+            )
+            
+            return LaneResult(
+                lane_id=config.lane_id,
+                lane_name=config.lane_name,
+                success=True,
+                output=output_str,
+                evidence_refs=evidence,
+                metrics={
+                    "output_length": len(output_str),
+                    "mode": config.mode,
+                    "attempts": attempt + 1
+                },
+            )
         
-        output_str = str(result)
-        evidence = [
-            f"lane:{config.lane_id}",
-            f"mode:{config.mode}",
-            f"output_len:{len(output_str)}",
-        ]
-        
-        log_receipt(
-            "yield",
-            f"Lane {config.lane_name} completed successfully",
-            evidence,
-        )
-        
-        return LaneResult(
-            lane_id=config.lane_id,
-            lane_name=config.lane_name,
-            success=True,
-            output=output_str,
-            evidence_refs=evidence,
-            metrics={"output_length": len(output_str), "mode": config.mode},
-        )
+        except Exception as e:
+            last_error = e
+            error_trace = traceback.format_exc()
+            logger.warning(
+                f"Lane {config.lane_name} failed on attempt {attempt + 1}/{max_retries}: {str(e)}\n{error_trace}"
+            )
+            
+            # Exponential backoff before retry
+            if attempt < max_retries - 1:
+                backoff_time = 2 ** attempt  # 1s, 2s, 4s
+                logger.info(f"Retrying lane {config.lane_name} in {backoff_time}s...")
+                time.sleep(backoff_time)
     
-    except Exception as e:
-        error_msg = f"Lane {config.lane_name} failed: {str(e)}"
-        log_receipt(
-            "yield",
-            error_msg,
-            [f"lane:{config.lane_id}", f"error:{type(e).__name__}"],
-        )
-        
-        return LaneResult(
-            lane_id=config.lane_id,
-            lane_name=config.lane_name,
-            success=False,
-            output=error_msg,
-            evidence_refs=[f"lane:{config.lane_id}", "status:failed"],
-            metrics={"error": str(e), "mode": config.mode},
-        )
+    # All retries exhausted
+    error_msg = f"Lane {config.lane_name} failed after {max_retries} attempts: {str(last_error)}"
+    logger.error(error_msg)
+    log_receipt(
+        "yield",
+        error_msg,
+        [f"lane:{config.lane_id}", f"error:{type(last_error).__name__}", f"attempts:{max_retries}"],
+    )
+    
+    return LaneResult(
+        lane_id=config.lane_id,
+        lane_name=config.lane_name,
+        success=False,
+        output=error_msg,
+        evidence_refs=[f"lane:{config.lane_id}", "status:failed", f"attempts:{max_retries}"],
+        metrics={"error": str(last_error), "mode": config.mode, "attempts": max_retries},
+    )
 
 
-def run_parallel_lanes(lane_configs: List[LaneConfig]) -> List[LaneResult]:
-    """Execute multiple lanes in parallel using ThreadPoolExecutor."""
+def execute_lane(config: LaneConfig) -> LaneResult:
+    """Execute a single PREY lane (wrapper for compatibility)."""
+    return execute_lane_with_retry(config)
+
+
+def run_parallel_lanes(lane_configs: List[LaneConfig], timeout: int = LANE_TIMEOUT_SECONDS) -> List[LaneResult]:
+    """Execute multiple lanes in parallel using ThreadPoolExecutor with timeout protection."""
+    logger.info(f"Starting {len(lane_configs)} parallel lanes with {timeout}s timeout")
     log_receipt(
         "engage",
-        f"Starting {len(lane_configs)} parallel lanes",
-        [f"lane_count:{len(lane_configs)}"],
+        f"Starting {len(lane_configs)} parallel lanes with {timeout}s timeout",
+        [f"lane_count:{len(lane_configs)}", f"timeout:{timeout}"],
     )
     
     results = []
@@ -266,13 +307,29 @@ def run_parallel_lanes(lane_configs: List[LaneConfig]) -> List[LaneResult]:
             for config in lane_configs
         }
         
-        for future in as_completed(future_to_lane):
+        for future in as_completed(future_to_lane, timeout=timeout):
             config = future_to_lane[future]
             try:
-                result = future.result()
+                result = future.result(timeout=timeout)
                 results.append(result)
+                logger.info(f"Lane {config.lane_name} completed: {'success' if result.success else 'failed'}")
+            except TimeoutError:
+                logger.error(f"Lane {config.lane_name} timed out after {timeout}s")
+                # Create timeout result
+                results.append(
+                    LaneResult(
+                        lane_id=config.lane_id,
+                        lane_name=config.lane_name,
+                        success=False,
+                        output=f"Lane execution timed out after {timeout} seconds",
+                        evidence_refs=[f"lane:{config.lane_id}", "status:timeout"],
+                        metrics={"error": "timeout", "timeout_seconds": timeout},
+                    )
+                )
             except Exception as e:
                 # Fallback if future itself fails
+                error_trace = traceback.format_exc()
+                logger.error(f"Lane {config.lane_name} future failed: {str(e)}\n{error_trace}")
                 results.append(
                     LaneResult(
                         lane_id=config.lane_id,
@@ -280,7 +337,7 @@ def run_parallel_lanes(lane_configs: List[LaneConfig]) -> List[LaneResult]:
                         success=False,
                         output=f"Lane execution failed: {str(e)}",
                         evidence_refs=[f"lane:{config.lane_id}", "status:failed"],
-                        metrics={"error": str(e)},
+                        metrics={"error": str(e), "mode": config.mode},
                     )
                 )
     
@@ -308,9 +365,32 @@ def create_lane_configs(num_lanes: int, explore_ratio: float) -> List[LaneConfig
     return configs
 
 
+def validate_api_key() -> bool:
+    """Validate that API key is present and formatted correctly."""
+    api_key = os.getenv("OPENAI_API_KEY", "")
+    
+    if not api_key:
+        return False
+    
+    # Basic format validation (OpenAI keys start with 'sk-')
+    if not api_key.startswith("sk-"):
+        logger.warning("OPENAI_API_KEY doesn't match expected format (should start with 'sk-')")
+        return False
+    
+    if len(api_key) < 20:
+        logger.warning("OPENAI_API_KEY seems too short")
+        return False
+    
+    return True
+
+
 def main() -> int:
     """Main orchestration function implementing Swarmlord facade."""
     from hfo_quorum_verifier import run_quorum_verification
+    
+    logger.info("="* 70)
+    logger.info("Hive Fleet Obsidian - Multi-Lane Orchestrator")
+    logger.info("=" * 70)
     
     print("=" * 70)
     print("Hive Fleet Obsidian - Multi-Lane Orchestrator")
@@ -318,9 +398,12 @@ def main() -> int:
     print(f"Mission ID: {MISSION_ID}")
     print(f"Parallel Lanes: {PARALLEL_LANES}")
     print(f"Explore/Exploit Ratio: {EXPLORE_RATIO}/{1-EXPLORE_RATIO}")
+    print(f"Lane Timeout: {LANE_TIMEOUT_SECONDS}s")
+    print(f"Max Retries: {MAX_RETRIES}")
     print("=" * 70)
     
     # Phase 1: Perceive
+    logger.info("Phase 1: Perceive - Scanning configuration")
     log_receipt(
         "perceive",
         f"Multi-lane orchestrator starting with {PARALLEL_LANES} parallel lanes",
@@ -329,15 +412,21 @@ def main() -> int:
             f"mission_id:{MISSION_ID}",
             f"lanes:{PARALLEL_LANES}",
             f"explore_ratio:{EXPLORE_RATIO}",
+            f"timeout:{LANE_TIMEOUT_SECONDS}",
         ],
     )
     
-    # Check API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("\n⚠️  WARNING: OPENAI_API_KEY not found in environment")
+    # Check API key with validation
+    if not validate_api_key():
+        logger.error("API key validation failed")
+        print("\n⚠️  ERROR: OPENAI_API_KEY not found or invalid")
         print("Please set it in .env file (copy from .env.example)")
-        print("Get your API key from: https://platform.openai.com/api-keys")
+        print("Requirements:")
+        print("  - Must start with 'sk-'")
+        print("  - Get your API key from: https://platform.openai.com/api-keys")
         return 1
+    
+    logger.info("API key validation passed")
     
     # Phase 2: React - Create lane configurations
     lane_configs = create_lane_configs(PARALLEL_LANES, EXPLORE_RATIO)
