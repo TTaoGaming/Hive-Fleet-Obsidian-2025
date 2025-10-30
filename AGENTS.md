@@ -1,3 +1,49 @@
+
+## Using the Crew AI pilot (Swarm attempt 1)
+
+This repo includes a minimal, parser-safe Crew AI pilot that runs two parallel PREY lanes with OBSIDIAN roles and logs receipts to the blackboard.
+
+- Roles per lane
+  - Perceive → Observer
+  - React → Bridger
+  - Engage → Shaper
+  - Yield → Assimilator
+  - Post-lane checks → Immunizer and Disruptor (quorum verify)
+
+- What it does
+  - Reads a daily mission intent (v5) that encodes safety, quorum verify, and telemetry defaults.
+  - Executes lanes in parallel with PREY; logs receipts to `hfo_blackboard/obsidian_synapse_blackboard.jsonl`.
+  - Emits simple OpenTelemetry-like spans to `temp/otel/trace-*.jsonl`.
+  - Makes at most one small, bounded LLM call during Engage per lane (optional; skips if no key).
+
+- Prerequisites (local)
+  - `.env` at repo root with `OPENROUTER_API_KEY` (optional for no-cost dry-runs) and optional `OPENROUTER_MODEL_HINT` (e.g., `haiku`).
+  - Python environment with dependencies from `requirements.txt`.
+
+- Run
+  - Optional model hint for a cheap/fast model is supported via env.
+
+```bash
+# optional: constrain model to a cheap/fast allowlisted model
+OPENROUTER_MODEL_HINT=haiku \
+  python3 scripts/crew_ai/runner.py \
+  --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+```
+
+- Outputs
+  - Blackboard receipts: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
+  - Spans: `temp/otel/trace-*.jsonl`
+  - Verify quorum: recorded in blackboard with votes and threshold
+
+- Safety and cost guards
+  - Bounded tokens and allowlisted models for Engage LLM calls; presence-only secret audit (never logs key).
+  - Chunk-size limit (≤200 lines per write), placeholder ban, canary-first, measurable tripwires, explicit revert.
+
+- References
+  - Mission intent: `hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
+  - Crew README: `scripts/crew_ai/README.md`
+  - Runner: `scripts/crew_ai/runner.py`
+
 # AGENTS.md — Operating Guide for Agents in Hive Fleet Obsidian (Gen21)
 
 This lightweight guide tells any agent (workers, tools, scripts, LLMs) how to act in this repo so behavior aligns with the Gen21 SSOT. If you do one thing: follow PREY, log receipts to the blackboard, and don’t talk to the human directly.

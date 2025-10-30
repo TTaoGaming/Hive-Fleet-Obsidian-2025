@@ -3,11 +3,12 @@
 Minimal Crew AI runner (pilot):
 - Reads mission intent YAML
 - Runs 2 lanes (from intent) with PREY steps (Perceive→React→Engage→Yield)
+- Executes lane agents (Observer, Bridger, Shaper, Assimilator); then Immunizer + Disruptor
 - Appends receipts to blackboard JSONL
 - Writes simple OpenTelemetry-like spans (JSON) to temp/otel/
 - Runs Verify with immunizer + disruptor, aggregate to PASS/FAIL
 
-No external deps beyond PyYAML (present in requirements.txt).
+Dependencies: PyYAML and python-dotenv. Optional: requests for OpenRouter LLM path.
 """
 from __future__ import annotations
 import argparse
@@ -21,6 +22,13 @@ from typing import Any, Dict, List
 
 import yaml
 from dotenv import load_dotenv
+
+# Ensure local imports work when running as a script
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+from llm_client import call_openrouter
+from agents import REGISTRY as AGENTS
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INTENT = ROOT / "hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml"
@@ -62,7 +70,9 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
         ("engage", "Work executed under safety envelope"),
         ("yield", "Review bundle assembled"),
     ]
-    evidence = []
+    evidence: List[str] = []
+    phases_seen: List[str] = []
+    collected: Dict[str, Any] = {}
     for phase, summary in phases:
         ts = now_z()
         entry = {
@@ -94,7 +104,139 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
         }
         write_span(trace_id, span)
         evidence.append(f"lane={lane_name}:{phase}")
-    return {"lane": lane_name, "evidence": evidence}
+        phases_seen.append(phase)
+
+        # Run role agents aligned to the current PREY phase
+        agent_map = {
+            "perceive": ["observer"],
+            "react": ["bridger"],
+            "engage": ["shaper"],
+            "yield": ["assimilator"],
+        }
+        for role in agent_map.get(phase, []):
+            agent = AGENTS.get(role)
+            if not agent:
+                continue
+            ctx = {"mission": mission, "lane": lane_name, "phase": phase, "evidence": evidence, "flags": {"phases_seen": phases_seen}, "collected": collected}
+            res = agent.run(ctx)
+            collected[role] = {"ok": res.ok, "summary": res.summary, "data": res.data, "llm_used": res.llm_used}
+            # Span per agent
+            write_span(trace_id, {
+                "trace_id": trace_id,
+                "span_id": f"{lane_name}-{phase}-{role}-{int(time.time()*1000)}",
+                "name": f"{lane_name}:{phase}:{role}",
+                "start_time": ts,
+                "end_time": now_z(),
+                "attributes": {
+                    "lane": lane_name,
+                    "phase": phase,
+                    "role": role,
+                    "ok": res.ok,
+                    "llm_used": res.llm_used,
+                },
+            })
+            append_blackboard({
+                "mission_id": mission_id,
+                "phase": phase,
+                "summary": f"lane={lane_name}:{role} -> {'ok' if res.ok else 'fail'}",
+                "evidence_refs": [f"lane:{lane_name}", f"phase:{phase}", f"role:{role}"],
+                "safety_envelope": {
+                    "chunk_size_max": safety.get("chunk_size_max", 200),
+                    "placeholder_ban": safety.get("placeholder_ban", True),
+                },
+                "blocked_capabilities": [],
+                "timestamp": now_z(),
+                "agent": {"role": role, "summary": res.summary},
+            })
+
+        # During engage, perform a single, guarded LLM call if key present
+        if phase == "engage":
+            model_hint = os.environ.get("OPENROUTER_MODEL_HINT")
+            prompt = (
+                "In one short sentence, restate the mission's intent and safety posture: "
+                f"mission_id={mission_id}, safety={safety.get('tripwires', [])}."
+            )
+            llm_result = call_openrouter(
+                prompt,
+                model_hint=model_hint,
+                max_tokens=72,
+                temperature=0.1,
+            )
+
+            # Emit span for the LLM action (content not stored here to limit size)
+            write_span(
+                trace_id,
+                {
+                    "trace_id": trace_id,
+                    "span_id": f"{lane_name}-engage-llm-{int(time.time()*1000)}",
+                    "name": f"{lane_name}:engage_llm",
+                    "start_time": ts,
+                    "end_time": now_z(),
+                    "attributes": {
+                        "lane": lane_name,
+                        "mission_id": mission_id,
+                        "ok": llm_result.get("ok"),
+                        "model": llm_result.get("model"),
+                        "latency_ms": llm_result.get("latency_ms"),
+                        "status_code": llm_result.get("status_code"),
+                        "error": llm_result.get("error"),
+                    },
+                },
+            )
+
+            # Append a concise blackboard receipt noting success/failure and a tiny preview
+            content_preview = None
+            if llm_result.get("ok") and llm_result.get("content"):
+                content_preview = llm_result["content"].strip().replace("\n", " ")[:180]
+            append_blackboard(
+                {
+                    "mission_id": mission_id,
+                    "phase": "engage",
+                    "summary": f"lane={lane_name}: LLM engage call {'ok' if llm_result.get('ok') else 'fail'}",
+                    "evidence_refs": [f"lane:{lane_name}", "phase:engage", "action:llm"],
+                    "safety_envelope": {
+                        "chunk_size_max": safety.get("chunk_size_max", 200),
+                        "placeholder_ban": safety.get("placeholder_ban", True),
+                        "bounded_tokens": 72,
+                    },
+                    "blocked_capabilities": [],
+                    "timestamp": now_z(),
+                    "llm": {
+                        "ok": llm_result.get("ok"),
+                        "model": llm_result.get("model"),
+                        "latency_ms": llm_result.get("latency_ms"),
+                        "status_code": llm_result.get("status_code"),
+                        "error": llm_result.get("error"),
+                        "content_preview": content_preview,
+                    },
+                }
+            )
+    # Post-Yield lane checks by Immunizer and Disruptor
+    for role in ("immunizer", "disruptor"):
+        agent = AGENTS.get(role)
+        if not agent:
+            continue
+        res = agent.run({"mission": mission, "lane": lane_name, "evidence": evidence, "flags": {"phases_seen": phases_seen}, "collected": collected})
+        write_span(trace_id, {
+            "trace_id": trace_id,
+            "span_id": f"{lane_name}-post-{role}-{int(time.time()*1000)}",
+            "name": f"{lane_name}:post:{role}",
+            "start_time": now_z(),
+            "end_time": now_z(),
+            "attributes": {"lane": lane_name, "role": role, "ok": res.ok},
+        })
+        append_blackboard({
+            "mission_id": mission_id,
+            "phase": "verify",
+            "summary": f"lane={lane_name}:{role} -> {'ok' if res.ok else 'fail'}",
+            "evidence_refs": [f"lane:{lane_name}", f"role:{role}"],
+            "safety_envelope": {"tripwires_checked": ["receipts_present"]},
+            "blocked_capabilities": [],
+            "timestamp": now_z(),
+            "agent": {"role": role, "summary": res.summary},
+        })
+
+    return {"lane": lane_name, "evidence": evidence, "phases_seen": phases_seen}
 
 
 def verify_quorum(mission: Dict[str, Any], lane_results: List[Dict[str, Any]], trace_id: str) -> Dict[str, Any]:

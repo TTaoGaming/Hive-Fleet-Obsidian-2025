@@ -1,6 +1,6 @@
 # Crew AI Pilot — Secrets and Setup
 
-This pilot reads `mission_intent_daily_YYYY-MM-DD.v5.yml`, runs 2 lanes with PREY steps, writes receipts to the blackboard, and emits simple OpenTelemetry-like spans.
+This pilot reads `mission_intent_daily_YYYY-MM-DD.v5.yml`, runs 2 lanes with PREY steps, and executes a minimal multi-agent crew per lane (Observer for Perceive, Bridger for React, Shaper for Engage, Assimilator for Yield; plus Immunizer and Disruptor checks), writes receipts to the blackboard, and emits simple OpenTelemetry-like spans.
 
 ## Secrets (OpenRouter)
 
@@ -25,7 +25,7 @@ Security notes:
 
 ## Run locally (pilot)
 
-The pilot does not call the LLM yet; it validates orchestration and audit flows.
+The pilot will perform at most one guarded LLM call per lane during the Engage phase if `OPENROUTER_API_KEY` is present. The call uses an allowlisted cheap/fast model, low `max_tokens` (<= 96), and logs only a short preview in the blackboard.
 
 ```bash
 python3 scripts/crew_ai/runner.py \
@@ -36,7 +36,10 @@ Outputs:
 - Blackboard receipts in `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
 - Spans in `temp/otel/trace-*.jsonl`
 
+Notes:
+- If no `OPENROUTER_API_KEY` is set, the Engage step gracefully skips the remote call and records a failed but non-fatal audit.
+
 ## Next steps
-- Wire Crew AI agents to use OpenRouter with the env-loaded key.
-- Start with cheap/fast models; add model selection heuristics and rate limits.
-- Expand Verify with richer immunizer/disruptor probes.
+- Add budgeting/rate limits per mission to cap LLM calls.
+- Externalize model allowlist and limits into mission intent or policy file.
+- Expand Verify to assert per-lane engage_llm spans when keys are present.
