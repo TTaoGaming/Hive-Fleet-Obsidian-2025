@@ -285,6 +285,8 @@ def main() -> None:
     parser.add_argument("--diag-boundary", action="store_true", help="Collect boundary and movement diagnostics (near-wall, min-dists, clipping, OOB checks)")
     parser.add_argument("--diag-boundary-thr", type=float, default=0.98, help="Abs position threshold to count 'near boundary' (default 0.98)")
     parser.add_argument("--diag-close-dist", type=float, default=0.03, help="Distance threshold to consider predators 'close' to prey (default 0.03)")
+    parser.add_argument("--force-prey-near-wall", action="store_true", help="On reset, repeat until prey spawns within diag-boundary-thr of wall (max attempts)")
+    parser.add_argument("--force-prey-near-wall-max", type=int, default=50, help="Max reset attempts to place prey near wall when forced")
     args = parser.parse_args()
 
     run_end = datetime.now(timezone.utc)
@@ -418,6 +420,27 @@ def main() -> None:
                         diag["pred_clip_steps_near_boundary"] += 1
 
     # Wrap run_eval to inject diagnostics by reusing its loop via a local copy
+    def _prey_near_wall(penv, thr: float) -> bool:
+        raw = penv.unwrapped
+        w = raw.world
+        prey = [a for a in w.agents if not getattr(a, 'adversary', False)][0]
+        pos = prey.state.p_pos
+        return (abs(pos[0]) >= thr) or (abs(pos[1]) >= thr)
+
+    def _maybe_force_prey_near_wall_reset(penv, seed0: int, thr: float, max_attempts: int) -> tuple:
+        """Attempt to reset until prey is near wall. Returns (obs, infos)."""
+        obs, infos = penv.reset(seed=seed0)
+        if not args.force_prey_near_wall:
+            return obs, infos
+        if _prey_near_wall(penv, thr):
+            return obs, infos
+        # Try additional resets with incremented seeds
+        for k in range(1, max_attempts + 1):
+            obs, infos = penv.reset(seed=seed0 + k)
+            if _prey_near_wall(penv, thr):
+                return obs, infos
+        return obs, infos
+
     def _run_eval_with_diag(episodes: int, seed: int, pred_spec: str, prey_spec: str, baseline: str):
         if not args.diag_boundary:
             return run_eval(episodes, seed, pred_spec, prey_spec, baseline, pred_kwargs=pred_kwargs, prey_kwargs=prey_kwargs)
@@ -436,7 +459,13 @@ def main() -> None:
 
         for ep in range(episodes):
             ep_seed = seed + ep
-            obs, infos = penv.reset(seed=ep_seed)
+            # Optional forced placement near wall
+            obs, infos = _maybe_force_prey_near_wall_reset(
+                penv,
+                seed0=ep_seed,
+                thr=float(args.diag_boundary_thr),
+                max_attempts=int(args.force_prey_near_wall_max),
+            )
             step = 0
             caught = False
             first_step: Optional[int] = None
