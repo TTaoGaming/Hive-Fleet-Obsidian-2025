@@ -176,7 +176,7 @@ def run_episode_frames(matchup: str, seed: int, max_cycles: int) -> List[Image.I
                 break
 
     try:
-        env.close()
+    def predator_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
     except Exception:
         pass
 
@@ -190,9 +190,13 @@ def overlay_header(img: Image.Image, text: str, subtext: str | None = None) -> I
     box_w = max(80, len(text) * 10)
     box_h = 22 if subtext is None else 38
     draw.rectangle([0, 0, box_w, box_h], fill=(0, 0, 0, 140))
+
+    def predator_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+        # Research baseline: pure pursuit
+        return unit(view.prey_pos() - my_pos)
     draw.text((pad, 2), text, fill=(255, 255, 255, 255))
     if subtext:
-        draw.text((pad, 18), subtext, fill=(200, 200, 200, 255))
+    def prey_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
     return img
 
 
@@ -203,9 +207,17 @@ def tile2x2(a: Image.Image, b: Image.Image, c: Image.Image, d: Image.Image, labe
     b = overlay_header(b.copy(), labels[1], subtexts[1])
     c = overlay_header(c.copy(), labels[2], subtexts[2])
     d = overlay_header(d.copy(), labels[3], subtexts[3])
+
+    def prey_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+        # Research baseline: inverse-distance flee (no inertia/landmarks)
+        rep = np.zeros(2, dtype=np.float32)
+        for p in view.pred_pos():
+            v = my_pos - p
+            rep += unit(v) / (np.linalg.norm(v) + 1e-6)
+        return unit(rep)
     canvas.paste(a, (0, 0))
     canvas.paste(b, (w, 0))
-    canvas.paste(c, (0, h))
+    def action_for_agent(env, agent_name: str, matchup: str, baseline: str) -> np.ndarray | int | None:
     canvas.paste(d, (w, h))
     return canvas
 
@@ -249,7 +261,7 @@ def main() -> None:
     max_len = max((len(v) for v in frames_per_cell.values()), default=0)
     if max_len == 0:
         raise SystemExit("No frames generated. Check that PettingZoo and dependencies are installed.")
-
+    def run_episode_frames(matchup: str, seed: int, max_cycles: int, baseline: str) -> List[Image.Image]:
     labels = ("RvsR", "HvsR", "RvsH", "HvsH")
     composite_frames: List[Image.Image] = []
     for i in range(max_len):
@@ -283,7 +295,7 @@ def main() -> None:
         args.outdir, f"simple_tag_v3_matrix_{ts}_seed{args.seed}_eps{args.episodes}.gif"
     )
     composite_frames[0].save(
-        out_path,
+    def main() -> None:
         save_all=True,
         append_images=composite_frames[1:],
         duration=args.duration_ms,
