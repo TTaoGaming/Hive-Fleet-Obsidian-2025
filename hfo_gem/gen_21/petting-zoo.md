@@ -43,9 +43,13 @@ python3 scripts/pz_matrix_simple_tag_v3.py \
 - Generate a 2×2 animated GIF (3 episodes/cell by default):
 
 ```bash
-python3 scripts/pz_make_matrix_gif.py --episodes 3 --seed 42 --max-cycles 25 --duration-ms 120 --outdir hfo_petting_zoo_results/gifs
+# Simple wrapper (uses .venv if present) and writes to dated folder
+bash scripts/run_pz_make_matrix_gif.sh
+
+# Or call the Python script directly and choose an output folder
+python3 scripts/pz_make_matrix_gif.py --episodes 3 --seed 42 --max-cycles 25 --duration-ms 120 --outdir hfo_petting_zoo_results/$(date +%Y-%m-%d)
 ```
-Output file: `hfo_petting_zoo_results/gifs/simple_tag_v3_matrix_<TS>_seed<seed>_eps<episodes>.gif`
+Output file example: `hfo_petting_zoo_results/YYYY-MM-DD/simple_tag_v3_matrix_<TS>_seed<seed>_eps<episodes>.gif`
 
 Flags in `pz_matrix_simple_tag_v3.py`:
 - `--min-hvsr <float>`: fail if HvsR catch_rate falls below this threshold

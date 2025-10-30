@@ -175,6 +175,14 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
     - Custom: `bash scripts/run_pz_simple_tag_matrix.sh <episodes> <seed> [outdir]`
   - Output: Prints per-cell metrics and saves `simple_tag_v3_matrix_<TIMESTAMP>_seed<seed>_eps<episodes>.json` in the outdir.
 
+- 2x2 Animated GIF generator:
+  - Path: `scripts/run_pz_make_matrix_gif.sh`
+  - Purpose: Produce a 2×2 looping GIF (RvsR, HvsR, RvsH, HvsH) with headers and ep/step overlays for quick visual inspection.
+  - Usage:
+    - Default (3 episodes/cell, seed 42, 25 cycles/ep): `bash scripts/run_pz_make_matrix_gif.sh`
+    - Custom: `bash scripts/run_pz_make_matrix_gif.sh <seed> <max_cycles> <duration_ms>`
+  - Output: Writes to dated folder `hfo_petting_zoo_results/YYYY-MM-DD/` with name `simple_tag_v3_matrix_<TS>_seed<seed>_eps3.gif`.
+
 ## Acronyms quick reference
 
 - D3A — Decide, Detect, Deliver, Assess
