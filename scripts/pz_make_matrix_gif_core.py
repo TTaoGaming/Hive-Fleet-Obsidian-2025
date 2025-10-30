@@ -202,44 +202,60 @@ def main() -> None:
     args = p.parse_args()
 
     cells = ["RvsR", "HvsR", "RvsH", "HvsH"]
-    frames_per_cell: Dict[str, List[Image.Image]] = {k: [] for k in cells}
+    # Store frames per cell per episode to preserve true episode lengths
+    frames_per_cell_eps: Dict[str, List[List[Image.Image]]] = {k: [] for k in cells}
 
     for cell in cells:
         for ep in range(args.episodes):
             ep_seed = args.seed + ep
             frames = run_episode_frames(cell, seed=ep_seed, max_cycles=args.max_cycles, baseline=args.baseline)
-            frames_per_cell[cell].extend(frames)
+            frames_per_cell_eps[cell].append(frames)
 
     widths: List[int] = []
     heights: List[int] = []
-    for seq in frames_per_cell.values():
-        for im in seq:
-            widths.append(im.width)
-            heights.append(im.height)
+    for eps_list in frames_per_cell_eps.values():
+        for seq in eps_list:
+            for im in seq:
+                widths.append(im.width)
+                heights.append(im.height)
     base_w = min(widths) if widths else 300
     base_h = min(heights) if heights else 300
-    for k, seq in frames_per_cell.items():
-        frames_per_cell[k] = [im.resize((base_w, base_h), Image.BILINEAR) for im in seq]
+    for k, eps_list in frames_per_cell_eps.items():
+        for e_idx, seq in enumerate(eps_list):
+            frames_per_cell_eps[k][e_idx] = [im.resize((base_w, base_h), Image.BILINEAR) for im in seq]
 
-    max_len = max((len(v) for v in frames_per_cell.values()), default=0)
-    if max_len == 0:
+    # Safety: ensure we have at least one frame overall
+    any_len = 0
+    for eps_list in frames_per_cell_eps.values():
+        for seq in eps_list:
+            any_len += len(seq)
+    if any_len == 0:
         raise SystemExit("No frames generated. Ensure PettingZoo is installed and renderable.")
 
     labels = ("RvsR", "HvsR", "RvsH", "HvsH")
     composite_frames: List[Image.Image] = []
-    fpe = args.max_cycles
-    for i in range(max_len):
-        a = frames_per_cell["RvsR"][i if i < len(frames_per_cell["RvsR"]) else -1]
-        b = frames_per_cell["HvsR"][i if i < len(frames_per_cell["HvsR"]) else -1]
-        c = frames_per_cell["RvsH"][i if i < len(frames_per_cell["RvsH"]) else -1]
-        d = frames_per_cell["HvsH"][i if i < len(frames_per_cell["HvsH"]) else -1]
-        subs = (
-            f"ep {i // fpe + 1} step {i % fpe + 1}",
-            f"ep {i // fpe + 1} step {i % fpe + 1}",
-            f"ep {i // fpe + 1} step {i % fpe + 1}",
-            f"ep {i // fpe + 1} step {i % fpe + 1}",
-        )
-        composite_frames.append(tile2x2(a, b, c, d, labels, subs))
+    # Compose episode by episode; within each episode, reflect true lengths.
+    for ep in range(args.episodes):
+        rvr = frames_per_cell_eps["RvsR"][ep]
+        hvr = frames_per_cell_eps["HvsR"][ep]
+        rvh = frames_per_cell_eps["RvsH"][ep]
+        hvh = frames_per_cell_eps["HvsH"][ep]
+
+        max_len_ep = max(len(rvr), len(hvr), len(rvh), len(hvh))
+        if max_len_ep == 0:
+            continue
+        for i in range(max_len_ep):
+            a = rvr[i] if i < len(rvr) else rvr[-1]
+            b = hvr[i] if i < len(hvr) else hvr[-1]
+            c = rvh[i] if i < len(rvh) else rvh[-1]
+            d = hvh[i] if i < len(hvh) else hvh[-1]
+            subs = (
+                f"ep {ep + 1} step {i + 1}" if i < len(rvr) else f"ep {ep + 1} done",
+                f"ep {ep + 1} step {i + 1}" if i < len(hvr) else f"ep {ep + 1} done",
+                f"ep {ep + 1} step {i + 1}" if i < len(rvh) else f"ep {ep + 1} done",
+                f"ep {ep + 1} step {i + 1}" if i < len(hvh) else f"ep {ep + 1} done",
+            )
+            composite_frames.append(tile2x2(a, b, c, d, labels, subs))
 
     os.makedirs(args.outdir, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
