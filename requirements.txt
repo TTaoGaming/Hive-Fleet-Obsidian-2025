@@ -64,3 +64,5 @@ urllib3==2.5.0
 xxhash==3.6.0
 yarl==1.22.0
 zstandard==0.25.0
+crewai==0.94.0
+crewai-tools==0.17.0
