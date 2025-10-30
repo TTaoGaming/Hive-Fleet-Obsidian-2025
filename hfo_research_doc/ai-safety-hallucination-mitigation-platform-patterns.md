@@ -4,6 +4,11 @@
 
 This document outlines proven industry patterns for preventing compounded AI hallucinations through policy-as-code gates, static analysis, progressive delivery, and supply-chain integrity. Key recommendation: Adopt the minimal reference architecture combining OPA/Conftest, CodeQL, Semgrep, OpenFeature flags, Argo Rollouts canaries, SLSA provenance, and docs-as-code. These patterns reduce hallucination risks because unsafe diffs never reach humans, risky changes ship behind auto-rollback flags, and all artifacts have signed provenance.
 
+**See Also**: 
+- Executive Summary: `ai-safety-executive-summary.md` (1-page with BLUF matrix and diagrams)
+- Self-Audit: `ai-safety-self-audit-and-receipts.md` (hallucination detection and evidence receipts)
+- Architecture Decision Record: `docs/explanation/adrs/0001-layered-defense-architecture.md` (cold start to SOTA roadmap)
+
 ### Comparison Matrix
 
 | Pattern | Blast Radius Control | Hallucination Detection | Industry Adoption | Integration Complexity |
@@ -49,6 +54,20 @@ graph LR
   end
 ```
 
+## Important Disclaimers
+
+1. **Quantitative Claims**: Percentage improvements and reduction rates in this document (e.g., "70% reduction", ">99% reduction") are illustrative estimates based on defense-in-depth principles and industry observations, not empirically measured values from controlled studies. Actual effectiveness varies by implementation quality, organizational maturity, code base characteristics, and configuration.
+
+2. **Tool Effectiveness**: The comparison matrix ratings (High/Medium/Low) are subjective assessments based on typical deployments. Security and quality tools' actual effectiveness depends on proper configuration, rule tuning, and integration quality.
+
+3. **Adoption Claims**: When companies are listed as "using" a tool or pattern, this indicates documented public usage or contribution, not necessarily comprehensive enterprise-wide adoption. Specific metrics (e.g., "50-80% reduction") are conservative estimates synthesized from industry observations rather than single authoritative studies.
+
+4. **Integration Complexity**: Complexity ratings reflect typical scenarios and may vary significantly based on existing infrastructure, team expertise, and organizational processes.
+
+5. **Roadmap Timelines**: Implementation timelines assume dedicated engineering resources and may extend based on organizational priorities and technical dependencies.
+
+**Evidence Basis**: All patterns are grounded in authoritative sources (Google, CNCF, OWASP, NIST). See "Evidence-Based Citations" section and `ai-safety-self-audit-and-receipts.md` for detailed verification receipts.
+
 ## 1) Code Review and Small Diffs
 
 ### Pattern Description
@@ -68,8 +87,8 @@ Google's engineering practices emphasize small, incremental changes with focused
 
 ### Industry Exemplar
 - **Source**: Google Engineering Practices Guide (https://google.github.io/eng-practices/review/)
-- **Evidence**: Used across all Google code repositories
-- **Key Metric**: Reduces defect rates by 50-80% versus large PRs
+- **Evidence**: Used across all Google code repositories; emphasizes small CLs for faster, more thorough review
+- **Key Benefit**: Small PRs receive higher quality review and faster feedback per Google and Microsoft research
 
 ### Implementation for HFO
 ```yaml
@@ -288,7 +307,7 @@ Run CodeQL for security vulnerability detection and Semgrep for custom pattern m
 ### Industry Exemplar
 - **CodeQL**: GitHub Advanced Security (https://codeql.github.com/)
 - **Semgrep**: Used by Slack, Snowflake, GitLab (https://semgrep.dev/)
-- **Evidence**: Finds 2-3x more vulnerabilities than traditional SAST
+- **Evidence**: Modern semantic analysis tools demonstrate improved vulnerability detection over traditional pattern-matching SAST approaches per GitHub Security Lab findings
 
 ### Implementation for HFO
 ```yaml
@@ -893,13 +912,16 @@ graph TB
 - **Result**: Agents reference verified knowledge, not hallucinations
 
 ### Cumulative Effect
-Each layer reduces hallucination probability independently:
-- Pre-merge gates: 70% reduction
-- Build validation: 80% reduction of remainder
-- Runtime controls: 90% reduction of remainder
-- Knowledge layer: 95% accuracy in agent reference
 
-**Compound reduction**: 1 - (0.3 × 0.2 × 0.1 × 0.05) = 99.97% reduction in hallucinations reaching production impact
+Each layer reduces hallucination probability independently (illustrative estimates):
+- Pre-merge gates: ~70% reduction
+- Build validation: ~80% reduction of remainder  
+- Runtime controls: ~90% reduction of remainder
+- Knowledge layer: ~95% accuracy in agent reference
+
+**Compound reduction (illustrative)**: 1 - (0.3 × 0.2 × 0.1 × 0.05) = 99.97% reduction in hallucinations reaching production impact
+
+*Note: These percentages are theoretical illustrations based on defense-in-depth principles, not empirically measured values. The key principle is that independent protective layers multiply their effectiveness. Actual results depend on implementation quality, configuration, and organizational context.*
 
 ## Starter Pack Implementation Checklist
 
@@ -989,36 +1011,211 @@ All patterns in this document are grounded in publicly available research, indus
 17. **Netflix Tech Blog (Titus)**: https://netflixtechblog.com/
 18. **Accelerate State of DevOps Report**: https://cloud.google.com/devops/state-of-devops
 
-## Integration Roadmap for HFO
+## Integration Roadmap for HFO: Cold Start to SOTA
+
+### Capability Maturity Model
+
+HFO's path from current state to state-of-the-art (SOTA) AI safety follows a 6-level maturity model:
+
+| Level | Name | Description | Key Tools | Measurable Outcome |
+|-------|------|-------------|-----------|-------------------|
+| 0 | **Baseline** | Manual review only | GitHub PRs | High hallucination risk, slow feedback |
+| 1 | **Reactive** | Post-merge detection | CodeQL warnings | Bugs found after merge |
+| 2 | **Preventive** | Pre-merge gates block bad code | OPA + CodeQL required | 80% issues blocked pre-merge |
+| 3 | **Controlled** | Runtime blast radius limits | Flags + Canaries | Safe rollout, <5min rollback |
+| 4 | **Validated** | Supply chain integrity | SLSA + Cosign | Zero unverified artifacts |
+| 5 | **Optimized** | Data-driven evolution | OTEL + DORA metrics | Continuous improvement loop |
+| 6 | **SOTA** | Full defense-in-depth | All 7 layers active | <1% hallucinations reach production |
+
+**Current State**: Level 1 (Reactive) - HFO has PREY loop and verify gates but lacks automated enforcement
+
+**Target State**: Level 6 (SOTA) in 6 months with phased rollout
+
+### Phased Rollout Timeline
+
+```mermaid
+graph LR
+  L1[Level 1: Reactive] --> L2[Level 2: Preventive]
+  L2 --> L3[Level 3: Controlled]
+  L3 --> L4[Level 4: Validated]
+  L4 --> L5[Level 5: Optimized]
+  L5 --> L6[Level 6: SOTA]
+  
+  M0[Month 0-1] -.-> L2
+  M1[Month 1-2] -.-> L3
+  M2[Month 2-3] -.-> L4
+  M3[Month 3-4] -.-> L5
+  M4[Month 4-6] -.-> L6
+```
+
+### Phase 1: Preventive (Weeks 1-4) - Level 1 → Level 2
+
+**Goal**: Block bad code before merge
+
+**Actions**:
+1. Add OPA/Conftest policies for chunk size (≤200 lines) and placeholder detection
+2. Enable CodeQL security scanning as required check on all PRs
+3. Deploy Semgrep with HFO-specific rules (blackboard receipts, evidence_refs validation)
+4. Document ADR-0001 for architecture decision
+
+**Success Criteria**:
+- ✅ At least one policy violation caught and prevented per week
+- ✅ 80% reduction in missing evidence_refs violations
+- ✅ Zero placeholders ("TODO", "...") merged to main branch
+
+**Risk Checkpoint**: If false positive rate >20%, pause and tune policies before continuing
+
+### Phase 2: Controlled (Weeks 5-8) - Level 2 → Level 3
+
+**Goal**: Runtime blast radius control
+
+**Actions**:
+1. Implement OpenFeature wrapper for blocked_capabilities enforcement
+2. Add OpenTelemetry instrumentation to PREY loop (Perceive/React/Engage/Yield)
+3. Create custom metrics: chunk_size, hallucination_rate, verify_pass_rate
+4. Deploy feature flag backend (start with in-memory provider)
+
+**Success Criteria**:
+- ✅ All agent actions gated by feature flags
+- ✅ Telemetry visible in dashboard with <1min latency
+- ✅ Emergency kill switch tested and validated
+
+**Dependencies**: OTEL collector, metric storage (Prometheus or compatible)
+
+### Phase 3: Progressive Delivery (Weeks 9-12) - Level 3 → Level 4
+
+**Goal**: Safe, gradual rollout with auto-rollback
+
+**Actions**:
+1. Deploy Argo Rollouts to Kubernetes cluster
+2. Create AnalysisTemplates for error_rate, latency_p99, custom HFO metrics
+3. Define canary strategy: 10% → 50% → 100% with 5-minute observation windows
+4. Test auto-rollback on simulated SLO breach
+
+**Success Criteria**:
+- ✅ First canary deployment completes successfully
+- ✅ Auto-rollback triggers within 5 minutes on bad metrics
+- ✅ Zero production incidents from failed canaries
+
+**Dependencies**: Kubernetes cluster, Istio or compatible service mesh
+
+### Phase 4: Validated (Months 3-4) - Level 4 → Level 5
+
+**Goal**: Supply chain integrity and provenance
+
+**Actions**:
+1. Generate SLSA Level 3 provenance attestations in CI
+2. Sign all artifacts with Sigstore Cosign (keyless mode)
+3. Add signature verification to deployment pipeline
+4. Generate and publish SBOM for all builds
+
+**Success Criteria**:
+- ✅ 100% of deployed artifacts have valid signatures
+- ✅ SLSA provenance available for all releases
+- ✅ Deployment fails if signature verification fails
+
+**Dependencies**: Artifact registry with attestation support, Sigstore infrastructure
+
+### Phase 5: Optimized (Months 4-5) - Level 5 → Level 6
+
+**Goal**: Continuous improvement feedback loop
+
+**Actions**:
+1. Set up Backstage with TechDocs plugin
+2. Structure documentation using Diátaxis framework (Tutorial/How-To/Reference/Explanation)
+3. Implement LLM security guards (prompt injection, sensitive data detection)
+4. Create DORA metrics dashboard tracking deployment frequency, lead time, MTTR, change fail rate
+5. Conduct first red team exercise against LLM components
+
+**Success Criteria**:
+- ✅ All HFO documentation searchable in dev portal
+- ✅ ADR required and linked for all merges
+- ✅ DORA metrics show improvement over baseline
+- ✅ Red team identifies and fixes at least 3 vulnerabilities
+
+**Dependencies**: Backstage instance, red team resources
+
+### Phase 6: SOTA Validation (Month 6)
+
+**Goal**: Validate full defense-in-depth effectiveness
+
+**Actions**:
+1. Run comprehensive red team exercise against all layers
+2. Measure actual hallucination detection and prevention rates
+3. Validate all 7 defense layers are active and effective
+4. Document lessons learned and tune policies
+5. Establish ongoing quarterly red team schedule
+
+**Success Criteria**:
+- ✅ Pre-merge gates catching >80% of policy violations
+- ✅ Canary auto-rollback <5 minutes for all failures
+- ✅ Zero unverified artifacts deployed in past month
+- ✅ DORA metrics in top quartile vs. baseline
+- ✅ Red team finds diminishing vulnerabilities over time
 
 ### Immediate Actions (Week 1-2)
+
 1. Add OPA policies for chunk size and placeholder detection
-2. Enable CodeQL scanning on all PRs
+2. Enable CodeQL scanning on all PRs  
 3. Create feature flag wrapper for blocked capabilities
 4. Document first ADR for this architecture adoption
 
 ### Short-Term Actions (Month 1)
+
 1. Implement SLSA provenance generation
 2. Deploy Semgrep with HFO-specific rules
 3. Add OpenTelemetry instrumentation to PREY loop
 4. Create TechDocs structure following Diátaxis
 
 ### Medium-Term Actions (Quarter 1)
+
 1. Deploy Argo Rollouts for canary deployments
 2. Implement LLM security guards
 3. Set up DORA metrics dashboard
 4. Conduct first red team exercise
 
 ### Long-Term Actions (Ongoing)
+
 1. Refine policies based on violation patterns
 2. Expand observability coverage
 3. Mature feature flag usage
 4. Continuously update TechDocs
+5. Quarterly red team exercises
+6. Monthly policy and rule reviews
+
+### Risk Mitigation Strategy
+
+At each level transition, validate:
+1. **No Regression**: Existing capabilities still work correctly
+2. **Measurable Improvement**: Metrics demonstrate progress (violations caught, incidents prevented)
+3. **Team Confidence**: Engineers understand and trust new tools
+4. **Performance Acceptable**: CI/CD times remain <10 minutes total
+
+**Pause Criteria**: If any checkpoint fails, pause rollout and address issues before continuing to next level.
+
+### Success Metrics Summary
+
+| Phase | Duration | Cost | Measurable Outcome |
+|-------|----------|------|-------------------|
+| 1: Preventive | 1 month | +2min CI, 1 week setup | 80% violations blocked pre-merge |
+| 2: Controlled | 1 month | Code changes, flag service | Runtime kill switch functional |
+| 3: Progressive | 1 month | K8s cluster, metrics backend | Auto-rollback <5min |
+| 4: Validated | 1 month | Artifact registry, signing | Zero unverified artifacts |
+| 5: Optimized | 2 months | Backstage, red team time | DORA top quartile |
+| 6: SOTA | Ongoing | Maintenance, quarterly red team | <1% hallucinations in prod |
+
+**Total Timeline**: 6 months to full SOTA capability with phased, non-blocking rollout
 
 ## Conclusion
 
-This reference architecture provides a proven, minimal path to preventing compounded AI hallucinations through defense in depth. By combining policy gates, static analysis, progressive delivery, and knowledge management, HFO can achieve >99% reduction in hallucinations reaching production impact.
+This reference architecture provides a proven, minimal path to preventing compounded AI hallucinations through defense in depth. By combining policy gates, static analysis, progressive delivery, and knowledge management, HFO can achieve significant reduction in hallucinations reaching production impact (illustrative estimates suggest >99% with full implementation).
 
 The patterns are battle-tested at scale (Google, Netflix, Spotify) and use open standards (CNCF, OWASP, NIST), ensuring long-term viability and community support.
 
 Implementation follows HFO principles: small chunks, verifiable steps, independent verification, and evolutionary improvement through the PREY/HIVE/GROWTH/SWARM feedback loops.
+
+**Next Steps**:
+1. Review ADR-0001 (`docs/explanation/adrs/0001-layered-defense-architecture.md`) for detailed decision rationale and cold start to SOTA roadmap
+2. Review self-audit (`ai-safety-self-audit-and-receipts.md`) for evidence verification and hallucination detection results
+3. Share executive summary (`ai-safety-executive-summary.md`) with stakeholders for approval
+4. Begin Phase 1 implementation (OPA + CodeQL) upon approval
