@@ -84,9 +84,23 @@ class WorldView:
 
 
 def predator_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    # Wall-aware pursuit (see matrix runner for details)
     k_lead = 0.15
-    target = (view.prey_pos() + k_lead * view.prey_vel()) - my_pos
-    return unit(target)
+    bound = 1.0
+    prey_future = view.prey_pos() + k_lead * view.prey_vel()
+    prey_future = np.clip(prey_future, -bound, bound)
+    d = unit(prey_future - my_pos)
+    eps_wall = 0.02
+    for i in range(2):
+        if abs(my_pos[i]) > (bound - eps_wall):
+            if (my_pos[i] > 0 and d[i] > 0) or (my_pos[i] < 0 and d[i] < 0):
+                d[i] = 0.0
+    near = 0.01
+    inward = np.zeros(2, dtype=np.float32)
+    for i in range(2):
+        if abs(my_pos[i]) > (bound - near):
+            inward[i] = -0.2 * np.sign(my_pos[i])
+    return unit(d + inward)
 
 
 def prey_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
