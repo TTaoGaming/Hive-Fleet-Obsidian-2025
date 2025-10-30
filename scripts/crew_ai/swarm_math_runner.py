@@ -41,6 +41,7 @@ except Exception:  # pragma: no cover
 
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS_ROOT = ROOT / "hfo_crew_ai_swarm_results"
+OTEL_DIR = ROOT / "temp/otel"
 ISO = "%Y-%m-%dT%H:%M:%SZ"
 
 # Small set of math problems with known integer answers
@@ -60,6 +61,13 @@ PROBLEMS: List[Tuple[str, int]] = [
 
 def now_z() -> str:
     return datetime.now(timezone.utc).strftime(ISO)
+
+
+def write_span(trace_id: str, span: Dict[str, object]) -> None:
+    OTEL_DIR.mkdir(parents=True, exist_ok=True)
+    out = OTEL_DIR / f"{trace_id}.jsonl"
+    with out.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(span, ensure_ascii=False) + "\n")
 
 
 @dataclass
@@ -105,17 +113,71 @@ def extract_int(s: str) -> Optional[int]:
         return None
 
 
-def ask_llm(q: str, model_hint: Optional[str]) -> Tuple[bool, Optional[int], str, Optional[str]]:
-    res = call_openrouter(
-        f"Answer with just the integer. {q}",
-        model_hint=model_hint,
-        max_tokens=12,
-        temperature=0.0,
+def ask_llm(q: str, model_hint: Optional[str]) -> Tuple[bool, Optional[int], str, Optional[str], str]:
+    """
+    Request strict JSON to improve parseability. Fallback to integer extraction.
+    Returns: ok, got_int, model, error, raw_content
+    """
+    prompt = (
+        "Return ONLY a JSON object with the schema {\"answer\": <integer>} and nothing else. "
+        f"Question: {q}"
     )
+    def do_call(p: str):
+        return call_openrouter(
+            p,
+            model_hint=model_hint,
+            max_tokens=32,
+            temperature=0.0,
+        )
+
+    res = do_call(prompt)
     ok = bool(res.get("ok"))
-    content = res.get("content") or ""
-    got = extract_int(content) if ok else None
-    return ok, got, (res.get("model") or ""), res.get("error")
+    content = (res.get("content") or "").strip()
+    got: Optional[int] = None
+    if ok and content:
+        # Try strict JSON first
+        try:
+            obj = json.loads(content)
+            if isinstance(obj, dict) and "answer" in obj:
+                if isinstance(obj["answer"], int):
+                    got = obj["answer"]
+                else:
+                    # try to coerce if string number
+                    try:
+                        got = int(str(obj["answer"]))
+                    except Exception:
+                        got = None
+            else:
+                got = extract_int(content)
+        except Exception:
+            got = extract_int(content)
+    # Fallback attempts if no parseable content
+    if (not content or got is None) and ok:
+        # Simpler instruction
+        fallback1 = f"Answer with just the integer. Question: {q}"
+        res2 = do_call(fallback1)
+        c2 = (res2.get("content") or "").strip()
+        if c2:
+            try:
+                got = extract_int(c2)
+                content = c2
+                ok = bool(res2.get("ok"))
+            except Exception:
+                pass
+
+    if (not content or got is None) and ok:
+        fallback2 = f"Only output a single integer on one line: {q}"
+        res3 = do_call(fallback2)
+        c3 = (res3.get("content") or "").strip()
+        if c3:
+            try:
+                got = extract_int(c3)
+                content = c3
+                ok = bool(res3.get("ok"))
+            except Exception:
+                pass
+
+    return ok, got, (res.get("model") or ""), res.get("error"), content
 
 
 def solve_locally(q: str, expected: int) -> Tuple[bool, int, str, Optional[str]]:
@@ -123,18 +185,20 @@ def solve_locally(q: str, expected: int) -> Tuple[bool, int, str, Optional[str]]
     return True, expected, "local/deterministic", None
 
 
-def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path) -> LaneAttemptResult:
+def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id: Optional[str]) -> LaneAttemptResult:
     model_hint = os.environ.get("OPENROUTER_MODEL_HINT")
     # Choose subset for this attempt (shrink if retries)
     subset = PROBLEMS[: cfg.problems_per_lane]
 
     details: List[Dict[str, object]] = []
     correct = 0
+    start_ts = now_z()
     for q, ans in subset:
         if cfg.use_llm:
-            ok, got, model, err = ask_llm(q, model_hint)
+            ok, got, model, err, raw = ask_llm(q, model_hint)
         else:
             ok, got, model, err = solve_locally(q, ans)
+            raw = str(got)
         is_correct = (got == ans)
         correct += 1 if is_correct else 0
         details.append({
@@ -144,10 +208,29 @@ def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path) -> LaneAt
             "ok": ok,
             "correct": is_correct,
             "error": err,
+            "raw": raw if cfg.use_llm else None,
         })
     total = len(subset)
     accuracy = (correct / total) if total else 0.0
     passed = accuracy >= cfg.verify_cfg.accuracy_threshold
+    end_ts = now_z()
+
+    # Emit one analyzer-compatible span per lane attempt
+    if trace_id:
+        write_span(trace_id, {
+            "trace_id": trace_id,
+            "span_id": f"{lane}-engage-llm-{int(time.time()*1000)}",
+            "name": f"{lane}:engage_llm",
+            "start_time": start_ts,
+            "end_time": end_ts,
+            "attributes": {
+                "lane": lane,
+                "mission_id": cfg.mission_id,
+                "ok": True,
+                "model": "LLM" if cfg.use_llm else "deterministic",
+                "latency_ms": None,
+            },
+        })
 
     # Write yield artifact (JSON) and yield.md
     lane_dir = out_dir / lane / f"attempt_{attempt}"
@@ -315,6 +398,7 @@ def main() -> None:
     )
 
     _, run_dir = plan_run_dirs()
+    trace_id = f"trace-swarm_math-{int(time.time()*1000)}"
 
     def lane_flow(lane: str) -> LaneAttemptResult:
         problems = cfg.problems_per_lane
@@ -327,7 +411,7 @@ def main() -> None:
                 use_llm=cfg.use_llm,
                 problems_per_lane=problems,
             )
-            r = run_lane_once(attempt_cfg, lane, attempt, run_dir)
+            r = run_lane_once(attempt_cfg, lane, attempt, run_dir, trace_id)
             if r.passed:
                 return r
             # Prepare next attempt
@@ -354,6 +438,7 @@ def main() -> None:
     print(f"Results dir: {run_dir.relative_to(ROOT)}")
     print(f"Digest: {digest_path.relative_to(ROOT)}")
     print(f"Passed: {passed}  Failed: {failed}")
+    print("Spans:", f"temp/otel/{trace_id}.jsonl")
 
 
 if __name__ == "__main__":
