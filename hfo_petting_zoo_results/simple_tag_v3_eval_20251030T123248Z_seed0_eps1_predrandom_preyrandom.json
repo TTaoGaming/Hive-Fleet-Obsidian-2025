@@ -1,0 +1,72 @@
+{
+  "diagnostics": {
+    "bound_obs_max_abs": 0.9669447289429418,
+    "bound_obs_max_abs_x": 0.9180529521276106,
+    "bound_obs_max_abs_y": 0.9669447289429418,
+    "close_dist_thr": 0.03,
+    "co_near_boundary_steps": 0,
+    "co_near_corner_steps": 0,
+    "episodes_close_dist": 0,
+    "global_min_dist": 0.5523827243179323,
+    "near_boundary_min_dist_avg": null,
+    "near_boundary_min_dist_min": null,
+    "near_boundary_steps": 0,
+    "pred_clip_delta_rate": 1.0,
+    "pred_clip_delta_rate_near_boundary": null,
+    "pred_clip_delta_steps": 3,
+    "pred_clip_delta_steps_near_boundary": 0,
+    "pred_clip_delta_total_checked": 3,
+    "pred_clip_delta_total_checked_near_boundary": 0,
+    "pred_clip_rate": 0.0,
+    "pred_clip_rate_near_boundary": null,
+    "pred_clip_steps": 0,
+    "pred_clip_steps_near_boundary": 0,
+    "pred_clip_total_checked": 3,
+    "pred_clip_total_checked_near_boundary": 0,
+    "pred_near_boundary_frac": 0.0,
+    "pred_near_boundary_steps": 0,
+    "pred_near_corner_frac": 0.0,
+    "pred_near_corner_steps": 0,
+    "pred_oob_steps": 0,
+    "pred_oob_steps_dyn": 0,
+    "pred_total_steps": 3,
+    "prey_near_boundary_frac": 0.0,
+    "prey_near_boundary_steps": 0,
+    "prey_near_corner_frac": 0.0,
+    "prey_near_corner_steps": 0,
+    "prey_oob_steps": 0,
+    "prey_oob_steps_dyn": 0,
+    "prey_total_steps": 1,
+    "threshold_abs": 0.98
+  },
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "continuous_actions": true,
+    "episodes": 1,
+    "seed": 0
+  },
+  "policies": {
+    "baseline": "research",
+    "pred": "random",
+    "prey": "random"
+  },
+  "results": {
+    "avg_steps_to_first_catch": null,
+    "catch_rate": 0.0,
+    "caught_episodes": 0,
+    "total_episodes": 1
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-30T12:32:48.780157+00:00"
+  }
+}

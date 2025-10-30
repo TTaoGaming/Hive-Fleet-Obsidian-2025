@@ -1,0 +1,72 @@
+{
+  "diagnostics": {
+    "bound_obs_max_abs": 39.3210248602612,
+    "bound_obs_max_abs_x": 38.863989711538416,
+    "bound_obs_max_abs_y": 39.3210248602612,
+    "close_dist_thr": 0.03,
+    "co_near_boundary_steps": 28679,
+    "co_near_corner_steps": 25221,
+    "episodes_close_dist": 0,
+    "global_min_dist": 0.03450486697830617,
+    "near_boundary_min_dist_avg": 5.1991364770353385,
+    "near_boundary_min_dist_min": 0.23219283883418398,
+    "near_boundary_steps": 29500,
+    "pred_clip_delta_rate": 1.0,
+    "pred_clip_delta_rate_near_boundary": 1.0,
+    "pred_clip_delta_steps": 90000,
+    "pred_clip_delta_steps_near_boundary": 85013,
+    "pred_clip_delta_total_checked": 90000,
+    "pred_clip_delta_total_checked_near_boundary": 85013,
+    "pred_clip_rate": 0.0003444444444444444,
+    "pred_clip_rate_near_boundary": 7.057744109724395e-05,
+    "pred_clip_steps": 31,
+    "pred_clip_steps_near_boundary": 6,
+    "pred_clip_total_checked": 90000,
+    "pred_clip_total_checked_near_boundary": 85013,
+    "pred_near_boundary_frac": 0.9413888888888889,
+    "pred_near_boundary_steps": 84725,
+    "pred_near_corner_frac": 0.8253444444444444,
+    "pred_near_corner_steps": 74281,
+    "pred_oob_steps": 84587,
+    "pred_oob_steps_dyn": 0,
+    "pred_total_steps": 90000,
+    "prey_near_boundary_frac": 0.9802666666666666,
+    "prey_near_boundary_steps": 29408,
+    "prey_near_corner_frac": 0.8837666666666667,
+    "prey_near_corner_steps": 26513,
+    "prey_oob_steps": 29367,
+    "prey_oob_steps_dyn": 0,
+    "prey_total_steps": 30000,
+    "threshold_abs": 0.98
+  },
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "continuous_actions": true,
+    "episodes": 100,
+    "seed": 42
+  },
+  "policies": {
+    "baseline": "research",
+    "pred": "heuristic",
+    "prey": "heuristic"
+  },
+  "results": {
+    "avg_steps_to_first_catch": 1.0,
+    "catch_rate": 0.01,
+    "caught_episodes": 1,
+    "total_episodes": 100
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-30T12:33:06.862639+00:00"
+  }
+}

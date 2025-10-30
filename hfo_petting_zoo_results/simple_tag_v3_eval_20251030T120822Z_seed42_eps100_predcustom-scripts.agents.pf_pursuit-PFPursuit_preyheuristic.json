@@ -1,0 +1,55 @@
+{
+  "diagnostics": {
+    "close_dist_thr": 0.03,
+    "episodes_close_dist": 0,
+    "global_min_dist": 0.03450486697830617,
+    "near_boundary_min_dist_avg": 5.2011175546750685,
+    "near_boundary_min_dist_min": 0.23219283883418398,
+    "near_boundary_steps": 29500,
+    "pred_clip_rate": 0.00035555555555555557,
+    "pred_clip_rate_near_boundary": 5.8851916806930405e-05,
+    "pred_clip_steps": 32,
+    "pred_clip_steps_near_boundary": 5,
+    "pred_clip_total_checked": 90000,
+    "pred_clip_total_checked_near_boundary": 84959,
+    "pred_near_boundary_frac": 0.9407888888888889,
+    "pred_near_boundary_steps": 84671,
+    "pred_oob_steps": 84531,
+    "pred_total_steps": 90000,
+    "prey_near_boundary_frac": 0.9802666666666666,
+    "prey_near_boundary_steps": 29408,
+    "prey_oob_steps": 29368,
+    "prey_total_steps": 30000,
+    "threshold_abs": 0.98
+  },
+  "env": "mpe.simple_tag_v3",
+  "host": {
+    "platform": "Linux",
+    "python": "3.11.2"
+  },
+  "library_versions": {
+    "gymnasium": "1.2.1",
+    "mpe2": "0.0.1",
+    "numpy": "2.3.4",
+    "pettingzoo": "1.25.0"
+  },
+  "parameters": {
+    "continuous_actions": true,
+    "episodes": 100,
+    "seed": 42
+  },
+  "policies": {
+    "baseline": "research",
+    "pred": "custom:scripts.agents.pf_pursuit:PFPursuit",
+    "prey": "heuristic"
+  },
+  "results": {
+    "avg_steps_to_first_catch": 1.0,
+    "catch_rate": 0.01,
+    "caught_episodes": 1,
+    "total_episodes": 100
+  },
+  "timestamps": {
+    "run_end_iso": "2025-10-30T12:08:22.570727+00:00"
+  }
+}
