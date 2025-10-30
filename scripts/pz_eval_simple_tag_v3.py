@@ -27,6 +27,8 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import sys
+from pathlib import Path
 import importlib
 import json
 import os
@@ -40,6 +42,12 @@ try:
     from mpe2 import simple_tag_v3
 except Exception:  # pragma: no cover
     from pettingzoo.mpe import simple_tag_v3  # type: ignore
+
+# Ensure repo root is importable so module paths like 'scripts.agents.*' resolve
+_THIS = Path(__file__).resolve()
+_ROOT = _THIS.parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 
 # --------- Utilities ---------
@@ -270,6 +278,7 @@ def main() -> None:
     parser.add_argument("--baseline", type=str, choices=["research", "enhanced"], default="research")
     parser.add_argument("--pred", type=str, default="heuristic", help="Pred policy: random|heuristic|custom:module:Class")
     parser.add_argument("--prey", type=str, default="random", help="Prey policy: random|heuristic|custom:module:Class")
+    parser.add_argument("--diag-boundary", action="store_true", help="Collect boundary proximity diagnostics for prey and predators")
     args = parser.parse_args()
 
     run_end = datetime.now(timezone.utc)
@@ -290,7 +299,86 @@ def main() -> None:
     except Exception:
         mpe2_ver = "unknown"
 
-    cr, avg, c = run_eval(args.episodes, args.seed, args.pred, args.prey, args.baseline)
+    # Optional diagnostics accumulation
+    diag = {"enabled": bool(args.diag_boundary)}
+    if args.diag_boundary:
+        diag.update({
+            "prey_near_boundary_steps": 0,
+            "prey_total_steps": 0,
+            "pred_near_boundary_steps": 0,
+            "pred_total_steps": 0,
+        })
+
+    def _accum_diag(penv):
+        if not args.diag_boundary:
+            return
+        raw = penv.unwrapped
+        w = raw.world
+        bound = 1.0
+        thr = 0.98  # within 2% of boundary considered "near"
+        for a in w.agents:
+            pos = a.state.p_pos
+            near = (abs(pos[0]) >= thr) or (abs(pos[1]) >= thr)
+            if getattr(a, 'adversary', False):
+                diag["pred_total_steps"] += 1
+                if near:
+                    diag["pred_near_boundary_steps"] += 1
+            else:
+                diag["prey_total_steps"] += 1
+                if near:
+                    diag["prey_near_boundary_steps"] += 1
+
+    # Wrap run_eval to inject diagnostics by reusing its loop via a local copy
+    def _run_eval_with_diag(episodes: int, seed: int, pred_spec: str, prey_spec: str, baseline: str):
+        if not args.diag_boundary:
+            return run_eval(episodes, seed, pred_spec, prey_spec, baseline)
+
+        from typing import List, Dict, Optional, Tuple
+        penv = simple_tag_v3.parallel_env(continuous_actions=True, render_mode=None)
+        obs, infos = penv.reset(seed=seed)
+
+        pred_policy = parse_policy(pred_spec, role='pred', baseline=baseline)
+        prey_policy = parse_policy(prey_spec, role='prey', baseline=baseline)
+
+        adversary_keys = {a for a in penv.agents if ("adversary" in a) or ("pursuer" in a) or ("tagger" in a)}
+
+        catches = 0
+        steps_to_first: List[int] = []
+
+        for ep in range(episodes):
+            ep_seed = seed + ep
+            obs, infos = penv.reset(seed=ep_seed)
+            step = 0
+            caught = False
+            first_step: Optional[int] = None
+            while True:
+                actions: Dict[str, np.ndarray | int] = {}
+                raw = penv.unwrapped
+                w = raw.world
+                for ag in penv.agents:
+                    aobj = next(a for a in w.agents if getattr(a, 'name', None) == ag)
+                    is_pred = getattr(aobj, 'adversary', False)
+                    if is_pred:
+                        actions[ag] = pred_policy.select_action(penv, ag)
+                    else:
+                        actions[ag] = prey_policy.select_action(penv, ag)
+                _accum_diag(penv)
+                obs, rewards, terms, truncs, infos = penv.step(actions)
+                step += 1
+                if not caught and detect_tag_event(rewards, infos, adversary_keys):
+                    caught = True
+                    first_step = step
+                if all(terms.values()) or all(truncs.values()):
+                    break
+            if caught and first_step is not None:
+                catches += 1
+                steps_to_first.append(first_step)
+
+        catch_rate = catches / float(episodes)
+        avg_steps = float(np.mean(steps_to_first)) if steps_to_first else float("nan")
+        return catch_rate, avg_steps, catches
+
+    cr, avg, c = _run_eval_with_diag(args.episodes, args.seed, args.pred, args.prey, args.baseline)
 
     results = {
         "env": "mpe.simple_tag_v3",
@@ -303,6 +391,15 @@ def main() -> None:
             "episodes": int(args.episodes),
             "seed": int(args.seed),
             "continuous_actions": True,
+        },
+        "diagnostics": None if not args.diag_boundary else {
+            "prey_near_boundary_frac": (diag["prey_near_boundary_steps"] / diag["prey_total_steps"]) if diag["prey_total_steps"] else None,
+            "pred_near_boundary_frac": (diag["pred_near_boundary_steps"] / diag["pred_total_steps"]) if diag["pred_total_steps"] else None,
+            "prey_near_boundary_steps": int(diag["prey_near_boundary_steps"]),
+            "prey_total_steps": int(diag["prey_total_steps"]),
+            "pred_near_boundary_steps": int(diag["pred_near_boundary_steps"]),
+            "pred_total_steps": int(diag["pred_total_steps"]),
+            "threshold_abs": 0.98,
         },
         "library_versions": {
             "pettingzoo": pz_ver,
