@@ -35,9 +35,23 @@ from dotenv import load_dotenv
 
 # Local imports (works both as module and script)
 try:
-    from .llm_client import call_openrouter
+    from .llm_client import call_openrouter, ALLOWLIST as MODEL_ALLOWLIST
 except Exception:  # pragma: no cover
     from llm_client import call_openrouter  # type: ignore
+    # Fallback static allowlist if relative import fails (kept minimal)
+    MODEL_ALLOWLIST = [
+        "openai/gpt-5-mini",
+        "x-ai/grok-4-fast",
+        "minimax/minimax-m2",
+        "deepseek/deepseek-v3.2-exp",
+        "deepseek/deepseek-v3.1-terminus",
+        # Backups and prior allowlist entries to ensure full coverage when relative import fails
+        "deepseek/deepseek-chat-v3-0324",
+        "qwen/qwen3-235b-a22b-2507",
+        "x-ai/grok-code-fast-1",
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+    ]
 
 ROOT = Path(__file__).resolve().parents[2]
 RESULTS_ROOT = ROOT / "hfo_crew_ai_swarm_results"
@@ -225,8 +239,7 @@ def solve_locally(q: str, expected: int) -> Tuple[bool, int, str, Optional[str]]
     return True, expected, "local/deterministic", None
 
 
-def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id: Optional[str]) -> LaneAttemptResult:
-    model_hint = os.environ.get("OPENROUTER_MODEL_HINT")
+def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id: Optional[str], model_hint: Optional[str]) -> LaneAttemptResult:
     # Choose subset for this attempt (shrink if retries)
     subset = PROBLEMS[: cfg.problems_per_lane]
 
@@ -273,7 +286,7 @@ def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id:
                 "lane": lane,
                 "mission_id": cfg.mission_id,
                 "ok": True,
-                "model": (model_hint or "openai/gpt-oss-120b") if cfg.use_llm else "deterministic",
+                "model": (model_hint or "allowlist-default") if cfg.use_llm else "deterministic",
                 "latency_ms": lane_latency_ms_total if cfg.use_llm else 0,
             },
         })
@@ -323,13 +336,7 @@ def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id:
     ]
     (lane_dir / "verify.md").write_text("\n".join(verify_md), encoding="utf-8")
 
-    model_used = None
-    if cfg.use_llm and details:
-        # If at least one ok, report model of the first ok response
-        for d in details:
-            # No model stored in details; use model_hint for now
-            model_used = os.environ.get("OPENROUTER_MODEL_HINT")
-            break
+    model_used = model_hint if cfg.use_llm else None
 
     return LaneAttemptResult(
         lane=lane,
@@ -409,12 +416,19 @@ def plan_run_dirs() -> Tuple[Path, Path]:
     return date_dir, run_dir
 
 
+def sanitize_lane_name(name: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9_\-]", "_", name)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Lane-parallel math runner with verification and digest")
     ap.add_argument("--intent", type=str, default=str(ROOT / "hfo_mission_intent/2025-10-30/mission_intent_parallel_10lanes_2025-10-30.v1.yml"))
     ap.add_argument("--use-llm", action="store_true", help="Use LLM to answer questions (cost)")
     ap.add_argument("--problems", type=int, default=10, help="Problems per lane (max 10)")
     ap.add_argument("--threshold", type=float, default=0.8, help="Accuracy threshold for PASS")
+    ap.add_argument("--per-model", action="store_true", help="Spawn one lane per allowlisted model (concurrent)")
+    ap.add_argument("--models", type=str, default="", help="Comma-separated subset of model names to use; 'all' for the full allowlist")
+    ap.add_argument("--max-workers", type=int, default=0, help="Override thread pool size (0 = lanes count)")
     args = ap.parse_args()
 
     load_dotenv(dotenv_path=ROOT / ".env", override=False)
@@ -422,10 +436,36 @@ def main() -> None:
     intent = load_intent(Path(args.intent))
     mission_id = str(intent.get("mission_id", f"mi_swarm_{now_z()}"))
 
+    # Build lanes and per-lane model mapping
+    lane_to_model: Dict[str, Optional[str]] = {}
     lanes = intent.get("lanes", {}) or {}
-    count = int(lanes.get("count", 10))
-    names = lanes.get("names") or [f"lane_{i+1}" for i in range(count)]
-    names = [str(n) for n in names][:count]
+    if args.per_model or (args.models.strip().lower() == "all"):
+        selected = list(MODEL_ALLOWLIST)
+    elif args.models.strip():
+        wants = [m.strip() for m in args.models.split(",") if m.strip()]
+        # substring match against allowlist
+        selected = []
+        for w in wants:
+            for m in MODEL_ALLOWLIST:
+                if w.lower() in m.lower():
+                    selected.append(m)
+        # de-dup preserving order
+        seen = set()
+        selected = [m for m in selected if not (m in seen or seen.add(m))]
+        if not selected:
+            selected = list(MODEL_ALLOWLIST)
+    else:
+        count = int(lanes.get("count", 10))
+        names = lanes.get("names") or [f"lane_{i+1}" for i in range(count)]
+        names = [str(n) for n in names][:count]
+        for n in names:
+            lane_to_model[str(n)] = os.environ.get("OPENROUTER_MODEL_HINT")  # global or None
+        selected = []
+
+    if selected:
+        names = [sanitize_lane_name(m) for m in selected]
+        for name, model in zip(names, selected):
+            lane_to_model[name] = model
 
     policy = lanes.get("policy", {}) or {}
     lane_policy = LanePolicy(
@@ -448,6 +488,7 @@ def main() -> None:
 
     def lane_flow(lane: str) -> LaneAttemptResult:
         problems = cfg.problems_per_lane
+        model_hint = lane_to_model.get(lane)
         for attempt in range(1, cfg.lane_policy.auto_retries_max + 2):  # initial + retries
             attempt_cfg = RunCfg(
                 mission_id=cfg.mission_id,
@@ -457,7 +498,7 @@ def main() -> None:
                 use_llm=cfg.use_llm,
                 problems_per_lane=problems,
             )
-            r = run_lane_once(attempt_cfg, lane, attempt, run_dir, trace_id)
+            r = run_lane_once(attempt_cfg, lane, attempt, run_dir, trace_id, model_hint)
             if r.passed:
                 return r
             # Prepare next attempt
@@ -469,8 +510,9 @@ def main() -> None:
         return r  # unreachable
 
     results: Dict[str, LaneAttemptResult] = {}
-    with ThreadPoolExecutor(max_workers=len(cfg.lane_names)) as ex:
-        futs = {ex.submit(lane_flow, lane): lane for lane in cfg.lane_names}
+    max_workers = int(args.max_workers) if int(args.max_workers) > 0 else len(cfg.lane_names)
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        futs = {ex.submit(lambda ln=lane: lane_flow(ln), lane): lane for lane in cfg.lane_names}
         for fut in as_completed(futs):
             r = fut.result()
             results[r.lane] = r

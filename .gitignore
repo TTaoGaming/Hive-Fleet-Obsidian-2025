@@ -9,3 +9,6 @@ temp/otel/
 
 # Ignore Crew AI swarm results (noisy run artifacts)
 hfo_crew_ai_swarm_results/
+
+# Ignore PettingZoo evaluation outputs
+hfo_petting_zoo_results/

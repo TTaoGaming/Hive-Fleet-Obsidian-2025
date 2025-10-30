@@ -56,7 +56,8 @@ class BridgerAgent(BaseAgent):
         mission = ctx.get("mission", {})
         mission_id = mission.get("mission_id", "mi")
         llm_cfg = mission.get("llm", {})
-        hint = os.environ.get("OPENROUTER_MODEL_HINT")
+        # Prefer lane-specific hint from ctx; fallback to env
+        hint = ctx.get("model_hint") or os.environ.get("OPENROUTER_MODEL_HINT")
         # Try a tiny LLM restatement if key is present; else a local stub
         if os.environ.get("OPENROUTER_API_KEY"):
             prompt = (

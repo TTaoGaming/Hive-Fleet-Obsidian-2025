@@ -33,7 +33,6 @@ ALLOWLIST = [
     "openai/gpt-5-mini",
     "x-ai/grok-4-fast",
     "minimax/minimax-m2",
-    "z-ai/glm-4.6",
     "deepseek/deepseek-v3.2-exp",
     "deepseek/deepseek-v3.1-terminus",
     # Existing backups and test models
@@ -51,7 +50,6 @@ REASONING_MODELS = {
     "deepseek/deepseek-v3.2-exp",
     "deepseek/deepseek-v3.1-terminus",
     "minimax/minimax-m2",
-    "z-ai/glm-4.6",
 }
 
 

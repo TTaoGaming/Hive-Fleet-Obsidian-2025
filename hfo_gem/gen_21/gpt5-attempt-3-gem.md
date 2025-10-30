@@ -281,6 +281,13 @@ flowchart LR
 
 ---
 
+### Note (2025-10-30): Arbitrary lanes and per-model PREY orchestration
+- The PREY runner now supports arbitrarily many concurrent lanes. Concurrency defaults to the number of lanes and can be capped via `lanes.max_workers`.
+- Mission intent can request one lane per allowlisted model using `lanes.models: all`, or a specific subset via `lanes.models: [..]` (substring match against the allowlist). Fallback mode uses `lanes.count` and optional `lanes.names`.
+- Each lane receives a lane-specific `model_hint` carried into React (planner/bridger) and Engage (shaper) calls; reasoning and LLM limits follow the mission’s `llm` block or environment overrides.
+- Each PREY run emits a digest bundle at `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md` containing a BLUF, a lane↔model matrix, and a parser-safe Mermaid diagram. The blackboard `yield` receipt references this digest and the OTEL trace file.
+
+
 ## Section 9: Cold-Start Bootstrap (≤3 manual steps; repo-agnostic)
 1) Drop this Gen21 SSOT into the repo at `hfo_gem/gen_21/gpt5-attempt-3-gem.md`.
 2) Ensure a dated `mission_intent_YYYY-MM-DD.yml` exists (UTC Z), with SSOT ≥1000 lines and chunk plan ≤200 lines.

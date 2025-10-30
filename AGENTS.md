@@ -19,10 +19,18 @@ This repo includes a minimal, parser-safe Crew AI pilot that runs two parallel P
 - Prerequisites (local)
   - `.env` at repo root with `OPENROUTER_API_KEY` (optional for no-cost dry-runs) and optional `OPENROUTER_MODEL_HINT` (e.g., `haiku`).
   - Python environment with dependencies from `requirements.txt`.
-  - Model allowlist (enforced):
-    - Default priority: `openai/gpt-oss-120b`
-    - Also allowed for testing: `deepseek/deepseek-chat-v3-0324`, `qwen/qwen3-235b-a22b-2507`, `x-ai/grok-code-fast-1`, `openai/gpt-oss-20b`
-    - If `OPENROUTER_MODEL_HINT` is not one of the above, the system falls back to `openai/gpt-oss-120b`.
+  - Model allowlist (enforced; top 10 active)
+    - openai/gpt-5-mini
+    - x-ai/grok-4-fast
+    - minimax/minimax-m2
+    - deepseek/deepseek-v3.2-exp
+    - deepseek/deepseek-v3.1-terminus
+    - deepseek/deepseek-chat-v3-0324
+    - qwen/qwen3-235b-a22b-2507
+    - x-ai/grok-code-fast-1
+    - openai/gpt-oss-120b
+    - openai/gpt-oss-20b
+  - Note: z-ai/glm-4.6 is temporarily removed due to failing strict integer math sanity; we’ll revisit after tuning.
 
 - Run
   - Concurrency: lanes execute in parallel (thread pool) and emit OTEL spans per phase/agent and per-lane LLM call.
@@ -309,4 +317,22 @@ Note: If a renderer still errors, simplify labels further and remove punctuation
 - Next tweaks (low risk)
   - Harden client parsing for oss-120b: multi-shape content parsing and retry-on-empty; optional response_format JSON when supported.
   - Add optional CSV/metrics: wall-clock vs. sum speedup and pass/fail tallies per run.
+
+## Crew AI swarm — Arbitrary lanes and per-model PREY (2025-10-30)
+
+- What’s new (pilot runner)
+  - Mission can orchestrate any number of PREY lanes; thread pool scales to lane count by default.
+  - Per-model orchestration supported via mission intent:
+    - `lanes.models: all` → one lane per allowlisted model (from `scripts/crew_ai/llm_client.py`).
+    - `lanes.models: ["gpt-5-mini", "grok-4-fast", ...]` → substring match against allowlist.
+    - Optional `lanes.max_workers` to cap concurrency (defaults to number of lanes).
+  - Each lane carries its own `model_hint` into React (Bridger) and Engage (Shaper) LLM calls.
+  - A digest file is written per PREY run: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md` with a lane↔model matrix and Verify status.
+
+- LLM behavior (mission/env overrides)
+  - Mission-level `llm` config sets `max_tokens`, `temperature`, `timeout_seconds`, `response_format_type`, `system_prompt`, and `reasoning`.
+  - Env overrides: `OPENROUTER_MAX_TOKENS`, `OPENROUTER_TEMPERATURE`, `OPENROUTER_TIMEOUT_SECONDS`, `OPENROUTER_REASONING(_EFFORT)`.
+
+- Safety remains unchanged
+  - Chunk size ≤200 lines; placeholder ban; receipts appended to blackboard; Verify quorum required before digest.
 

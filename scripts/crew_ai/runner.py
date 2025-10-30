@@ -18,7 +18,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import yaml
@@ -28,13 +28,14 @@ from dotenv import load_dotenv
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
-from llm_client import call_openrouter
+from llm_client import call_openrouter, ALLOWLIST as MODEL_ALLOWLIST
 from agents import REGISTRY as AGENTS
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_INTENT = ROOT / "hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml"
 BLACKBOARD = ROOT / "hfo_blackboard/obsidian_synapse_blackboard.jsonl"
 OTEL_DIR = ROOT / "temp/otel"
+RESULTS_ROOT = ROOT / "hfo_crew_ai_swarm_results"
 
 ISO = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -60,7 +61,7 @@ def load_intent(path: Path) -> Dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> Dict[str, Any]:
+def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str, model_hint: Optional[str] = None) -> Dict[str, Any]:
     mission_id = mission.get("mission_id", f"mi_{now_z()}")
     safety = mission.get("safety", {})
     telemetry = mission.get("telemetry", {})
@@ -118,7 +119,7 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
             agent = AGENTS.get(role)
             if not agent:
                 continue
-            ctx = {"mission": mission, "lane": lane_name, "phase": phase, "evidence": evidence, "flags": {"phases_seen": phases_seen}, "collected": collected}
+            ctx = {"mission": mission, "lane": lane_name, "phase": phase, "evidence": evidence, "flags": {"phases_seen": phases_seen}, "collected": collected, "model_hint": model_hint}
             res = agent.run(ctx)
             collected[role] = {"ok": res.ok, "summary": res.summary, "data": res.data, "llm_used": res.llm_used}
             # Span per agent
@@ -152,7 +153,7 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
 
         # During engage, perform a single, guarded LLM call if key present
         if phase == "engage":
-            model_hint = os.environ.get("OPENROUTER_MODEL_HINT")
+            model_hint_eff = model_hint or os.environ.get("OPENROUTER_MODEL_HINT")
             llm_cfg = mission.get("llm", {})
             prompt = (
                 "Restate the mission's intent and safety posture briefly but completely: "
@@ -160,7 +161,7 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
             )
             llm_result = call_openrouter(
                 prompt,
-                model_hint=model_hint,
+                model_hint=model_hint_eff,
                 max_tokens=int(llm_cfg.get("max_tokens", 72)),
                 temperature=float(llm_cfg.get("temperature", 0.2)),
                 timeout_seconds=int(llm_cfg.get("timeout_seconds", 25)),
@@ -292,16 +293,48 @@ def run(intent_path: Path) -> int:
     load_dotenv(dotenv_path=ROOT / ".env", override=False)
     mission = load_intent(intent_path)
     mission_id = mission.get("mission_id", f"mi_{now_z()}")
-    lanes = mission.get("lanes", {})
-    count = lanes.get("count", 2)
-    names = lanes.get("names") or [f"lane_{i+1}" for i in range(count)]
+    lanes = mission.get("lanes", {}) or {}
+    # Build lanes and optional per-lane model mapping
+    def sanitize(name: str) -> str:
+        return "".join(ch if (ch.isalnum() or ch in ("_", "-")) else "_" for ch in str(name))[:64]
+
+    lane_to_model: Dict[str, Optional[str]] = {}
+    models_cfg = lanes.get("models")  # 'all' or list of strings
+    if isinstance(models_cfg, str) and models_cfg.strip().lower() == "all":
+        selected = list(MODEL_ALLOWLIST)
+        names = [sanitize(m) for m in selected]
+        lane_to_model = {n: m for n, m in zip(names, selected)}
+    elif isinstance(models_cfg, list) and models_cfg:
+        selected: List[str] = []
+        for want in models_cfg:
+            w = str(want).strip()
+            if not w:
+                continue
+            matched = False
+            for m in MODEL_ALLOWLIST:
+                if w.lower() in m.lower():
+                    selected.append(m)
+                    matched = True
+            if not matched:
+                selected.append(w)
+        # de-dup preserving order
+        seen = set()
+        selected = [m for m in selected if not (m in seen or seen.add(m))]
+        names = [sanitize(m) for m in selected]
+        lane_to_model = {n: m for n, m in zip(names, selected)}
+    else:
+        count = int(lanes.get("count", 2))
+        names = lanes.get("names") or [f"lane_{i+1}" for i in range(count)]
+        names = [str(n) for n in names][:count]
+        lane_to_model = {str(n): os.environ.get("OPENROUTER_MODEL_HINT") for n in names}
 
     trace_id = f"trace-{mission_id}-{int(time.time()*1000)}"
 
     # Execute lanes concurrently to achieve true parallel swarm behavior
     lane_results: List[Dict[str, Any]] = []
-    with ThreadPoolExecutor(max_workers=count) as executor:
-        futures = {executor.submit(lane_prey_cycle, mission, name, trace_id): name for name in names[:count]}
+    max_workers = int(lanes.get("max_workers", 0)) or len(names)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(lane_prey_cycle, mission, name, trace_id, lane_to_model.get(name)): name for name in names}
         for fut in as_completed(futures):
             lane_results.append(fut.result())
 
@@ -318,13 +351,48 @@ def run(intent_path: Path) -> int:
         "timestamp": now_z(),
     })
 
+    # Write digest file under hfo_crew_ai_swarm_results
+    date_dir = RESULTS_ROOT / datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    date_dir.mkdir(parents=True, exist_ok=True)
+    run_dir = date_dir / f"run-{int(time.time()*1000)}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    matrix_lines = ["| Lane | Model | Notes |", "|---|---|---|"]
+    for n in sorted(lane_to_model.keys()):
+        model = lane_to_model.get(n) or os.environ.get("OPENROUTER_MODEL_HINT") or "default"
+        matrix_lines.append(f"| {n} | {model} | PREY executed |")
+    mermaid = [
+        "```mermaid",
+        "graph LR",
+        "  A[Start] --> B[Parallel PREY lanes]",
+        "  B --> C[Verify quorum]",
+        "  C --> D[Pass]",
+        "  C --> E[Fail]",
+        "  D --> F[Digest]",
+        "```",
+    ]
+    md = [
+        f"# Swarmlord Digest — {mission_id}",
+        "",
+        f"- Lanes: {len(lane_to_model)}",
+        f"- Verify PASS: {verify_result.get('passed', False)}",
+        f"- Trace: temp/otel/{trace_id}.jsonl",
+        "",
+        "## Matrix",
+        *matrix_lines,
+        "",
+        "## Diagram",
+        *mermaid,
+    ]
+    digest_path = run_dir / "swarmlord_digest.md"
+    digest_path.write_text("\n".join(md), encoding="utf-8")
+
     # Yield digest receipt
     ts = now_z()
     append_blackboard({
         "mission_id": mission_id,
         "phase": "yield",
         "summary": "Pilot digest ready (lanes executed, verify quorum run)",
-        "evidence_refs": ["temp/otel", f"trace:{trace_id}"],
+        "evidence_refs": ["temp/otel", f"trace:{trace_id}", str(digest_path.relative_to(ROOT))],
         "safety_envelope": {"policy": "contact only on digest/critical/timeout"},
         "timestamp": ts,
         "digest": {"verify_pass": verify_result.get("passed", False)},
