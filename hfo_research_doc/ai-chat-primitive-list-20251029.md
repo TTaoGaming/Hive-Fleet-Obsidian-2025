@@ -319,3 +319,70 @@ def clip_norm(v, vmax):
 * Log all knob values and blackboard fields per episode.
 * Use deterministic seeds for reproducibility.
 * Start with a small subset per run; expand via sweeps or MAP-Elites.
+---
+Shortlist first, grounded in Simple Tag’s rules: bounded arena with obstacles, 3 slow adversaries vs 1 faster prey, collisions give reward, exiting is penalized for the prey. This favors fast intercept planning, obstacle-aware coverage, and peer-avoidance while closing space. ([pettingzoo.farama.org][1])
+
+# Top primitives to test first
+
+1. **Potential-field pursuit + obstacle/peer repulsion**
+   Why: smooth, local, cheap; composes with most tactics; handles walls and teammates. How: attractive vector to prey; repulsive vectors from obstacles, walls, peers; normalize. Knobs: `k_attr, k_rep_obs, k_rep_peer, r_influence, max_speed, heading_ema`. Background: classical potential fields for pursuit/coverage. ([robotics.ucmerced.edu][2])
+
+2. **Voronoi cell ownership + greedy pursuit**
+   Why: partitions space to reduce teammate overlap; enables “cover-and-close” around prey. How: Voronoi on predator positions; each agent pursues inside its cell or to the cell boundary closest to the prey; reclip at bounds. Knobs: `rebuild_every_n, wall_padding, handoff_thresh, cell_bias`. Reference: recent encirclement work using Voronoi cells. ([DIVA Portal][3])
+
+3. **Lead pursuit / time-to-intercept**
+   Why: prey is faster, so pure chase wastes time; leading improves closure. How: solve linear intercept to a predicted meeting point; fall back to direct seek if no solution due to speed ratio. Knobs: `max_tau, solve_eps, fallback_gain`. Guidance-law lineage. ([ResearchGate][4])
+
+4. **Proportional navigation (PN) steering**
+   Why: biologically and robotically observed for agile interception through obstacles; robust to prey zig-zags. How: command acceleration proportional to line-of-sight rate to prey; blend with wall avoidance. Knobs: `nav_const, los_ema, max_accel`. Evidence from insect interception and PN robotics. ([PMC][5])
+
+5. **ORCA/RVO-lite peer avoidance blended with pursuit**
+   Why: three predators must avoid each other and obstacles while closing; reciprocal collision avoidance is a standard fix. How: compute admissible velocity set from ORCA; choose the element closest to the pursuit vector. Knobs: `orca_tau, blend, peer_weight`. ORCA canonical references. ([gamma.cs.unc.edu][6])
+
+6. **Chokepoint blocking + exit enumeration**
+   Why: Simple Tag has obstacles and walls; cutting escape lanes is high leverage. How: detect gaps between obstacles or to walls; assign blockers by time-to-reach; third agent drives prey toward a blocked lane. Knobs: `exit_radius, assign_policy, hold_dist, handoff_hysteresis`. Aligns with pursuit-evasion literature on barrier strategies. ([robotics.ucmerced.edu][2])
+
+7. **Fixed-angle encirclement (0°/120°/240°) with adaptive spacing**
+   Why: minimal coordination to “cap” three arcs around prey; easy to tune and combine with pursuit. How: maintain ring slots around prey; adaptive spacing via soft peer-repulsion. Knobs: `slot_angles, slot_radius, spacing, repulse_gain`. Encirclement patterns surveyed in multi-robot pursuit. ([robotics.ucmerced.edu][2])
+
+8. **Wall-tangent assist**
+   Why: prey uses walls; naive pursuit sticks; tangent projection prevents pinballing while keeping pressure. How: when within wall margin, project velocity along wall tangent then blend back to pursuit. Knobs: `wall_margin, tangent_gain, blend_alpha`. Standard boundary-following trick in robotics. ([robotics.ucmerced.edu][2])
+
+9. **Prey state estimator (Kalman CV or IMM CV/CA)**
+   Why: noisy observations and occlusion near obstacles; short-horizon prediction improves intercept and blocking. How: KF on `[x,y,vx,vy]` or IMM switching CV↔CA; publish `prey_est(t+τ)` to a blackboard used by all primitives. Knobs: `Q,R, lookahead_tau, mode_trans_prob`. Estimation is standard in pursuit/intercept stacks. ([robotics.ucmerced.edu][2])
+
+10. **Hungarian role assigner + simple scheduler**
+    Why: reduces thrash; assigns agents to slots/exits/lanes with minimal crossovers; switches tactics only on no-progress. How: build cost matrix (time-to-slot, turn cost), solve; scheduler tries [Voronoi+Pursuit] → [Blocking] → [PF] with patience and hysteresis. Knobs: `cost_weights, reassign_cooldown, patience, hysteresis`. Task allocation and staged tactics are common in pursuit teams. ([robotics.ucmerced.edu][2])
+
+# Why these first
+
+* They match **Simple Tag’s mechanics**: continuous motion, obstacles, team coordination, speed disadvantage for predators. ([pettingzoo.farama.org][1])
+* They are **well-documented** in pursuit-evasion and multi-robot navigation, so implementation risk is low and tuning levers are known. ([robotics.ucmerced.edu][2])
+* They **compose**: estimator → lead/PN → ORCA blend → Voronoi/encirclement → chokepoint. This yields quick baselines before advanced RL. ([robotics.ucmerced.edu][2])
+
+# Quick setup notes
+
+* Confirm you are on PettingZoo **MPE `simple_tag`** defaults: 3 adversaries, 1 prey, 2 obstacles, bounded map, continuous control. ([pettingzoo.farama.org][1])
+* If you later benchmark RL baselines, the **MPE/MADDPG** papers are the canonical references for environment provenance and centralized-training setups. ([arXiv][7])
+
+# Minimal knob sheet to expose now
+
+* PF: `k_attr, k_rep_obs, k_rep_peer, r_influence, max_speed, heading_ema`.
+* Voronoi: `rebuild_every_n, handoff_thresh, wall_padding, cell_bias`.
+* Lead/PN: `max_tau, solve_eps, fallback_gain` / `nav_const, los_ema, max_accel`.
+* ORCA-blend: `orca_tau, blend, peer_weight`.
+* Blocking: `exit_radius, assign_policy, hold_dist, handoff_hysteresis`.
+* Encirclement: `slot_angles, slot_radius, spacing, repulse_gain`.
+* Wall-tangent: `wall_margin, tangent_gain, blend_alpha`.
+* Estimator: `Q, R, lookahead_tau` (IMM adds `mode_trans_prob`).
+* Roles/Scheduler: `cost_weights, reassign_cooldown, patience, hysteresis`.
+
+If you want, I can convert these ten into a tiny `hfo_primitives/` scaffold with a PettingZoo runner and a JSON knobs file.
+
+[1]: https://pettingzoo.farama.org/environments/mpe/simple_tag/?utm_source=chatgpt.com "Simple Tag - PettingZoo Documentation"
+[2]: https://robotics.ucmerced.edu/sites/g/files/ufvvjh1576/f/page/documents/andreaskollingphdthesis.pdf?utm_source=chatgpt.com "Multi-Robot Pursuit-Evasion"
+[3]: https://www.diva-portal.org/smash/get/diva2%3A1989723/FULLTEXT01.pdf?utm_source=chatgpt.com "Voronoi-cell based pursuit and evasion strategies in a ..."
+[4]: https://www.researchgate.net/publication/352622118_A_Novel_Proportional_Navigation_Based_Method_for_Robotic_Interception_Planning_With_Final_Velocity_Control?utm_source=chatgpt.com "(PDF) A Novel Proportional Navigation Based Method for ..."
+[5]: https://pmc.ncbi.nlm.nih.gov/articles/PMC8920034/?utm_source=chatgpt.com "Avoiding obstacles while intercepting a moving target"
+[6]: https://gamma.cs.unc.edu/ORCA/?utm_source=chatgpt.com "Optimal Reciprocal Collision Avoidance (ORCA)"
+[7]: https://arxiv.org/abs/1706.02275?utm_source=chatgpt.com "Multi-Agent Actor-Critic for Mixed Cooperative-Competitive ... - arXiv"
