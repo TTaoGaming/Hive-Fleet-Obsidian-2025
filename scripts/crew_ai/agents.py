@@ -55,6 +55,7 @@ class BridgerAgent(BaseAgent):
     def run(self, ctx: Dict[str, Any]) -> AgentResult:
         mission = ctx.get("mission", {})
         mission_id = mission.get("mission_id", "mi")
+        llm_cfg = mission.get("llm", {})
         hint = os.environ.get("OPENROUTER_MODEL_HINT")
         # Try a tiny LLM restatement if key is present; else a local stub
         if os.environ.get("OPENROUTER_API_KEY"):
@@ -62,7 +63,17 @@ class BridgerAgent(BaseAgent):
                 "Restate the mission and safety posture in one short sentence. "
                 f"mission_id={mission_id}"
             )
-            res = _llm(prompt, model_hint=hint, max_tokens=48, temperature=0.1)
+            res = _llm(
+                prompt,
+                model_hint=hint,
+                max_tokens=int(llm_cfg.get("bridger_max_tokens", llm_cfg.get("max_tokens", 96))),
+                temperature=float(llm_cfg.get("bridger_temperature", llm_cfg.get("temperature", 0.2))),
+                timeout_seconds=int(llm_cfg.get("timeout_seconds", 25)),
+                response_format_type=llm_cfg.get("response_format_type", "text"),
+                system_prompt=llm_cfg.get("system_prompt"),
+                enable_reasoning=bool(llm_cfg.get("reasoning", False)),
+                reasoning_effort=llm_cfg.get("reasoning_effort", "medium"),
+            )
             llm_used = True
             if res.get("ok"):
                 content = (res.get("content") or "").strip().replace("\n", " ")[:160]

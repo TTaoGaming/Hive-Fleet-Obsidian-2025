@@ -122,12 +122,22 @@ def ask_llm(q: str, model_hint: Optional[str]) -> Tuple[bool, Optional[int], str
         "Return ONLY a JSON object with the schema {\"answer\": <integer>} and nothing else. "
         f"Question: {q}"
     )
+    # Model-aware safe params (based on characterization sweep)
+    hint_lc = (model_hint or "").lower()
+    if (not model_hint) or ("oss-120b" in hint_lc):
+        max_toks = 80  # ≥64 fixes empty-content for gpt-oss-120b
+    elif "oss-20b" in hint_lc:
+        max_toks = 96  # be generous; this model showed empties at low budgets
+    else:
+        max_toks = 32  # other models were fine with small budgets in probes
+
     def do_call(p: str):
         return call_openrouter(
             p,
             model_hint=model_hint,
-            max_tokens=32,
+            max_tokens=max_toks,
             temperature=0.0,
+            response_format_type="text",
         )
 
     res = do_call(prompt)
@@ -177,6 +187,36 @@ def ask_llm(q: str, model_hint: Optional[str]) -> Tuple[bool, Optional[int], str
             except Exception:
                 pass
 
+    # One last retry-on-empty for OSS models with expanded token budget
+    if (not content or got is None) and ((not model_hint) or ("oss" in hint_lc)):
+        # Increase token budget further as a final attempt
+        def do_call_big(p: str):
+            return call_openrouter(
+                p,
+                model_hint=model_hint,
+                max_tokens=max(max_toks, 128),
+                temperature=0.0,
+                response_format_type="text",
+            )
+        res4 = do_call_big(prompt)
+        c4 = (res4.get("content") or "").strip()
+        if c4:
+            try:
+                # Try JSON first, then integer extraction
+                try:
+                    obj = json.loads(c4)
+                    if isinstance(obj, dict) and "answer" in obj:
+                        val = obj["answer"]
+                        got = int(val) if isinstance(val, (int, str)) else None
+                    else:
+                        got = extract_int(c4)
+                except Exception:
+                    got = extract_int(c4)
+                content = c4
+                ok = bool(res4.get("ok"))
+            except Exception:
+                pass
+
     return ok, got, (res.get("model") or ""), res.get("error"), content
 
 
@@ -193,12 +233,16 @@ def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id:
     details: List[Dict[str, object]] = []
     correct = 0
     start_ts = now_z()
+    lane_latency_ms_total = 0
     for q, ans in subset:
         if cfg.use_llm:
+            t0 = time.time()
             ok, got, model, err, raw = ask_llm(q, model_hint)
+            lane_latency_ms_total += int((time.time() - t0) * 1000)
         else:
             ok, got, model, err = solve_locally(q, ans)
             raw = str(got)
+            lane_latency_ms_total += 0
         is_correct = (got == ans)
         correct += 1 if is_correct else 0
         details.append({
@@ -209,6 +253,8 @@ def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id:
             "correct": is_correct,
             "error": err,
             "raw": raw if cfg.use_llm else None,
+            "latency_ms": None if not cfg.use_llm else lane_latency_ms_total,
+            "model_hint": model_hint if cfg.use_llm else None,
         })
     total = len(subset)
     accuracy = (correct / total) if total else 0.0
@@ -227,8 +273,8 @@ def run_lane_once(cfg: RunCfg, lane: str, attempt: int, out_dir: Path, trace_id:
                 "lane": lane,
                 "mission_id": cfg.mission_id,
                 "ok": True,
-                "model": "LLM" if cfg.use_llm else "deterministic",
-                "latency_ms": None,
+                "model": (model_hint or "openai/gpt-oss-120b") if cfg.use_llm else "deterministic",
+                "latency_ms": lane_latency_ms_total if cfg.use_llm else 0,
             },
         })
 

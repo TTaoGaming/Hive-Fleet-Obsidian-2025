@@ -35,6 +35,16 @@ telemetry:
   blackboard_path: hfo_blackboard/obsidian_synapse_blackboard.jsonl
   emit_opentelemetry: true
   otel_format: json
+llm:
+  # Mission-level defaults for LLM calls; can be overridden by env vars
+  max_tokens: 2048
+  temperature: 0.2
+  timeout_seconds: 60
+  response_format_type: text
+  system_prompt: |
+    You are a careful, accurate assistant helping a multi-agent system. Provide complete, actionable answers.
+  reasoning: true
+  reasoning_effort: medium
 safety:
   chunk_size_max: 200
   placeholder_ban: true

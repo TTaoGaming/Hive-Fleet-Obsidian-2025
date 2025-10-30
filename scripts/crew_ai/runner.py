@@ -153,15 +153,21 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
         # During engage, perform a single, guarded LLM call if key present
         if phase == "engage":
             model_hint = os.environ.get("OPENROUTER_MODEL_HINT")
+            llm_cfg = mission.get("llm", {})
             prompt = (
-                "In one short sentence, restate the mission's intent and safety posture: "
+                "Restate the mission's intent and safety posture briefly but completely: "
                 f"mission_id={mission_id}, safety={safety.get('tripwires', [])}."
             )
             llm_result = call_openrouter(
                 prompt,
                 model_hint=model_hint,
-                max_tokens=72,
-                temperature=0.1,
+                max_tokens=int(llm_cfg.get("max_tokens", 72)),
+                temperature=float(llm_cfg.get("temperature", 0.2)),
+                timeout_seconds=int(llm_cfg.get("timeout_seconds", 25)),
+                response_format_type=llm_cfg.get("response_format_type", "text"),
+                system_prompt=llm_cfg.get("system_prompt"),
+                enable_reasoning=bool(llm_cfg.get("reasoning", False)),
+                reasoning_effort=llm_cfg.get("reasoning_effort", "medium"),
             )
 
             # Emit span for the LLM action (content not stored here to limit size)
@@ -198,7 +204,7 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str) -> D
                     "safety_envelope": {
                         "chunk_size_max": safety.get("chunk_size_max", 200),
                         "placeholder_ban": safety.get("placeholder_ban", True),
-                        "bounded_tokens": 72,
+                        "bounded_tokens": int(mission.get("llm", {}).get("max_tokens", 72)),
                     },
                     "blocked_capabilities": [],
                     "timestamp": now_z(),

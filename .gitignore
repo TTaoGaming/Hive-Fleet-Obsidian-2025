@@ -6,3 +6,6 @@ HFO_molt_shell_2025-10-25T17:00:00Z/
 git_backup*/
 .env
 temp/otel/
+
+# Ignore Crew AI swarm results (noisy run artifacts)
+hfo_crew_ai_swarm_results/
