@@ -79,12 +79,10 @@ class WorldView:
     def pred_vel(self) -> List[np.ndarray]:
         return [p.state.p_vel.copy() for p in self.preds]
 
-    def landmarks_pos(self) -> List[np.ndarray]:
-        return [l.state.p_pos.copy() for l in self.landmarks]
 
+# Enhanced (for parity with runner 'enhanced')
 
-def predator_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
-    # Wall-aware pursuit (mirror runner): allow approaching walls; bias inward only if prey not near that wall.
+def predator_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
     k_lead = 0.15
     bound = 1.0
     prey_future = view.prey_pos() + k_lead * view.prey_vel()
@@ -93,16 +91,14 @@ def predator_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.
     near = 0.01
     inward = np.zeros(2, dtype=np.float32)
     for i in range(2):
-        if abs(my_pos[i]) > (bound - near):
-            if not (abs(prey_future[i]) > (bound - near)):
-                inward[i] = -0.15 * np.sign(my_pos[i])
+        if abs(my_pos[i]) > (bound - near) and not (abs(prey_future[i]) > (bound - near)):
+            inward[i] = -0.15 * np.sign(my_pos[i])
     return unit(d + inward)
 
 
-def prey_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+def prey_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
     k_rep_pred = 1.25
     k_inertia = 0.10
-
     rep = np.zeros(2, dtype=np.float32)
     for p in view.pred_pos():
         v = my_pos - p
@@ -111,21 +107,41 @@ def prey_dir(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndar
     return unit(d)
 
 
-def action_for_agent(env, agent_name: str, matchup: str) -> np.ndarray | int | None:
+# Research baseline: pure pursuit + inverse-distance flee
+
+def predator_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    return unit(view.prey_pos() - my_pos)
+
+
+def prey_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+    rep = np.zeros(2, dtype=np.float32)
+    for p in view.pred_pos():
+        v = my_pos - p
+        rep += unit(v) / (np.linalg.norm(v) + 1e-6)
+    return unit(rep)
+
+
+def action_for_agent(env, agent_name: str, matchup: str, baseline: str) -> np.ndarray | int | None:
     # If agent is already done, caller should pass None
     raw = env.unwrapped
-    # Find matching agent in raw world
     aobj = next(a for a in raw.world.agents if getattr(a, "name", None) == agent_name)
     is_pred = getattr(aobj, "adversary", False)
     my_pos = aobj.state.p_pos.copy()
     my_vel = aobj.state.p_vel.copy()
+
+    if baseline == "research":
+        pred_fn = predator_dir_research
+        prey_fn = prey_dir_research
+    else:
+        pred_fn = predator_dir_enhanced
+        prey_fn = prey_dir_enhanced
 
     if matchup == "RvsR":
         return env.action_space(agent_name).sample()
     elif matchup == "HvsR":
         if is_pred:
             view = WorldView(raw)
-            d = predator_dir(view, my_pos, my_vel)
+            d = pred_fn(view, my_pos, my_vel)
             return dir_to_continuous_action(d)
         else:
             return env.action_space(agent_name).sample()
@@ -134,14 +150,14 @@ def action_for_agent(env, agent_name: str, matchup: str) -> np.ndarray | int | N
             return env.action_space(agent_name).sample()
         else:
             view = WorldView(raw)
-            d = prey_dir(view, my_pos, my_vel)
+            d = prey_fn(view, my_pos, my_vel)
             return dir_to_continuous_action(d)
     elif matchup == "HvsH":
         view = WorldView(raw)
         if is_pred:
-            d = predator_dir(view, my_pos, my_vel)
+            d = pred_fn(view, my_pos, my_vel)
         else:
-            d = prey_dir(view, my_pos, my_vel)
+            d = prey_fn(view, my_pos, my_vel)
         return dir_to_continuous_action(d)
     else:
         raise ValueError(f"unknown matchup {matchup}")
@@ -149,13 +165,12 @@ def action_for_agent(env, agent_name: str, matchup: str) -> np.ndarray | int | N
 
 # ---------- Episode rendering ----------
 
-def run_episode_frames(matchup: str, seed: int, max_cycles: int) -> List[Image.Image]:
+def run_episode_frames(matchup: str, seed: int, max_cycles: int, baseline: str) -> List[Image.Image]:
     env = simple_tag_v3.env(continuous_actions=True, render_mode="rgb_array")
     env.reset(seed=seed)
     n_agents = len(env.possible_agents)
     frames: List[Image.Image] = []
 
-    # Iterate over agents; capture a frame after each full pass of all agents
     step_idx = 0
     cycle = 0
     for agent in env.agent_iter():
@@ -163,7 +178,7 @@ def run_episode_frames(matchup: str, seed: int, max_cycles: int) -> List[Image.I
         if terminated or truncated:
             env.step(None)
         else:
-            act = action_for_agent(env, agent, matchup)
+            act = action_for_agent(env, agent, matchup, baseline)
             env.step(act)
 
         step_idx += 1
@@ -176,7 +191,7 @@ def run_episode_frames(matchup: str, seed: int, max_cycles: int) -> List[Image.I
                 break
 
     try:
-    def predator_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+        env.close()
     except Exception:
         pass
 
@@ -186,17 +201,12 @@ def run_episode_frames(matchup: str, seed: int, max_cycles: int) -> List[Image.I
 def overlay_header(img: Image.Image, text: str, subtext: str | None = None) -> Image.Image:
     draw = ImageDraw.Draw(img, "RGBA")
     pad = 4
-    # Header box
     box_w = max(80, len(text) * 10)
     box_h = 22 if subtext is None else 38
     draw.rectangle([0, 0, box_w, box_h], fill=(0, 0, 0, 140))
-
-    def predator_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
-        # Research baseline: pure pursuit
-        return unit(view.prey_pos() - my_pos)
     draw.text((pad, 2), text, fill=(255, 255, 255, 255))
     if subtext:
-    def prey_dir_enhanced(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
+        draw.text((pad, 18), subtext, fill=(200, 200, 200, 255))
     return img
 
 
@@ -207,17 +217,9 @@ def tile2x2(a: Image.Image, b: Image.Image, c: Image.Image, d: Image.Image, labe
     b = overlay_header(b.copy(), labels[1], subtexts[1])
     c = overlay_header(c.copy(), labels[2], subtexts[2])
     d = overlay_header(d.copy(), labels[3], subtexts[3])
-
-    def prey_dir_research(view: WorldView, my_pos: np.ndarray, my_vel: np.ndarray) -> np.ndarray:
-        # Research baseline: inverse-distance flee (no inertia/landmarks)
-        rep = np.zeros(2, dtype=np.float32)
-        for p in view.pred_pos():
-            v = my_pos - p
-            rep += unit(v) / (np.linalg.norm(v) + 1e-6)
-        return unit(rep)
     canvas.paste(a, (0, 0))
     canvas.paste(b, (w, 0))
-    def action_for_agent(env, agent_name: str, matchup: str, baseline: str) -> np.ndarray | int | None:
+    canvas.paste(c, (0, h))
     canvas.paste(d, (w, h))
     return canvas
 
@@ -231,6 +233,7 @@ def main() -> None:
     p.add_argument("--max-cycles", type=int, default=25, help="max environment cycles per episode (frame count per episode)")
     p.add_argument("--duration-ms", type=int, default=120, help="GIF frame duration in milliseconds")
     p.add_argument("--outdir", type=str, default="hfo_petting_zoo_results/gifs")
+    p.add_argument("--baseline", type=str, choices=["research", "enhanced"], default="research")
     args = p.parse_args()
 
     cells = ["RvsR", "HvsR", "RvsH", "HvsH"]
@@ -240,45 +243,33 @@ def main() -> None:
     for ci, cell in enumerate(cells):
         for ep in range(args.episodes):
             ep_seed = args.seed + ep
-            ep_frames = run_episode_frames(cell, seed=ep_seed, max_cycles=args.max_cycles)
-            # annotate episode/step as subtext later (per-frame info)
+            ep_frames = run_episode_frames(cell, seed=ep_seed, max_cycles=args.max_cycles, baseline=args.baseline)
             frames_per_cell[cell].extend(ep_frames)
 
-    # Normalize frame sizes and lengths
-    # Use smallest common size to avoid upscaling artifacts
-    widths = []
-    heights = []
+    # Normalize sizes
+    widths: List[int] = []
+    heights: List[int] = []
     for seq in frames_per_cell.values():
         for im in seq:
             widths.append(im.width)
             heights.append(im.height)
     base_w = min(widths) if widths else 300
     base_h = min(heights) if heights else 300
-
     for k, seq in frames_per_cell.items():
         frames_per_cell[k] = [im.resize((base_w, base_h), Image.BILINEAR) for im in seq]
 
     max_len = max((len(v) for v in frames_per_cell.values()), default=0)
     if max_len == 0:
         raise SystemExit("No frames generated. Check that PettingZoo and dependencies are installed.")
-    def run_episode_frames(matchup: str, seed: int, max_cycles: int, baseline: str) -> List[Image.Image]:
+
     labels = ("RvsR", "HvsR", "RvsH", "HvsH")
     composite_frames: List[Image.Image] = []
+    fpe = args.max_cycles
     for i in range(max_len):
         a = frames_per_cell["RvsR"][i if i < len(frames_per_cell["RvsR"]) else -1]
         b = frames_per_cell["HvsR"][i if i < len(frames_per_cell["HvsR"]) else -1]
         c = frames_per_cell["RvsH"][i if i < len(frames_per_cell["RvsH"]) else -1]
         d = frames_per_cell["HvsH"][i if i < len(frames_per_cell["HvsH"]) else -1]
-
-        # Compute subtexts: episode and step indices per cell based on frame index
-        def ep_step(idx: int, frames_per_ep: int) -> Tuple[int, int]:
-            if frames_per_ep <= 0:
-                return (0, idx)
-            ep = idx // frames_per_ep
-            step = idx % frames_per_ep
-            return (ep, step)
-
-        fpe = args.max_cycles  # approximate frames per episode per cell
         subs = (
             f"ep {i // fpe + 1} step {i % fpe + 1}",
             f"ep {i // fpe + 1} step {i % fpe + 1}",
@@ -288,14 +279,13 @@ def main() -> None:
         composite = tile2x2(a, b, c, d, labels, subs)
         composite_frames.append(composite)
 
-    # Save GIF
     os.makedirs(args.outdir, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_path = os.path.join(
         args.outdir, f"simple_tag_v3_matrix_{ts}_seed{args.seed}_eps{args.episodes}.gif"
     )
     composite_frames[0].save(
-    def main() -> None:
+        out_path,
         save_all=True,
         append_images=composite_frames[1:],
         duration=args.duration_ms,
