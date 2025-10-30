@@ -20,7 +20,7 @@ DATE_DIR="$(date +%Y-%m-%d)"
 OUTDIR="${ROOT_DIR}/hfo_petting_zoo_results/${DATE_DIR}"
 mkdir -p "${OUTDIR}"
 
-exec "${PY}" "${ROOT_DIR}/scripts/pz_make_matrix_gif_v2.py" \
+exec "${PY}" "${ROOT_DIR}/scripts/pz_make_matrix_gif_core.py" \
   --episodes 3 \
   --seed "${SEED}" \
   --max-cycles "${MAX_CYCLES}" \
