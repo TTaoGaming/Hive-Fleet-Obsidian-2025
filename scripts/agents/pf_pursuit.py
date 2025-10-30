@@ -39,6 +39,7 @@ def _dir_to_continuous_action(d: np.ndarray) -> np.ndarray:
 class Params:
     k_attr: float = 1.0
     k_rep_obs: float = 0.8
+    k_rep_wall: float = 0.0  # scale wall repulsion (0 disables)
     r_inf: float = 0.25  # influence radius for obstacles/walls
     heading_ema: float = 0.0  # 0 = off
     max_speed: float = 1.0
@@ -93,8 +94,8 @@ class PFPursuit:
             if dist_neg < margin:
                 v_rep_wall[i] += (1.0 / max(dist_neg, 1e-6) - 1.0 / margin)
 
-        # Combine
-        v = v_attr + v_rep_obs + v_rep_wall
+        # Scale wall repulsion and combine
+        v = v_attr + v_rep_obs + (self.p.k_rep_wall * v_rep_wall)
         d = _unit(v)
 
         # EMA heading smoothing
