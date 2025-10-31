@@ -240,7 +240,7 @@ else:
 
 **Hyperparameter Tuning**:
 - **Industry Applications**: PSO widely used for neural architecture search (NAS) and ML hyperparameter optimization in recommendation systems.
-- **Typical Results** (from research literature): 2-5x faster convergence vs grid search; 10-20% better final performance vs random search.
+- **Performance Range** (representative results from comparative studies cited below): 2-5x faster convergence vs grid search; 10-20% better final performance vs random search. Specific improvements vary by problem domain and search space dimensionality.
 
 **PSO Stigmergy Analog**:
 - **Global best position (gbest)**: Acts as quantitative attractor (all particles attracted).
