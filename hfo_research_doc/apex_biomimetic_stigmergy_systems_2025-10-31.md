@@ -582,7 +582,7 @@ class StigmergyLayer:
   "evidence_refs": [...],
   "timestamp": "2025-10-31T...",
   "pheromone": {
-    "type": "EXPLOIT",  // EXPLORE | EXPLOIT | DANGER | RESOURCE
+    "type": "EXPLOIT",
     "attractant_strength": 0.75,
     "repellent_strength": 0.0,
     "decay_rate": 0.15,
@@ -596,6 +596,8 @@ class StigmergyLayer:
   }
 }
 ```
+
+**Note:** The `type` field accepts one of: `EXPLORE`, `EXPLOIT`, `DANGER`, `RESOURCE`.
 
 ### Phase 2: Pheromone Management Module
 
@@ -615,6 +617,7 @@ Implements pheromone-based coordination with:
 from __future__ import annotations
 import json
 import math
+import random
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -749,7 +752,6 @@ class StigmergyLayer:
             return None
         
         # Epsilon-greedy exploration
-        import random
         if random.random() < self.epsilon:
             # Explore: uniform random
             return random.choice(eligible)
@@ -989,7 +991,7 @@ graph TD
     A[Agent Completes Task] --> B{Success?}
     B -->|Yes| C[Deposit Attractant Pheromone]
     B -->|No| D[Deposit Repellent Pheromone]
-    C --> E[Add to Blackboard with Strength=f success, complexity]
+    C --> E[Add to Blackboard with Strength=f&#40;success, complexity&#41;]
     D --> F[Add to Blackboard with Repellent Marker]
     E --> G[Evaporation Process]
     F --> G
