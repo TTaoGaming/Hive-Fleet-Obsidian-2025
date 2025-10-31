@@ -573,6 +573,9 @@ class StigmergyLayer:
 ```
 
 **Enhanced Schema with Pheromones:**
+
+The enhanced schema adds a `pheromone` field supporting four types: `EXPLORE`, `EXPLOIT`, `DANGER`, `RESOURCE`.
+
 ```json
 {
   "mission_id": "mi_xxx",
@@ -596,8 +599,6 @@ class StigmergyLayer:
   }
 }
 ```
-
-**Note:** The `type` field accepts one of: `EXPLORE`, `EXPLOIT`, `DANGER`, `RESOURCE`.
 
 ### Phase 2: Pheromone Management Module
 
@@ -813,7 +814,6 @@ Generates heatmaps, gradient fields, and flow diagrams.
 """
 import json
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict
@@ -991,7 +991,7 @@ graph TD
     A[Agent Completes Task] --> B{Success?}
     B -->|Yes| C[Deposit Attractant Pheromone]
     B -->|No| D[Deposit Repellent Pheromone]
-    C --> E[Add to Blackboard with Strength=f&#40;success, complexity&#41;]
+    C --> E[Add to Blackboard with Strength=f(success, complexity)]
     D --> F[Add to Blackboard with Repellent Marker]
     E --> G[Evaporation Process]
     F --> G
