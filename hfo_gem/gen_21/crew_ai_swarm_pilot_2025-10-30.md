@@ -40,3 +40,19 @@ Next steps (low-risk improvements)
 
 Notes
 - All commands are already embedded in existing scripts/README; this file is a handoff pointer. See the digest and spans above for concrete evidence.
+
+## Addendum — ARC swarm aligned with PREY artifacts (2025-10-31)
+
+What changed
+- The ARC swarm runner now mirrors the pilot’s per-lane PREY artifact pattern so each lane is auditable:
+  - Per-lane directory: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/<sanitized_model>_lane_<n>/attempt_1/`
+  - Artifacts: `perception_snapshot.yml`, `react_plan.yml`, `engage_report.yml`, `yield_summary.yml`
+- A lightweight lane validator checks that `yield_summary.evidence_refs` includes the other three files and appends a blackboard receipt ("artifact validation PASS/FAIL").
+
+What stayed the same
+- Run-level digest (`swarmlord_digest.md`) and results JSON (`arc_swarm_results.json`) are still written in the run directory.
+- Safety envelope (≤200 lines/docs, placeholder ban) and blackboard append-only discipline remain unchanged.
+
+Where to look
+- Example run directory: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/`
+- Blackboard: `hfo_blackboard/obsidian_synapse_blackboard.jsonl` (look for lane artifact receipts and validator PASS entries)
