@@ -1,0 +1,32 @@
+# Tiny schema for PREY lane artifacts (pilot)
+# Types: str | dict | list | int | float | bool
+
+perception_snapshot.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  trace_id: str
+  safety: dict
+  llm: dict
+  paths: dict
+
+react_plan.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  cynefin: dict
+  approach: dict
+
+engage_report.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  safety: dict
+  llm: dict
+
+yield_summary.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  collected_agents: list
+  evidence_refs: list

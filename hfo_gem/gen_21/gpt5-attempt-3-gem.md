@@ -261,6 +261,16 @@ flowchart LR
 - safety summary (tripwire/canary/revert status)
 - blockers (blocked_capabilities and unresolved gaps)
 
+### PREY per-step artifacts (pilot implementation)
+- Each PREY lane emits four YAML artifacts at Yield time (attempt_1):
+  - perception_snapshot.yml — mission_id, lane, timestamp, trace_id, safety, llm, paths
+  - react_plan.yml — cynefin rationale and approach (tripwires, quorum)
+  - engage_report.yml — actions taken and LLM metadata under safety
+  - yield_summary.yml — collected agents and evidence_refs (must include the core three)
+- Swarmlord writes a run-level mission pointer (mission_pointer.yml) and a digest (swarmlord_digest.md) per run; the digest includes a Trace pointer to `temp/otel/trace-*.jsonl`.
+- A lane-level validator checks presence and minimal schema for the four artifacts and contributes a vote to Verify quorum.
+- CI runs the pilot in dry-run mode, validates JSON/JSONL (blackboard), asserts span-level parallelism with the trace analyzer, and fails on placeholders or missing artifacts.
+
 ### Examples: Swarmlord prompts to workers (internal only)
 - "Perceive: Snapshot repo structure and detect existing mission_intent.yml; report file counts and notable configs."
 - "React: Classify complexity and propose chunk plan to reach 1000+ lines with ≤200-line writes; list tripwires."

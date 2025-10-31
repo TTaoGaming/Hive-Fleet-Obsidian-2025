@@ -35,7 +35,14 @@ python3 scripts/crew_ai/runner.py \
 Outputs:
 - Blackboard receipts in `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
 - Spans in `temp/otel/trace-*.jsonl`
-- Perception snapshot per lane at start of PREY: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/lane_<name>/attempt_1/perception_snapshot.yml`
+- Per-step artifacts per lane under: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/lane_<name>/attempt_1/`
+  - `perception_snapshot.yml` (Perceive)
+  - `react_plan.yml` (React)
+  - `engage_report.yml` (Engage)
+  - `yield_summary.yml` (Yield)
+- Swarmlord-level run artifacts under: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/`
+  - `mission_pointer.yml` (pointer to mission intent and run config)
+  - `swarmlord_digest.md` (BLUF, matrix, diagram, notes)
 
 Notes:
 - If no `OPENROUTER_API_KEY` is set, the Engage step gracefully skips the remote call and records a failed but non-fatal audit.
@@ -49,6 +56,15 @@ Each lane writes a YAML snapshot during the Perceive phase capturing:
 - Paths (blackboard, spans file, lane_dir)
 
 Use this to debug context and to feed downstream tools or validators without scraping logs.
+
+### React plan
+- Cynefin domain and rationale; approach/tripwires; chunk limit; C2/CBR hints; quorum config.
+
+### Engage report
+- Actions executed, safety bounds (tokens, placeholder ban), and LLM call metadata (ok/model/latency/status/error, preview).
+
+### Yield summary
+- Collected agent keys, evidence refs across lane, and a note that Verify quorum runs post‑yield.
 
 ## Next steps
 - Add budgeting/rate limits per mission to cap LLM calls.

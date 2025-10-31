@@ -1,0 +1,36 @@
+name: Crew AI Pilot – Validate PREY Run
+
+on:
+  push:
+    branches: [ main, master, trunk, "release/**", "feature/**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Crew AI pilot (dry-run)
+        run: |
+          python scripts/crew_ai/runner.py --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+
+      - name: Validate JSON/JSONL files (incl. blackboard)
+        run: |
+          python scripts/validate_jsonl.py
+
+      - name: Validate latest PREY run (artifacts, digest, parallelism)
+        run: |
+          python scripts/crew_ai/validate_run.py --require-parallel --fail-on-missing-run

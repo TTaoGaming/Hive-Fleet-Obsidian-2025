@@ -23,6 +23,7 @@ from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 import re
+import yaml
 
 import importlib.util
 
@@ -39,6 +40,36 @@ def append_blackboard(entry: Dict[str, Any]) -> None:
     BLACKBOARD.parent.mkdir(parents=True, exist_ok=True)
     with BLACKBOARD.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+
+def _sanitize_name(name: str) -> str:
+    # Safe lane folder names derived from model and lane index
+    return re.sub(r"[^A-Za-z0-9_-]+", "_", str(name)).strip("_")[:80]
+
+
+def _validate_lane_artifacts(lane_out: Path) -> Dict[str, Any]:
+    """Validate presence and minimal shape of PREY artifacts for a lane."""
+    required = {
+        "perception_snapshot.yml": ["mission_id", "lane", "timestamp", "dataset", "split", "limit"],
+        "react_plan.yml": ["mission_id", "lane", "timestamp", "approach"],
+        "engage_report.yml": ["mission_id", "lane", "timestamp", "metrics"],
+        "yield_summary.yml": ["mission_id", "lane", "timestamp", "evidence_refs"],
+    }
+    errors: List[str] = []
+    for fname, keys in required.items():
+        fp = lane_out / fname
+        if not fp.exists():
+            errors.append(f"missing_file:{fname}")
+            continue
+        try:
+            with fp.open("r", encoding="utf-8") as f:
+                data = yaml.safe_load(f) or {}
+        except Exception:
+            data = {}
+        for k in keys:
+            if k not in data:
+                errors.append(f"missing_key:{fname}:{k}")
+    return {"ok": len(errors) == 0, "errors": errors}
 
 
 # Load sibling modules
@@ -81,9 +112,93 @@ def _price_per_1k(model: str) -> float | None:
     return None
 
 
-def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temperature: float, timeout_seconds: int, *, lane_index: int = 0, seed_base: int = 1234) -> Dict[str, Any]:
+def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temperature: float, timeout_seconds: int, *, lane_index: int = 0, seed_base: int = 1234, run_dir: Optional[Path] = None) -> Dict[str, Any]:
     # Set env to propagate hint (client also accepts direct hint)
     os.environ["OPENROUTER_MODEL_HINT"] = model_hint
+    # Prepare lane output folder and PREY artifacts
+    lane_name = f"{_sanitize_name(model_hint)}_lane_{lane_index}"
+    base_dir = (run_dir or (RESULTS_ROOT / datetime.now(timezone.utc).strftime("%Y-%m-%d") / f"run-{int(time.time()*1000)}"))
+    lane_out = base_dir / lane_name / "attempt_1"
+    lane_out.mkdir(parents=True, exist_ok=True)
+
+    # Perceive: write perception_snapshot.yml
+    try:
+        snap = {
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "lane": lane_name,
+            "timestamp": now_z(),
+            "dataset": "ai2_arc/ARC-Challenge",
+            "split": split,
+            "limit": limit,
+            "llm": {
+                "model_hint": model_hint,
+                "max_tokens": int(max_tokens),
+                "temperature": float(temperature),
+                "timeout_seconds": int(timeout_seconds),
+                "reasoning": str(os.environ.get("OPENROUTER_REASONING", "")).lower() in {"1", "true", "yes"},
+                "reasoning_effort": os.environ.get("OPENROUTER_REASONING_EFFORT", "high"),
+            },
+            "paths": {
+                "blackboard": str(BLACKBOARD.relative_to(ROOT)),
+                "lane_dir": str(lane_out.relative_to(ROOT)),
+            },
+        }
+        ps = lane_out / "perception_snapshot.yml"
+        with ps.open("w", encoding="utf-8") as f:
+            yaml.safe_dump(snap, f, sort_keys=False)
+        append_blackboard({
+            "mission_id": snap["mission_id"],
+            "phase": "perceive",
+            "summary": f"lane={lane_name}: perception_snapshot.yml written",
+            "evidence_refs": [str(ps.relative_to(ROOT))],
+            "timestamp": now_z(),
+        })
+    except Exception as e:
+        append_blackboard({
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "phase": "perceive",
+            "summary": f"lane={lane_name}: perception snapshot write failed: {e}",
+            "evidence_refs": [f"lane:{lane_name}", "phase:perceive"],
+            "timestamp": now_z(),
+            "regen_flag": True,
+        })
+
+    # React: write react_plan.yml
+    try:
+        plan = {
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "lane": lane_name,
+            "timestamp": now_z(),
+            "cynefin": {"domain": "complicated", "rationale": "Bounded eval with known steps and measurable tripwires"},
+            "approach": {
+                "loop": ["perceive", "react", "engage", "yield"],
+                "chunk_limit_lines": 200,
+                "tripwires": [
+                    "format_fails>0",
+                    "empty_content>0",
+                ],
+                "receipts": True,
+            },
+        }
+        rp = lane_out / "react_plan.yml"
+        with rp.open("w", encoding="utf-8") as f:
+            yaml.safe_dump(plan, f, sort_keys=False)
+        append_blackboard({
+            "mission_id": plan["mission_id"],
+            "phase": "react",
+            "summary": f"lane={lane_name}: react_plan.yml written",
+            "evidence_refs": [str(rp.relative_to(ROOT))],
+            "timestamp": now_z(),
+        })
+    except Exception:
+        append_blackboard({
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "phase": "react",
+            "summary": f"lane={lane_name}: react_plan write failed",
+            "evidence_refs": [f"lane:{lane_name}", "phase:react"],
+            "timestamp": now_z(),
+            "regen_flag": True,
+        })
     res = arc_eval.run_eval(
         model_hint=model_hint,
         split=split,
@@ -99,6 +214,82 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
     est_cost = None
     if price is not None and res.total_tokens:
         est_cost = (res.total_tokens / 1000.0) * price
+    # Engage: write engage_report.yml with lane metrics
+    try:
+        er = {
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "lane": lane_name,
+            "timestamp": now_z(),
+            "metrics": {
+                "total": res.total,
+                "correct": res.correct,
+                "accuracy": acc,
+                "format_fails": res.format_fails,
+                "avg_latency_ms": res.avg_latency_ms,
+                "empty_content": res.empty_content,
+                "total_tokens": res.total_tokens,
+            },
+            "model": res.model,
+            "llm": {"max_tokens": int(max_tokens), "temperature": float(temperature), "timeout_seconds": int(timeout_seconds)},
+        }
+        erp = lane_out / "engage_report.yml"
+        with erp.open("w", encoding="utf-8") as f:
+            yaml.safe_dump(er, f, sort_keys=False)
+        append_blackboard({
+            "mission_id": er["mission_id"],
+            "phase": "engage",
+            "summary": f"lane={lane_name}: engage_report.yml written",
+            "evidence_refs": [str(erp.relative_to(ROOT))],
+            "timestamp": now_z(),
+        })
+    except Exception as e:
+        append_blackboard({
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "phase": "engage",
+            "summary": f"lane={lane_name}: engage report write failed: {e}",
+            "evidence_refs": [f"lane:{lane_name}", "phase:engage"],
+            "timestamp": now_z(),
+            "regen_flag": True,
+        })
+
+    # Yield: summarize and validate
+    try:
+        evidence_refs = [
+            str((lane_out / n).relative_to(ROOT)) for n in (
+                "perception_snapshot.yml",
+                "react_plan.yml",
+                "engage_report.yml",
+            ) if (lane_out / n).exists()
+        ]
+        ys = {
+            "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
+            "lane": lane_name,
+            "timestamp": now_z(),
+            "evidence_refs": evidence_refs,
+            "verify_expected": "artifact_validation",
+        }
+        ysp = lane_out / "yield_summary.yml"
+        with ysp.open("w", encoding="utf-8") as f:
+            yaml.safe_dump(ys, f, sort_keys=False)
+        append_blackboard({
+            "mission_id": ys["mission_id"],
+            "phase": "yield",
+            "summary": f"lane={lane_name}: yield_summary.yml written",
+            "evidence_refs": [str(ysp.relative_to(ROOT))],
+            "timestamp": now_z(),
+        })
+        val = _validate_lane_artifacts(lane_out)
+        append_blackboard({
+            "mission_id": ys["mission_id"],
+            "phase": "verify",
+            "summary": f"lane={lane_name}: artifact validation {'PASS' if val['ok'] else 'FAIL'}",
+            "evidence_refs": evidence_refs + [str(ysp.relative_to(ROOT))],
+            "timestamp": now_z(),
+            "validator": val,
+        })
+    except Exception:
+        pass
+
     return {
         "model": res.model,
         "limit": limit,
@@ -148,6 +339,7 @@ def main() -> None:
         filters = [s.strip().lower() for s in args.models.split(",") if s.strip()]
         allowlist = [m for m in allowlist if any(f in m.lower() for f in filters)]
     mission_id = f"arc_challenge_swarm_{int(time.time()*1000)}"
+    os.environ["ARC_SWARM_MISSION_ID"] = mission_id
 
     date_dir = RESULTS_ROOT / datetime.now(timezone.utc).strftime("%Y-%m-%d")
     run_dir = date_dir / f"run-{int(time.time()*1000)}"
@@ -223,6 +415,7 @@ def main() -> None:
                 args.temperature,
                 args.timeout_seconds,
                 lane_index=ln,
+                run_dir=run_dir,
             ): (m, ln)
             for (m, ln) in lanes
         }
