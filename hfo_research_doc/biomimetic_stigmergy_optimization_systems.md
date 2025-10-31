@@ -350,7 +350,7 @@ def select_next_state(current, options, pheromones):
   "evidence_refs": ["lane:lane_a", "phase:perceive"],
   "timestamp": "2025-10-30T12:00:00Z",
   
-  // NEW: Stigmergic Quantitative Fields
+  "_comment": "NEW: Stigmergic Quantitative Fields",
   "stigmergy": {
     "signal_type": "pheromone",           // or "conductivity", "weight"
     "signal_value": 1.0,                  // numeric deposit
@@ -413,7 +413,9 @@ def apply_diffusion(blackboard, diff_coeff=0.2):
         for neighbor in neighbors:
             neighbor_signal = graph[neighbor['lane']]['stigmergy']['signal_value']
             distance = neighbor['distance']
-            laplacian += (neighbor_signal - signal) / (distance**2)
+            # Add epsilon to prevent division by zero
+            epsilon = 1e-6
+            laplacian += (neighbor_signal - signal) / ((distance**2) + epsilon)
         
         # Update: S(t+1) = S(t) + D·∇²S·dt
         dt = 1.0  # timestep
@@ -448,7 +450,11 @@ def select_next_lane(current_lane, blackboard, alpha=1.0, beta=3.0, explore_prob
     
     # Normalize
     total = sum(probs)
-    probs = [p/total for p in probs]
+    if total > 0:
+        probs = [p/total for p in probs]
+    else:
+        # Fallback to uniform distribution if all probabilities are zero
+        probs = [1.0/len(probs)] * len(probs)
     
     return random_choice(candidates, probs)
 ```
@@ -768,11 +774,11 @@ def temporal_healing(blackboard, current_time):
 
 10. **Camazine, S., Deneubourg, J. L., Franks, N. R., Sneyd, J., Theraulaz, G., & Bonabeau, E. (2001).** *Self-Organization in Biological Systems.* Princeton University Press.
 
-### Recent Advances (2020-2024)
+### Recent Advances (2015-2020)
 
-11. **Li, Y., & Chen, W. (2023).** "Deep reinforcement learning enhanced ACO for vehicle routing." *Transportation Research Part E*, 178, 103265.
+11. **Dorigo, M., Birattari, M., & Stutzle, T. (2006).** "Ant colony optimization." *IEEE Computational Intelligence Magazine*, 1(4), 28-39.
 
-12. **Smith, J. et al. (2022).** "Stigmergic coordination in swarm robotics: A survey." *Robotics and Autonomous Systems*, 152, 104036.
+12. **Jones, J. (2010).** "Characteristics of pattern formation and evolution in approximations of Physarum transport networks." *Artificial Life*, 16(2), 127-153.
 
 ---
 
