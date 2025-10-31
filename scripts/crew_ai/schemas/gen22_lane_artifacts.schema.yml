@@ -1,0 +1,57 @@
+# Gen22 lane artifact schema (normative mirror of SSOT)
+# Types: str | dict | list | int | float | bool
+
+perception_snapshot.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  trace_id: str
+  safety_envelope: dict
+  llm: dict
+  paths: dict
+  tdd_mode: bool
+  parent_refs: list
+  evidence_hashes: list
+  context_notes: str   # >= 3 non-empty lines
+
+react_plan.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  trace_id: str
+  cynefin_rationale: dict
+  approach_plan: dict
+  acceptance_criteria: dict
+  parent_refs: list
+  evidence_hashes: list
+  context_notes: str
+
+engage_report.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  trace_id: str
+  actions: list
+  safety: dict
+  metrics_summary: dict
+  changes_summary: str
+  tests_green: bool
+  tripwires_passed: bool
+  evidence_refs_present: bool
+  llm: dict
+  parent_refs: list
+  evidence_hashes: list
+  context_notes: str
+
+yield_summary.yml:
+  mission_id: str
+  lane: str
+  timestamp: str
+  trace_id: str
+  collected_agents: list
+  evidence_refs: list
+  lane_summary: str
+  recommendations: str
+  parent_refs: list
+  evidence_hashes: list
+  context_notes: str

@@ -426,3 +426,105 @@ Environment tip
   - `OPENROUTER_MAX_TOKENS=1000`
   - Optionally tune per mission via mission intent `llm.max_tokens`.
 
+## Quick run guide — pilot and ARC swarm (Gen22-ready)
+
+This section gives practical, parser-safe commands to run the pilot (two PREY lanes) and the ARC swarm (multi-model, multi-lane) with Gen22 receipts and artifacts.
+
+### Pilot (PREY lanes with quorum and digest)
+
+- Prereqs
+  - `.env` with `OPENROUTER_API_KEY` (optional: runs in dry-mode and skips LLM call if missing)
+  - Python deps installed: `pip install -r requirements.txt`
+  - Mission intent (Gen22 fields are used where present): `hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml`
+
+- Run
+  - Default model selection follows allowlist; pass a hint or use mission `llm.per_stage_defaults.engage.model`
+
+```bash
+# Two lanes from the mission intent; writes per-lane artifacts and a quorum_report
+.venv/bin/python scripts/crew_ai/runner.py \
+  --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml
+```
+
+- Outputs
+  - Per-lane: `perception_snapshot.yml`, `react_plan.yml`, `engage_report.yml`, `yield_summary.yml`
+  - Run-level: `quorum_report.yml`, `swarmlord_digest.md`
+  - Spans: `temp/otel/trace-*.jsonl`
+  - Blackboard: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
+
+- Verify/validate
+
+```bash
+# Gen22 gap audit across the last run
+python3 scripts/crew_ai/gen22_gap_report.py --strict
+
+# Optional: inspect parallelism and engage_llm spans
+python3 scripts/crew_ai/analyze_traces.py temp/otel/<trace-file>.jsonl
+```
+
+### ARC swarm (multi-model, lanes-per-model)
+
+- Prereqs
+  - `.env` with `OPENROUTER_API_KEY`
+  - Optional pricing envs for cost estimates:
+    - `OPENROUTER_PRICE_DEFAULT_PER_1K=0.0000`
+    - Per-model: `OPENROUTER_PRICE_OPENAI_GPT_OSS_20B_PER_1K=...`
+
+- Run (example: 5 models × 2 lanes = 10 lanes, limit=50, validation split)
+
+```bash
+.venv/bin/python scripts/crew_ai/arc_swarm_runner.py \
+  --limit 50 --split validation --lanes-per-model 2 \
+  --models "gpt-5-mini,gpt-oss-120b,gpt-oss-20b,grok-4-fast,deepseek-v3.2-exp"
+```
+
+- Outputs
+  - Per-lane artifacts under: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/<sanitized_model>_lane_<n>/attempt_1/`
+  - Aggregated digest: `.../swarmlord_digest.md` (model ranking, accuracy, latency)
+  - Aggregated JSON: `.../arc_swarm_results.json` (per-lane and per-model metrics)
+
+- Guards & tips
+  - Full-dataset runs require `--allow-full` or `ALLOW_FULL_ARC=1` when `--limit 0` is used.
+  - To bias selection, use `--models` substrings against the allowlist.
+  - Reasoning is auto-enabled for supported models unless overridden by env/mission.
+
+## Gen22 SSOT — what’s enforced now (pilot)
+
+The pilot has been aligned to Gen22 contracts in a minimal, parser-safe way. Key points:
+
+- Traceability in lane artifacts
+  - Required keys added: `trace_id`, `parent_refs`, `evidence_hashes`, `context_notes` (≥3 lines)
+  - Evidence chaining via sha256 of parent artifacts:
+    - `perception_snapshot.yml` → hash of `mission_pointer.yml`
+    - `react_plan.yml` → hash of `perception_snapshot.yml`
+    - `engage_report.yml` → hash of `react_plan.yml`
+    - `yield_summary.yml` → hash of `engage_report.yml`
+
+- Run-level quorum
+  - `quorum_report.yml` contains validators, threshold, votes (lane-level), attestation, evidence_refs.
+  - Deterministic quorum executed post-Yield; PASS/FAIL recorded to the blackboard.
+
+- Digest validation checklist
+  - `swarmlord_digest.md` includes: `bluf_present`, `matrix_present`, `diagrams_present`, `diagrams_parser_safe`, `executive_summary_present`, `evidence_refs_complete`.
+
+- Per-stage LLM plan and resiliency
+  - Each PREY phase logs an LLM plan (model, max_tokens, temperature, reasoning_planned/effort).
+  - Engage performs a single bounded call when key present, with retry-on-empty and drop-response_format on retry; spans record `reasoning_removed_on_retry`.
+
+- Stigmergy (pilot scope)
+  - Blackboard receipts include a minimal `stigmergy` block with `signals` and a `ttl` evaporation plan.
+
+- Validation aides
+  - Gap check: `scripts/crew_ai/gen22_gap_report.py --strict`
+  - Trace analyzer: `scripts/crew_ai/analyze_traces.py temp/otel/<trace>.jsonl`
+
+Acceptance snapshot (quick)
+- Lane artifacts present with required fields; `context_notes` ≥ 3 lines.
+- Lane-level validator PASS recorded; run-level quorum PASS/FAIL written.
+- Digest checklist present; spans contain per-stage LLM plan and engage_llm telemetry.
+
+Troubleshooting
+- `missing_api_key`: Pilot runs without calling the LLM; engage_llm spans show `ok=false` and `content_preview: null`.
+- ARC guard on full runs: set `--allow-full` or `ALLOW_FULL_ARC=1` when using `--limit 0`.
+- Price fields show `n/a` unless `OPENROUTER_PRICE_*` env vars are set.
+

@@ -1,0 +1,12 @@
+# Gen22 quorum report schema (normative mirror of SSOT)
+# Types: str | dict | list | int | float | bool
+
+quorum_report.yml:
+  mission_id: str
+  timestamp: str
+  validators: list
+  threshold: int
+  performed_by: str
+  votes: list   # elements: { lane: str, pass: bool, notes: str }
+  attestation: str
+  evidence_refs: list
