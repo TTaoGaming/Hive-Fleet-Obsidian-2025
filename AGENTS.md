@@ -19,17 +19,14 @@ This repo includes a minimal, parser-safe Crew AI pilot that runs two parallel P
 - Prerequisites (local)
   - `.env` at repo root with `OPENROUTER_API_KEY` (optional for no-cost dry-runs) and optional `OPENROUTER_MODEL_HINT` (e.g., `haiku`).
   - Python environment with dependencies from `requirements.txt`.
-  - Model allowlist (enforced; top 10 active)
+  - Model allowlist (enforced)
     - openai/gpt-5-mini
-    - x-ai/grok-4-fast
     - minimax/minimax-m2
-    - deepseek/deepseek-v3.2-exp
-    - deepseek/deepseek-v3.1-terminus
-    - deepseek/deepseek-chat-v3-0324
-    - qwen/qwen3-235b-a22b-2507
-    - x-ai/grok-code-fast-1
     - openai/gpt-oss-120b
     - openai/gpt-oss-20b
+    - x-ai/grok-4-fast
+    - deepseek/deepseek-v3.2-exp
+    - qwen/qwen3-235b-a22b-2507
   - Note: z-ai/glm-4.6 is temporarily removed due to failing strict integer math sanity; we’ll revisit after tuning.
 
 - Run
@@ -55,10 +52,13 @@ OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
 - Safety and cost guards
   - Bounded tokens and allowlisted models for Engage LLM calls; presence-only secret audit (never logs key).
   - Chunk-size limit (≤200 lines per write), placeholder ban, canary-first, measurable tripwires, explicit revert.
+  - Reasoning policy (default): If the selected model supports a reasoning control, automatically enable reasoning with high effort unless mission intent or env overrides it. Override via mission `llm.reasoning`/`llm.reasoning_effort` or env `OPENROUTER_REASONING`/`OPENROUTER_REASONING_EFFORT`.
+  - Compatibility fallback: If a provider rejects the reasoning field, the client retries once without reasoning to avoid hard failures; override via mission/env if you need to force reasoning on/off for a run.
 
 - Verifying lanes and model selection
   - Check parallelism and LLM model in spans:
     - Spans file: `temp/otel/trace-*.jsonl` with entries like `name: lane_a:engage_llm` and attributes `model`, `latency_ms`.
+    - Engage spans also record `reasoning_enabled`, `reasoning_effort`, and `reasoning_removed_on_retry` for audit.
     - Helper tool: `scripts/crew_ai/analyze_traces.py` prints lane windows and "Parallel detected: True/False".
       ```bash
       python3 scripts/crew_ai/analyze_traces.py temp/otel/<trace-file>.jsonl
@@ -68,6 +68,17 @@ OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
     # defaults to gpt-oss-120b; or set an allowed OPENROUTER_MODEL_HINT
     python3 scripts/crew_ai/math_bench.py
     ```
+
+### Handoff: test with tightened model allowlist and reasoning-high
+
+- Allowlist in effect (enforced):
+  - openai/gpt-5-mini, minimax/minimax-m2, openai/gpt-oss-120b, openai/gpt-oss-20b, x-ai/grok-4-fast, deepseek/deepseek-v3.2-exp, qwen/qwen3-235b-a22b-2507
+- Defaults:
+  - Reasoning auto-enabled at high effort for supported models (gpt-5-mini, grok-4-fast, deepseek v3.2, minimax m2) unless overridden.
+  - To force a specific model for a quick run: set `OPENROUTER_MODEL_HINT` to a substring of one allowlisted model.
+- Run pilot and validate locally (optional):
+  - Pilot: `python scripts/crew_ai/runner.py --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
+  - Validate: `python scripts/crew_ai/validate_run.py --require-parallel`
 
 - References
   - Mission intent: `hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
@@ -237,6 +248,21 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
 - Blackboard JSONL: `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
 - SSOT (reference): `hfo_gem/gen_21/gpt5-attempt-3-gem.md`
 
+### PREY per-step artifacts and validator (pilot)
+
+- Run directory (per PREY run): `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/`
+  - `mission_pointer.yml` — run-level pointer to the mission intent plus lane/quorum/telemetry config.
+  - `<lane_name>/attempt_1/` — lane output directory containing four artifacts:
+    - `perception_snapshot.yml` — mission_id, lane, timestamp, trace_id, safety, llm, paths.
+    - `react_plan.yml` — cynefin rationale, approach with tripwires and quorum settings.
+    - `engage_report.yml` — actions performed under safety, LLM call metadata (if any).
+    - `yield_summary.yml` — collected agents, evidence_refs (must include the three core artifacts).
+  - `swarmlord_digest.md` — BLUF, lane↔model matrix, parser-safe Mermaid diagram, and a Trace pointer.
+
+- Validator (lane-level, post-Yield): ensures all four artifacts exist with minimal fields and that `yield_summary.evidence_refs` references `perception_snapshot.yml`, `react_plan.yml`, and `engage_report.yml`. Its PASS contributes a vote in Verify quorum.
+
+- CI gate (repo): a workflow runs the pilot, validates JSON/JSONL (including the blackboard), checks per-lane artifacts and digest, and asserts span-level parallelism using `scripts/crew_ai/analyze_traces.py`.
+
 - PettingZoo verification wrapper:
   - Path: `scripts/run_pz_simple_tag_random.sh`
   - Purpose: Run MPE simple_tag_v3 random-vs-random verification and write a JSON results file under `hfo_petting_zoo_results/`.
@@ -271,6 +297,16 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
 ---
 
 BLUF for agents: Use PREY, log to blackboard, respect chunk/tripwires, never ping the human, and don’t ship before Verify PASS. Align labels with HIVE/GROWTH/SWARM/PREY to stay in-family with Gen21.
+
+## Mission intent precondition and guards (Gen21)
+
+- Precondition: Do not create a mission intent for a given date until there are at least three Clarification Pass documents for that same date (Pass 1–3; Pass 4–5 recommended).
+- Enforcement:
+  - Local: pre-commit hook blocks commits of mission intents without ≥3 same-date clarification_pass_refs.
+  - CI: GitHub Action validates changed mission intent files and fails the check if the rule is violated.
+- Required references: mission intent must include clarification_pass_refs with ≥3 paths under `hfo_mission_intent/YYYY-MM-DD/` that exist and match the same date.
+- Hallucination policy: If fewer than 3 passes exist or dates mismatch, mark hallucination_flag: true and move the file to `archive/`.
+- LLM output budget default: set max_tokens=4000 per stage to avoid truncation; models may use fewer tokens as appropriate.
 
 ## Diagram rendering (Mermaid) — parser-safe conventions
 
@@ -348,10 +384,45 @@ Note: If a renderer still errors, simplify labels further and remove punctuation
   - Digest: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md`
   - JSON: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/arc_swarm_results.json`
 - Cost metrics (optional; env-driven):
+  - Engage receipts include LLM reasoning metadata (enabled/effort/removed_on_retry)
   - Default: `OPENROUTER_PRICE_DEFAULT_PER_1K=<usd>`
   - Per-model override (sanitized): `OPENROUTER_PRICE_OPENAI_GPT_OSS_20B_PER_1K=<usd>`
 - Transport resiliency (OSS models):
   - Client retries once on empty content and drops `response_format` on retry. Metrics include `empty_content` and `format_fails`.
 - Model selection (Swarmlord):
   - Prefer the best accuracy at acceptable latency and price. Use aggregated results across lanes; consider accuracy-per-dollar.
+
+### Update — ARC swarm lane artifacts and validation (2025-10-31)
+
+- ARC swarm runner now emits per-lane PREY artifacts for audit parity with the pilot:
+  - Path pattern per run: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/<sanitized_model>_lane_<n>/attempt_1/`
+  - Files per lane:
+    - `perception_snapshot.yml` — mission_id, lane, timestamp, dataset/split/limit, llm fields, paths
+    - `react_plan.yml` — cynefin rationale, approach plan, `chunk_limit_lines`, tripwires
+    - `engage_report.yml` — ARC metrics (total/correct/accuracy), latency/tokens, empty_content/format_fails
+    - `yield_summary.yml` — evidence_refs (must include the three above) and verify expectations
+- A lane-level validator runs post-Yield and appends a blackboard receipt: "artifact validation PASS/FAIL" with evidence_refs to the four files.
+- Run-level outputs remain unchanged: `swarmlord_digest.md` and `arc_swarm_results.json` are still produced under the run directory.
+
+### OpenAI/GPT low-token behavior (note)
+
+- Observation
+  - On OpenAI GPT‑OSS models, very low `max_tokens` budgets lead to frequent empty responses and format errors on ARC-like tasks.
+  - In controlled runs on the ARC validation split (OSS-only, many lanes), increasing `max_tokens` reduced empties and improved accuracy:
+    - 100 tokens: high empty_content counts; depressed accuracy
+    - 200 tokens: empties drop by an order of magnitude; large accuracy jump
+    - 400 tokens: empties near zero; accuracy near plateau for this task
+- Guidance
+  - General default (GPT‑OSS): set `max_tokens ≈ 1000` to give the model ample headroom for typical tasks; cost impact is small on these models.
+  - ARC-like multiple-choice: `max_tokens >= 200` works; `>= 400` yields near-zero empties. Using 1000 is fine if cost is trivial.
+  - Resiliency in client remains enabled (retry-on-empty, optional no `response_format`).
+  - Small-batch checks at 1k and 2k token budgets (validation limit=50, 5 lanes/model) showed empty_content=0 and accuracy comparable to 400 tokens, confirming a plateau:
+    - 1k tokens: 20B ≈ 93.6% (234/250), 120B ≈ 93.2% (233/250)
+    - 2k tokens: 20B ≈ 92.4% (231/250), 120B ≈ 94.8% (237/250)
+  - Cutoff: Practical stabilization by 200–400 tokens for ARC-like tasks on GPT‑OSS; higher budgets do not materially improve accuracy but increase cost. Use ~1000 by default for broader tasks.
+
+Environment tip
+- To set a higher default globally while keeping per-run overrides, export:
+  - `OPENROUTER_MAX_TOKENS=1000`
+  - Optionally tune per mission via mission intent `llm.max_tokens`.
 

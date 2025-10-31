@@ -1,0 +1,1 @@
+{"model": "openai/gpt-oss-20b", "attempt": 1, "status_code": 200, "latency_ms": 818, "total_latency_ms": 818, "has_usage": true, "content_len": 0, "raw_json_len": 520, "empty_content": true}

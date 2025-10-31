@@ -1,0 +1,10 @@
+# Tiny schema for mission_pointer.yml (pilot)
+# Types: str | dict | list | int | float | bool
+
+mission_pointer.yml:
+  mission_id: str
+  timestamp: str
+  intent_path: str
+  lanes: dict
+  quorum: dict
+  telemetry: dict

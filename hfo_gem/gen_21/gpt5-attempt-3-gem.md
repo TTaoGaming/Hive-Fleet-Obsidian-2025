@@ -261,6 +261,16 @@ flowchart LR
 - safety summary (tripwire/canary/revert status)
 - blockers (blocked_capabilities and unresolved gaps)
 
+### PREY per-step artifacts (pilot implementation)
+- Each PREY lane emits four YAML artifacts at Yield time (attempt_1):
+  - perception_snapshot.yml — mission_id, lane, timestamp, trace_id, safety, llm, paths
+  - react_plan.yml — cynefin rationale and approach (tripwires, quorum)
+  - engage_report.yml — actions taken and LLM metadata under safety
+  - yield_summary.yml — collected agents and evidence_refs (must include the core three)
+- Swarmlord writes a run-level mission pointer (mission_pointer.yml) and a digest (swarmlord_digest.md) per run; the digest includes a Trace pointer to `temp/otel/trace-*.jsonl`.
+- A lane-level validator checks presence and minimal schema for the four artifacts and contributes a vote to Verify quorum.
+- CI runs the pilot in dry-run mode, validates JSON/JSONL (blackboard), asserts span-level parallelism with the trace analyzer, and fails on placeholders or missing artifacts.
+
 ### Examples: Swarmlord prompts to workers (internal only)
 - "Perceive: Snapshot repo structure and detect existing mission_intent.yml; report file counts and notable configs."
 - "React: Classify complexity and propose chunk plan to reach 1000+ lines with ≤200-line writes; list tripwires."
@@ -286,6 +296,19 @@ flowchart LR
 - Mission intent can request one lane per allowlisted model using `lanes.models: all`, or a specific subset via `lanes.models: [..]` (substring match against the allowlist). Fallback mode uses `lanes.count` and optional `lanes.names`.
 - Each lane receives a lane-specific `model_hint` carried into React (planner/bridger) and Engage (shaper) calls; reasoning and LLM limits follow the mission’s `llm` block or environment overrides.
 - Each PREY run emits a digest bundle at `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md` containing a BLUF, a lane↔model matrix, and a parser-safe Mermaid diagram. The blackboard `yield` receipt references this digest and the OTEL trace file.
+
+### LLM token budget policy (OpenAI/GPT‑OSS) — fix empty/format errors
+- Problem summary: Very low `max_tokens` on GPT‑OSS can produce empty responses or format errors on some tasks. Increasing the response budget removes these failures.
+- Policy (applies across Crew AI PREY lanes unless overridden by mission intent):
+  - Default: set `max_tokens ≈ 1000` for GPT‑OSS to give headroom on general tasks. Cost is typically trivial for these models.
+  - Minimum: never go below `max_tokens = 200` on GPT‑OSS. Below this, empty/content-format failures become common.
+  - ARC-like multiple-choice tasks: `max_tokens ≥ 400` achieves near-zero empties; 1000 is fine if cost is not a concern.
+  - Non-OSS/other providers: keep reasonable headroom; tune per-model as needed.
+- Evidence: Small-batch ARC validation runs showed a plateau by 200–400 tokens with zero empties at 400, and no material accuracy gains at 1k–2k vs 400. See `AGENTS.md` (OpenAI/GPT low-token behavior) for numbers and references.
+- How to set:
+  - Mission intent: set `llm.max_tokens: 1000` as a default; override per mission/task as needed.
+  - Environment: export `OPENROUTER_MAX_TOKENS=1000` to enforce across processes; per-run flags may still override.
+  - Optional: use `OPENROUTER_FORCE_NO_RESPONSE_FORMAT_MODELS` to disable response_format on first attempt for fragile models; the client already retries on empty.
 
 
 ## Section 9: Cold-Start Bootstrap (≤3 manual steps; repo-agnostic)

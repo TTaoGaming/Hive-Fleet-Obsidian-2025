@@ -24,23 +24,20 @@ from typing import Any, Dict, Optional, List
 import requests
 
 DEFAULT_BASE_URL = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+DIAG_DIR = os.environ.get("OPENROUTER_DIAG_DIR")  # optional: where to write diag logs
 
 # Strict allowlist (user-defined)
 # Note: Only these models can be selected. Hints outside this set will fall back to the first entry.
 # Order reflects priority. You can override selection with OPENROUTER_MODEL_HINT.
 ALLOWLIST = [
-    # Preferred, modern, reasoning-capable or fast models
-    "openai/gpt-5-mini",
-    "x-ai/grok-4-fast",
-    "minimax/minimax-m2",
-    "deepseek/deepseek-v3.2-exp",
-    "deepseek/deepseek-v3.1-terminus",
-    # Existing backups and test models
-    "deepseek/deepseek-chat-v3-0324",
-    "qwen/qwen3-235b-a22b-2507",
-    "x-ai/grok-code-fast-1",
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b",
+    # Requested, tightened allowlist (order = priority)
+    "openai/gpt-5-mini",           # gpt 5 mini (reasoning high)
+    "minimax/minimax-m2",          # minimax m2
+    "openai/gpt-oss-120b",         # gpt oss 120b
+    "openai/gpt-oss-20b",          # gpt oss 20b
+    "x-ai/grok-4-fast",            # grok 4 fast
+    "deepseek/deepseek-v3.2-exp",  # deepseek v3.2
+    "qwen/qwen3-235b-a22b-2507",   # Qwen3 235B A22B Instruct 2507
 ]
 
 # Models that support a reasoning parameter (best-effort list)
@@ -48,8 +45,8 @@ REASONING_MODELS = {
     "openai/gpt-5-mini",
     "x-ai/grok-4-fast",
     "deepseek/deepseek-v3.2-exp",
-    "deepseek/deepseek-v3.1-terminus",
     "minimax/minimax-m2",
+    "qwen/qwen3-235b-a22b-2507",
 }
 
 
@@ -62,6 +59,33 @@ def _select_model(model_hint: Optional[str]) -> str:
                 return m
     # Fallback to first allowlisted model
     return ALLOWLIST[0]
+
+
+def _should_force_no_response_format(model: str) -> bool:
+    """Return True if env OPENROUTER_FORCE_NO_RESPONSE_FORMAT_MODELS matches this model.
+    Accepts comma-separated substrings (case-insensitive).
+    """
+    raw = os.environ.get("OPENROUTER_FORCE_NO_RESPONSE_FORMAT_MODELS", "")
+    if not raw.strip():
+        return False
+    filters = [s.strip().lower() for s in raw.split(",") if s.strip()]
+    m = model.lower()
+    return any(f in m for f in filters)
+
+
+def _diag_write(event: dict) -> None:
+    if not DIAG_DIR:
+        return
+    try:
+        import json, time
+        from pathlib import Path
+        p = Path(DIAG_DIR)
+        p.mkdir(parents=True, exist_ok=True)
+        fn = p / f"diag_{int(time.time()*1000)}.jsonl"
+        with fn.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
 
 
 def _coerce_int(val: Optional[str], default: int) -> int:
@@ -184,22 +208,33 @@ def call_openrouter(
         "temperature": temperature,
     }
     # Hint to prefer plain text when supported; gracefully ignored otherwise
-    if response_format_type:
+    # Force-drop response_format for specific models if instructed by env
+    if response_format_type and not _should_force_no_response_format(model):
         payload["response_format"] = {"type": response_format_type}
 
-    # Reasoning controls: enable when requested and model is in supported set
+    # Reasoning controls: auto-enable 'high' when supported unless explicitly overridden by mission/env
+    env_reason = os.environ.get("OPENROUTER_REASONING")
+    env_effort = os.environ.get("OPENROUTER_REASONING_EFFORT")
+
     if enable_reasoning is None:
-        # Allow env override: OPENROUTER_REASONING=true/false, OPENROUTER_REASONING_EFFORT
-        env_reason = os.environ.get("OPENROUTER_REASONING")
-        enable_reasoning = (str(env_reason).lower() in {"1", "true", "yes"}) if env_reason is not None else False
+        if env_reason is not None:
+            enable_reasoning = (str(env_reason).lower() in {"1", "true", "yes"})
+        else:
+            enable_reasoning = any(m in model for m in REASONING_MODELS)
+
     if reasoning_effort is None:
-        reasoning_effort = os.environ.get("OPENROUTER_REASONING_EFFORT", "medium")
+        if env_effort is not None:
+            reasoning_effort = env_effort
+        else:
+            reasoning_effort = "high" if (enable_reasoning and any(m in model for m in REASONING_MODELS)) else "medium"
+
     if enable_reasoning and any(m in model for m in REASONING_MODELS):
         payload["reasoning"] = {"effort": reasoning_effort}
 
     attempts = 0
     last_error: Optional[str] = None
     total_latency = 0
+    reasoning_removed_on_retry = False
     while True:
         attempts += 1
         t0 = time.time()
@@ -213,6 +248,10 @@ def call_openrouter(
                 # Retry on transport errors too
                 if retry_alt_format:
                     payload.pop("response_format", None)
+                # Also drop reasoning on retry to maximize compatibility
+                if "reasoning" in payload:
+                    payload.pop("reasoning", None)
+                    reasoning_removed_on_retry = True
                 continue
             return {
                 "ok": False,
@@ -221,6 +260,9 @@ def call_openrouter(
                 "content": None,
                 "error": last_error,
                 "status_code": None,
+                "reasoning_enabled": False,
+                "reasoning_effort": None,
+                "reasoning_removed_on_retry": reasoning_removed_on_retry,
             }
 
         if resp.status_code != 200:
@@ -228,6 +270,10 @@ def call_openrouter(
             if attempts <= retry_max:
                 if retry_alt_format:
                     payload.pop("response_format", None)
+                # If the provider rejects unknown fields, remove reasoning and retry once
+                if "reasoning" in payload:
+                    payload.pop("reasoning", None)
+                    reasoning_removed_on_retry = True
                 continue
             return {
                 "ok": False,
@@ -236,23 +282,56 @@ def call_openrouter(
                 "content": None,
                 "error": last_error,
                 "status_code": resp.status_code,
+                "reasoning_enabled": False,
+                "reasoning_effort": None,
+                "reasoning_removed_on_retry": reasoning_removed_on_retry,
             }
 
         usage = None
+        raw_len = None
         try:
             data = resp.json()
             content = _extract_content(data)
             usage = data.get("usage") if isinstance(data, dict) else None
+            try:
+                import json as _json
+                raw_len = len(_json.dumps(data))
+            except Exception:
+                raw_len = None
         except Exception:
             content = ""
             usage = None
+
+        # optional diagnostic log
+        _diag_write({
+            "model": model,
+            "attempt": attempts,
+            "status_code": resp.status_code,
+            "latency_ms": latency_ms,
+            "total_latency_ms": total_latency,
+            "has_usage": bool(usage),
+            "content_len": len(content or "") if content is not None else None,
+            "raw_json_len": raw_len,
+            "empty_content": not bool(str(content or "").strip()),
+        })
 
         # If content is empty and retry is allowed, try once more (possibly without response_format)
         if (content is None or not str(content).strip()) and retry_on_empty and attempts <= retry_max:
             if retry_alt_format:
                 payload.pop("response_format", None)
+            if "reasoning" in payload:
+                payload.pop("reasoning", None)
+                reasoning_removed_on_retry = True
             # slight jitter via no-op sleep avoided to keep fast
             continue
+
+        # Reasoning metadata for audit
+        used_reasoning_block = payload.get("reasoning") if isinstance(payload, dict) else None
+        reasoning_enabled_flag = bool(used_reasoning_block)
+        reasoning_effort_used = None
+        if isinstance(used_reasoning_block, dict):
+            effort_val = used_reasoning_block.get("effort")
+            reasoning_effort_used = effort_val if isinstance(effort_val, str) else None
 
         return {
             "ok": True,
@@ -262,4 +341,7 @@ def call_openrouter(
             "error": None,
             "status_code": resp.status_code,
             "usage": usage,
+            "reasoning_enabled": reasoning_enabled_flag,
+            "reasoning_effort": reasoning_effort_used,
+            "reasoning_removed_on_retry": reasoning_removed_on_retry,
         }

@@ -1,4 +1,13 @@
 repos:
+  - repo: local
+    hooks:
+      - id: mission-intent-guard
+        name: mission-intent-guard
+        entry: python3 scripts/validators/validate_mission_intents.py
+        language: system
+        types: [file]
+        files: ^hfo_mission_intent/.*/mission_intent.*\.yml$
+        exclude: (^hfo_mission_intent/.*/archive/)|mission_intent_template.yml
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:

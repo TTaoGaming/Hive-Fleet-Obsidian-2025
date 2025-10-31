@@ -26,3 +26,12 @@ from individual to a group or vice versa
 need alpha evolve
 open evolve for HFO
 meta evolution
+---
+i want to adjust the models allowed, I want it to be
+gpt 5 mini (reasoning high)
+minimax m2
+gpt oss 120b
+gpt oss 20b
+grok 4 fast
+deepseek v3.2
+Qwen3 235B A22B Instruct 2507

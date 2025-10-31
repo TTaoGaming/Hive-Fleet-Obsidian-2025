@@ -1,10 +1,13 @@
 # Mission Intent Template for HiveFleetObsidian
 # Usage Instructions:
 # - Copy this template to create a new daily file named: mission_intent.YYYY-MM-DD.yml (e.g., mission_intent.2025-10-29.yml)
+# - Precondition (required): Do NOT create a mission intent until there are at least THREE Clarification Pass documents for the SAME date under hfo_mission_intent/YYYY-MM-DD/.
+#   • Expected names: clarification_pass1_YYYY-MM-DD.md, clarification_pass2_YYYY-MM-DD.md, clarification_pass3_YYYY-MM-DD.md (Pass 4–5 optional but recommended).
+#   • If fewer than 3 clarification passes exist or the dates do not match, set hallucination_flag: true and move the file to archive/.
 # - Fill in goal, constraints, success_criteria, safety for the day's mission.
-# - Ensure only ONE file per day: Archive or delete any duplicates with the same date.
+# - Ensure only ONE mission intent file per day: Archive or delete any duplicates with the same date.
 # - Existing format preserved: goal (string), constraints (list), success_criteria (list), safety (object with tripwires, canary_plan, revert_plan), created_at (ISO timestamp), version (string).
-# - For standardization: All mission intents must follow this structure; non-compliant files go to archive/.
+# - Standardization policy: Mission intents MUST include clarification_pass_refs with ≥3 entries of same-date files; non-compliant files go to archive/ with hallucination_flag: true.
 # - Ready for today's new one: Duplicate to mission_intent.2025-10-29.yml and customize.
 
 goal: [Describe the primary goal for today's mission here. Keep concise and actionable.]
@@ -19,6 +22,18 @@ success_criteria:
   - [e.g., - Verification passes (lint, tests, dry-run)]
   - [e.g., - No data loss or errors in logs]
 
+# Clarification passes (REQUIRED: ≥3 references for same date)
+clarification_pass_refs:
+  - hfo_mission_intent/YYYY-MM-DD/clarification_pass1_YYYY-MM-DD.md
+  - hfo_mission_intent/YYYY-MM-DD/clarification_pass2_YYYY-MM-DD.md
+  - hfo_mission_intent/YYYY-MM-DD/clarification_pass3_YYYY-MM-DD.md
+# Optional additional passes
+#  - hfo_mission_intent/YYYY-MM-DD/clarification_pass4_YYYY-MM-DD.md
+#  - hfo_mission_intent/YYYY-MM-DD/clarification_pass5_YYYY-MM-DD.md
+
+# If clarification_pass_refs has <3 items or dates mismatch, mark hallucination and move to archive/
+hallucination_flag: false
+
 safety:
   tripwires:
     - [Measurable stop conditions, e.g., - Halt if checksum mismatch detected]
@@ -28,3 +43,20 @@ safety:
 
 created_at: [YYYY-MM-DDTHH:MM:SSZ, e.g., 2025-10-29T01:10:00Z]
 version: "1.0"  # Increment for updates to this daily intent
+
+# New: Mission context (upstream clarity block)
+# - Purpose: Provide narrative context and constraints that guide PREY perception and planning.
+# - Policy: Required for new mission intents; runs should fail fast if context is under-specified.
+mission_context:
+  required: true
+  min_lines: 5  # Increase for complex missions
+  fields:
+    - overview
+    - scope
+    - assumptions
+    - risks
+    - evidence_refs  # paths, line ranges, metrics, or URLs
+  provenance:
+    include_trace_id: true
+    include_evidence_hashes: true
+  # Do not leave placeholders like TODO; provide concrete, minimum 5 lines of context.
