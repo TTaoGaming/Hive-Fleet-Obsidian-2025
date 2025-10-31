@@ -298,6 +298,16 @@ Gate policy: PASS → persist/digest; FAIL → set regen_flag, shrink chunk, nar
 
 BLUF for agents: Use PREY, log to blackboard, respect chunk/tripwires, never ping the human, and don’t ship before Verify PASS. Align labels with HIVE/GROWTH/SWARM/PREY to stay in-family with Gen21.
 
+## Mission intent precondition and guards (Gen21)
+
+- Precondition: Do not create a mission intent for a given date until there are at least three Clarification Pass documents for that same date (Pass 1–3; Pass 4–5 recommended).
+- Enforcement:
+  - Local: pre-commit hook blocks commits of mission intents without ≥3 same-date clarification_pass_refs.
+  - CI: GitHub Action validates changed mission intent files and fails the check if the rule is violated.
+- Required references: mission intent must include clarification_pass_refs with ≥3 paths under `hfo_mission_intent/YYYY-MM-DD/` that exist and match the same date.
+- Hallucination policy: If fewer than 3 passes exist or dates mismatch, mark hallucination_flag: true and move the file to `archive/`.
+- LLM output budget default: set max_tokens=4000 per stage to avoid truncation; models may use fewer tokens as appropriate.
+
 ## Diagram rendering (Mermaid) — parser-safe conventions
 
 To keep diagrams rendering across strict Mermaid parsers and various viewers:

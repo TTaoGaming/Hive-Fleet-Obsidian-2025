@@ -1,0 +1,254 @@
+mission_id: mi_2025-10-31
+version: v1
+created_at: 2025-10-31T00:00:00Z
+orchestrator: Swarmlord of Webs
+interface:
+  sole_human_interface: true
+  contact_policy:
+    digest_only: true
+    on_critical_error: return_to_user
+    on_timeout: return_best_partial_with_plan
+    note: Workers never prompt the human mid-loop; minimal babysitting.
+mission_context:
+  required: true
+  min_lines: 5
+  fields:
+    - overview
+    - scope
+    - assumptions
+    - risks
+    - evidence_refs
+  provenance:
+    include_trace_id: true
+    include_evidence_hashes: true
+  notes: |
+    This context guides PREY perception and react planning.
+    Runs will fail validation if mission_context.min_lines is not met.
+    Workers never prompt the human mid-loop; the Swarmlord facade is the sole interface.
+    Limits (tokens and timeouts) act as safeguards for sanity, not as blockers of normal runs.
+    Deterministic Verify is required before any digest; receipts and evidence are mandatory.
+  user_touchpoints:
+    - clarification
+    - digest
+clarification_pass_refs:
+  - hfo_mission_intent/2025-10-31/clarification_pass1_2025-10-31.md
+  - hfo_mission_intent/2025-10-31/clarification_pass2_2025-10-31.md
+  - hfo_mission_intent/2025-10-31/clarification_pass3_2025-10-31.md
+  - hfo_mission_intent/2025-10-31/clarification_pass4_2025-10-31.md
+  - hfo_mission_intent/2025-10-31/clarification_pass5_2025-10-31.md
+orchestration:
+  doctrine: JADC2_mosaic
+  c2: swarmlord
+  lanes_alias: tiles   # PREY lanes are treated as mosaic tiles that disperse and converge
+provider: arc
+arc:
+  split: validation
+  limit: 50
+  seed: 42
+anytime_behavior: true
+background_scheduler: true
+quorum:
+  validators: [immunizer, disruptor, verifier_aux]
+  threshold: 2   # run-level Verify aggregator across lanes
+  performed_by: swarmlord   # explicit for now; will spin up dedicated quorum role later
+  future_role_candidate: quorum_officer
+  procedure:
+    - collect_lane_yields
+    - assert_lane_yield_validated
+    - aggregate_votes
+    - decide_pass_fail_threshold_2_of_3
+telemetry:
+  blackboard_path: hfo_blackboard/obsidian_synapse_blackboard.jsonl
+  emit_opentelemetry: true
+  otel_format: json
+  visualizations:
+    emit_topology_json: true
+    emit_mermaid_summaries: true
+    outdir: temp/otel/viz
+safety:
+  chunk_size_max: 200
+  placeholder_ban: true
+  revert_plan: true
+  canary_first: true
+  tripwires:
+    - line_count
+    - placeholder_scan
+    - tests_green
+    - policy_checks
+llm:
+  per_stage_defaults:
+    orchestrate: { model: openai/gpt-oss-120b, max_tokens: 2000 }
+    perceive:    { model: openai/gpt-oss-120b, max_tokens: 2000 }
+    react:       { model: openai/gpt-oss-120b, max_tokens: 2000 }
+    engage:      { model: openai/gpt-oss-120b, max_tokens: 2000 }
+    yield:       { model: openai/gpt-oss-120b, max_tokens: 2000 }
+    digest:      { model: openai/gpt-oss-120b, max_tokens: 2000 }
+  allow_overrides: true
+  override_via_env: true
+  transport_resiliency:
+    retry_on_empty: 1
+    drop_response_format_on_retry: true
+timeouts:
+  lane_cycle_soft_minutes: 5
+  mission_soft_minutes: 30
+lanes:
+  count: 10
+  names: [lane_a, lane_b, lane_c, lane_d, lane_e, lane_f, lane_g, lane_h, lane_i, lane_j]
+  policy:
+    auto_retries_max: 3
+    shrink_scope_on_retry: true
+    backpressure:
+      enabled: true
+      fairness: time_sliced
+  max_workers: 10
+
+# Virtual stigmergy layer
+stigmergy:
+  enabled: true
+  substrate: blackboard_jsonl
+  path: hfo_blackboard/obsidian_synapse_blackboard.jsonl
+  signals:
+    qualitative: true
+    quantitative: true
+  dynamics:
+    attraction_weight: 0.7
+    repulsion_weight: 0.3
+    evaporation_ttl_seconds: 7200
+    diffusion_coefficient: 0.2
+  mesh_quorum:
+    enabled: true
+    topology: small_world
+    performed_by: swarmlord
+    future_role_candidate: quorum_officer
+  coordination:
+    via_blackboard_only: true
+    no_manual_touches: true
+
+# TDD acceptance criteria embedded for PREY lanes
+# Lanes must reference this spec when producing artifacts and decisions.
+tdd:
+  red_green_refactor: true
+  required:
+    - failing_test_reproduced_or_written
+    - smallest_change_to_green
+    - tests_run_with_metrics
+    - refactor_if_green
+  negative_control_recommended: true
+
+prey_artifacts:
+  perception_snapshot:
+    required_fields:
+      - mission_id
+      - lane
+      - timestamp
+      - safety_envelope
+      - llm
+      - paths
+      - tdd_mode
+      - context_notes   # short narrative for traceability
+      - trace_id
+      - parent_refs
+      - evidence_hashes
+    context_notes_min_lines: 3
+  react_plan:
+    required_fields:
+      - cynefin_rationale
+      - approach_plan
+      - chunk_limit_lines
+      - tripwires
+      - acceptance_criteria   # tie to tdd.required and safety/tripwires
+      - context_notes
+      - trace_id
+      - parent_refs
+      - evidence_hashes
+    context_notes_min_lines: 3
+  engage_report:
+    success_criteria:
+      - tests_green
+      - tripwires_passed
+      - evidence_refs_present
+    safety_criteria:
+      - chunk_size_respected
+      - placeholder_ban_no_violations
+      - revert_plan_documented
+    required_fields:
+      - changes_summary
+      - metrics_summary
+      - context_notes
+      - trace_id
+      - parent_refs
+      - evidence_hashes
+    context_notes_min_lines: 3
+  yield_summary:
+    evidence_refs_must_include:
+      - perception_snapshot.yml
+      - react_plan.yml
+      - engage_report.yml
+    validate_in_yield: true
+    validation_checklist:
+      - perception_snapshot_exists
+      - react_plan_exists
+      - engage_report_exists
+      - tests_green_true
+      - tripwires_all_pass
+      - evidence_refs_complete
+      - context_notes_min_lines_met
+    required_fields:
+      - lane_summary
+      - recommendations
+      - context_notes
+      - trace_id
+      - parent_refs
+      - evidence_hashes
+    context_notes_min_lines: 3
+
+verify:
+  run_level_quorum: true
+  description: Aggregate lane yields deterministically; validators = immunizer, disruptor, verifier_aux; threshold = 2/3; performed_by = swarmlord.
+  hallucination_policy:
+    grounding_required: true
+    evidence_refs_required: true
+    max_rate_target: 0.05
+    action_on_violation: shrink_scope_and_rerun
+# Provenance and lineage (W3C PROV inspired)
+provenance:
+  standard: w3c_prov
+  entities: [perception_snapshot, react_plan, engage_report, yield_summary, digest, quorum_report]
+  activities: [perceive, react, engage, yield, verify_quorum, digest]
+  agents: [lanes, swarmlord, immunizer, disruptor, verifier_aux]
+  attestation:
+    lane_yield_attestation: true
+    quorum_attestation: true
+  hashing:
+    algorithm: sha256
+    compute_evidence_hashes: true
+    compute_run_merkle_root: true
+    include: [artifacts, receipts]
+  lineage_graph:
+    emit_json: true
+    outdir: temp/otel/viz
+
+digest:
+  built_by: swarmlord
+  validate_digest: true
+  validation_checklist:
+    - bluf_present
+    - matrix_present
+    - diagrams_present
+    - diagrams_parser_safe
+    - executive_summary_present
+    - evidence_refs_complete
+
+outputs:
+  digest_shape: [BLUF, matrix, diagrams, executive_summary]
+  optional_sections: [notes]
+  evidence_required: true
+
+notes:
+  - Yield includes lane-level deterministic validation before run-level Verify aggregation.
+  - LLM defaults are uniform at 2000 tokens and gpt-oss-120b across stages; override/tune later.
+  - Receipts are required for material actions and must reference artifacts by path.
+  - PREY lanes operate as JADC2 mosaic tiles; Swarmlord acts as strategic C2 and performs quorum aggregation for now.
+  - Each artifact includes context_notes with a minimum of 3 lines to aid traceability from intent to yield.
+  - Stigmergy governs coordination and quorum via the blackboard; signals include qualitative and quantitative dimensions with attraction, repulsion, evaporation TTL, and diffusion.
+  - Mission context block establishes upstream clarity; canary and validators should fail fast if context is insufficient.
