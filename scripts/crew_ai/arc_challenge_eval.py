@@ -6,12 +6,12 @@ ARC-Challenge evaluation harness (research-grade, lightweight):
 - Prompts LLM to output only the choice letter and parses strictly
 
 Usage examples:
-  # default: validation split, limit 0 (=all), uses env OPENROUTER_MODEL_HINT if set
-  python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
+    # default: validation split, budgeted run (limit 200), uses env OPENROUTER_MODEL_HINT if set
+    python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
 
   # select a specific model
-  OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
-    python3 scripts/crew_ai/arc_challenge_eval.py --limit 0
+    OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
+        python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
 
   # write JSON results
   python3 scripts/crew_ai/arc_challenge_eval.py --limit 200 --output temp/evals/arc_challenge_results.json
@@ -78,7 +78,7 @@ def run_eval(
     limit: int = 0,
     offset: int = 0,
     seed: Optional[int] = None,
-    max_tokens: int = 12,
+    max_tokens: int = 400,
     temperature: float = 0.0,
     timeout_seconds: int = 25,
 ) -> ARCResult:
@@ -163,12 +163,13 @@ def run_eval(
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="ARC-Challenge (validation) evaluation")
-    ap.add_argument("--limit", type=int, default=200, help="Limit number of items (0 = all)")
+    ap.add_argument("--limit", type=int, default=200, help="Limit number of items (0 = all; requires --allow-full or ALLOW_FULL_ARC=1)")
     ap.add_argument("--split", type=str, default="validation", choices=["train", "validation", "test"])
-    ap.add_argument("--max-tokens", type=int, default=12)
+    ap.add_argument("--max-tokens", type=int, default=400)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--timeout-seconds", type=int, default=25)
     ap.add_argument("--output", type=str, default="", help="Optional JSON output path")
+    ap.add_argument("--allow-full", action="store_true", help="Explicitly allow full-dataset run when --limit 0 is set")
     args = ap.parse_args()
 
     # Load env for key and model hint
@@ -178,6 +179,17 @@ def main() -> None:
         print("No OPENROUTER_API_KEY found. Set it in .env to run ARC-Challenge eval.")
         return
     model_hint = os.environ.get("OPENROUTER_MODEL_HINT")
+
+    # Guard rails: prevent accidental full-dataset runs
+    env_allow_full = str(os.environ.get("ALLOW_FULL_ARC", "")).lower() in ("1", "true", "yes", "y")
+    if args.limit is None:
+        args.limit = 200
+    if args.limit < 0:
+        print("Guard: --limit must be >= 0 (0 only with --allow-full).")
+        return
+    if args.limit == 0 and not (args.allow_full or env_allow_full):
+        print("Guard: --limit 0 (full) requires --allow-full or ALLOW_FULL_ARC=1. For budgeted runs, use --limit 200.")
+        return
 
     result = run_eval(
         model_hint=model_hint,

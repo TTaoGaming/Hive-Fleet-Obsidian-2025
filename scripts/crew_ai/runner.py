@@ -61,7 +61,13 @@ def load_intent(path: Path) -> Dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str, model_hint: Optional[str] = None) -> Dict[str, Any]:
+def lane_prey_cycle(
+    mission: Dict[str, Any],
+    lane_name: str,
+    trace_id: str,
+    model_hint: Optional[str] = None,
+    run_dir: Optional[Path] = None,
+) -> Dict[str, Any]:
     mission_id = mission.get("mission_id", f"mi_{now_z()}")
     safety = mission.get("safety", {})
     telemetry = mission.get("telemetry", {})
@@ -107,6 +113,66 @@ def lane_prey_cycle(mission: Dict[str, Any], lane_name: str, trace_id: str, mode
         write_span(trace_id, span)
         evidence.append(f"lane={lane_name}:{phase}")
         phases_seen.append(phase)
+
+        # If this is the Perceive phase, write a human/machine-friendly perception snapshot YAML
+        if phase == "perceive":
+            try:
+                # Compute an output folder for this lane/attempt under the current run directory
+                # Default to temp/ if run_dir is not provided (should be provided by runner)
+                base_dir = run_dir if run_dir is not None else (ROOT / "temp" / "crew_ai_runs")
+                lane_out = base_dir / str(lane_name) / "attempt_1"
+                lane_out.mkdir(parents=True, exist_ok=True)
+                effective_model = model_hint or os.environ.get("OPENROUTER_MODEL_HINT") or None
+                llm_cfg = mission.get("llm", {})
+                snapshot = {
+                    "mission_id": mission_id,
+                    "lane": lane_name,
+                    "timestamp": ts,
+                    "trace_id": trace_id,
+                    "prey_phases": [p for p, _ in phases],
+                    "safety": {
+                        "chunk_size_max": safety.get("chunk_size_max", 200),
+                        "placeholder_ban": safety.get("placeholder_ban", True),
+                        "tripwires": mission.get("safety", {}).get("tripwires", []),
+                    },
+                    "llm": {
+                        "model_hint": effective_model,
+                        "max_tokens": int(llm_cfg.get("max_tokens", 72)),
+                        "temperature": float(llm_cfg.get("temperature", 0.2)),
+                        "timeout_seconds": int(llm_cfg.get("timeout_seconds", 25)),
+                        "response_format_type": llm_cfg.get("response_format_type", "text"),
+                        "reasoning": bool(llm_cfg.get("reasoning", False)),
+                        "reasoning_effort": llm_cfg.get("reasoning_effort", "medium"),
+                        "allowlist": list(MODEL_ALLOWLIST),
+                        "api_key_present": bool(os.environ.get("OPENROUTER_API_KEY")),
+                    },
+                    "paths": {
+                        "blackboard": str(BLACKBOARD.relative_to(ROOT)),
+                        "spans": f"temp/otel/{trace_id}.jsonl",
+                        "lane_dir": str(lane_out.relative_to(ROOT)) if lane_out.is_relative_to(ROOT) else str(lane_out),
+                    },
+                }
+                snap_path = lane_out / "perception_snapshot.yml"
+                with snap_path.open("w", encoding="utf-8") as f:
+                    yaml.safe_dump(snapshot, f, sort_keys=False)
+                # Log a focused receipt referencing the snapshot
+                append_blackboard({
+                    "mission_id": mission_id,
+                    "phase": "perceive",
+                    "summary": f"lane={lane_name}: perception_snapshot.yml written",
+                    "evidence_refs": [str(snap_path.relative_to(ROOT)) if snap_path.is_relative_to(ROOT) else str(snap_path)],
+                    "timestamp": now_z(),
+                })
+                evidence.append(str(snap_path.relative_to(ROOT)) if snap_path.is_relative_to(ROOT) else str(snap_path))
+            except Exception as e:
+                append_blackboard({
+                    "mission_id": mission_id,
+                    "phase": "perceive",
+                    "summary": f"lane={lane_name}: perception snapshot write failed: {e}",
+                    "evidence_refs": [f"lane:{lane_name}", "phase:perceive"],
+                    "timestamp": now_z(),
+                    "regen_flag": True,
+                })
 
         # Run role agents aligned to the current PREY phase
         agent_map = {
@@ -328,13 +394,20 @@ def run(intent_path: Path) -> int:
         names = [str(n) for n in names][:count]
         lane_to_model = {str(n): os.environ.get("OPENROUTER_MODEL_HINT") for n in names}
 
-    trace_id = f"trace-{mission_id}-{int(time.time()*1000)}"
+    # Create a run directory upfront so that Perceive can write its snapshot there
+    date_dir = RESULTS_ROOT / datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    date_dir.mkdir(parents=True, exist_ok=True)
+    run_ts = int(time.time()*1000)
+    run_dir = date_dir / f"run-{run_ts}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    trace_id = f"trace-{mission_id}-{run_ts}"
 
     # Execute lanes concurrently to achieve true parallel swarm behavior
     lane_results: List[Dict[str, Any]] = []
     max_workers = int(lanes.get("max_workers", 0)) or len(names)
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(lane_prey_cycle, mission, name, trace_id, lane_to_model.get(name)): name for name in names}
+        futures = {executor.submit(lane_prey_cycle, mission, name, trace_id, lane_to_model.get(name), run_dir): name for name in names}
         for fut in as_completed(futures):
             lane_results.append(fut.result())
 
@@ -351,11 +424,7 @@ def run(intent_path: Path) -> int:
         "timestamp": now_z(),
     })
 
-    # Write digest file under hfo_crew_ai_swarm_results
-    date_dir = RESULTS_ROOT / datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    date_dir.mkdir(parents=True, exist_ok=True)
-    run_dir = date_dir / f"run-{int(time.time()*1000)}"
-    run_dir.mkdir(parents=True, exist_ok=True)
+    # Write digest file under the same run directory
     matrix_lines = ["| Lane | Model | Notes |", "|---|---|---|"]
     for n in sorted(lane_to_model.keys()):
         model = lane_to_model.get(n) or os.environ.get("OPENROUTER_MODEL_HINT") or "default"

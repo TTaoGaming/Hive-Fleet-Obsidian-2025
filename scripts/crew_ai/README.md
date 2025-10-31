@@ -35,9 +35,20 @@ python3 scripts/crew_ai/runner.py \
 Outputs:
 - Blackboard receipts in `hfo_blackboard/obsidian_synapse_blackboard.jsonl`
 - Spans in `temp/otel/trace-*.jsonl`
+- Perception snapshot per lane at start of PREY: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/lane_<name>/attempt_1/perception_snapshot.yml`
 
 Notes:
 - If no `OPENROUTER_API_KEY` is set, the Engage step gracefully skips the remote call and records a failed but non-fatal audit.
+
+### Perception snapshot (human + machine)
+
+Each lane writes a YAML snapshot during the Perceive phase capturing:
+- mission_id, lane, timestamp, trace_id
+- PREY phases, safety (chunk limits, placeholder ban, tripwires)
+- LLM config summary (model_hint, tokens, temperature, timeout, response_format, reasoning, allowlist, api_key presence)
+- Paths (blackboard, spans file, lane_dir)
+
+Use this to debug context and to feed downstream tools or validators without scraping logs.
 
 ## Next steps
 - Add budgeting/rate limits per mission to cap LLM calls.
@@ -72,19 +83,31 @@ Scoring notes:
 
 Evaluate models on the official AI2 ARC-Challenge dataset (validation split by default). This is a standard, widely-used benchmark for non-trivial reasoning.
 
-Single-model run:
+Single-model run (budgeted defaults):
 ```bash
-# uses env OPENROUTER_MODEL_HINT if set
+# uses env OPENROUTER_MODEL_HINT if set; default max_tokens=400
 python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
 
-# or pick a model explicitly
+# or pick a model explicitly (still budgeted)
 OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
-  python3 scripts/crew_ai/arc_challenge_eval.py --limit 0
+  python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
 ```
 
-Swarm run (one lane per allowlisted model):
+Swarm run (one or more lanes per allowlisted model):
 ```bash
+# default: 1–2 lanes per model, limit 200, max_tokens=400
 python3 scripts/crew_ai/arc_swarm_runner.py --limit 200
+
+# example: 2 lanes/model, limit 100, 1k tokens, high reasoning, extended timeout
+OPENROUTER_MAX_TOKENS=1000 \
+OPENROUTER_REASONING=true \
+OPENROUTER_REASONING_EFFORT=high \
+OPENROUTER_TIMEOUT_SECONDS=60 \
+python3 scripts/crew_ai/arc_swarm_runner.py \
+  --limit 100 \
+  --lanes-per-model 2 \
+  --max-tokens 1000 \
+  --timeout-seconds 60
 ```
 
 Outputs:
@@ -92,5 +115,20 @@ Outputs:
 - JSON: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/arc_swarm_results.json`
 
 Notes:
-- Limit defaults to 200 for cost control; set `--limit 0` for the full split.
+- Limit defaults to 200 for cost control.
+- Guardrails: `--limit 0` (full split) requires `--allow-full` or `ALLOW_FULL_ARC=1` to avoid accidental all-up runs.
 - Accuracy is computed on the validation split for easy, labeled scoring.
+
+### Budget and limits (recommended)
+
+- Smoke: `limit=50`, `lanes-per-model=1`, `max_tokens=400`
+- Quick compare: `limit=100`, `lanes-per-model=1–2`, `max_tokens=400–1000`
+- Balanced default: `limit=200`, `lanes-per-model=2`, `max_tokens=400`
+- Robust snapshot: `limit=500`, `lanes-per-model=1–2`, `max_tokens=400–1000`
+
+Reasoning controls are env-driven and applied to supported models only:
+- `OPENROUTER_REASONING=true|false`
+- `OPENROUTER_REASONING_EFFORT=low|medium|high` (default: medium)
+
+Optional cost estimates:
+- Set `OPENROUTER_PRICE_DEFAULT_PER_1K=<usd>` or per-model keys like `OPENROUTER_PRICE_OPENAI_GPT_OSS_20B_PER_1K=<usd>` to see estimated spend in the digest.

@@ -120,7 +120,7 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=200, help="Limit items per lane (0 = all; requires --allow-full)")
     ap.add_argument("--lanes-per-model", type=int, default=2, help="Parallel lanes per model")
     ap.add_argument("--split", type=str, default="validation", choices=["train", "validation", "test"])
-    ap.add_argument("--max-tokens", type=int, default=12)
+    ap.add_argument("--max-tokens", type=int, default=400)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--timeout-seconds", type=int, default=25)
     ap.add_argument("--models", type=str, default="", help="Comma-separated substrings to filter allowlisted models (e.g., 'gpt-oss,deepseek')")
@@ -162,6 +162,49 @@ def main() -> None:
         "blocked_capabilities": [],
         "timestamp": now_z(),
     })
+
+    # Write a top-level perception snapshot for the swarm run
+    try:
+        snapshot = {
+            "mission_id": mission_id,
+            "timestamp": now_z(),
+            "runner": "arc_swarm",
+            "dataset": "ai2_arc/ARC-Challenge",
+            "split": args.split,
+            "limit": args.limit,
+            "lanes_per_model": int(args.lanes_per_model),
+            "models": list(allowlist),
+            "llm": {
+                "max_tokens": int(args.max_tokens),
+                "temperature": float(args.temperature),
+                "timeout_seconds": int(args.timeout_seconds),
+                "api_key_present": bool(os.environ.get("OPENROUTER_API_KEY")),
+            },
+            "paths": {
+                "blackboard": str(BLACKBOARD.relative_to(ROOT)),
+                "run_dir": str(run_dir.relative_to(ROOT)),
+            },
+        }
+        snap_path = run_dir / "perception_snapshot.yml"
+        import yaml as _yaml  # local import to avoid global dependency confusion
+        with snap_path.open("w", encoding="utf-8") as f:
+            _yaml.safe_dump(snapshot, f, sort_keys=False)
+        append_blackboard({
+            "mission_id": mission_id,
+            "phase": "perceive",
+            "summary": "ARC swarm perception_snapshot.yml written",
+            "evidence_refs": [str(snap_path.relative_to(ROOT))],
+            "timestamp": now_z(),
+        })
+    except Exception as e:
+        append_blackboard({
+            "mission_id": mission_id,
+            "phase": "perceive",
+            "summary": f"ARC swarm snapshot write failed: {e}",
+            "evidence_refs": ["runner:arc_swarm"],
+            "timestamp": now_z(),
+            "regen_flag": True,
+        })
 
     results: List[Dict[str, Any]] = []
     lanes = []
