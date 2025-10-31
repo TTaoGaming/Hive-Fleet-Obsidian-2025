@@ -117,19 +117,31 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="ARC-Challenge swarm runner across allowlisted models")
-    ap.add_argument("--limit", type=int, default=200, help="Limit items per lane (0 = all)")
+    ap.add_argument("--limit", type=int, default=200, help="Limit items per lane (0 = all; requires --allow-full)")
     ap.add_argument("--lanes-per-model", type=int, default=2, help="Parallel lanes per model")
     ap.add_argument("--split", type=str, default="validation", choices=["train", "validation", "test"])
     ap.add_argument("--max-tokens", type=int, default=12)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--timeout-seconds", type=int, default=25)
     ap.add_argument("--models", type=str, default="", help="Comma-separated substrings to filter allowlisted models (e.g., 'gpt-oss,deepseek')")
+    ap.add_argument("--allow-full", action="store_true", help="Explicitly allow full-dataset run when --limit 0 is set")
     args = ap.parse_args()
 
     load_dotenv(dotenv_path=ROOT / ".env", override=False)
     if not os.environ.get("OPENROUTER_API_KEY"):
         print("No OPENROUTER_API_KEY found. Set it in .env to run the swarm.")
         return
+
+    # Guard: prevent accidental full-dataset runs unless explicitly allowed
+    env_allow_full = str(os.environ.get("ALLOW_FULL_ARC", "")).lower() in ("1", "true", "yes", "y")
+    if args.limit is None:
+        args.limit = 200
+    if args.limit <= 0 and not (args.allow_full or env_allow_full):
+        print("Guard: --limit 0 (full) requires --allow-full or ALLOW_FULL_ARC=1. For budgeted runs, use --limit 200.")
+        _sys.exit(2)
+    if args.limit < 0:
+        print("Guard: --limit must be >= 0 (0 only with --allow-full).")
+        _sys.exit(2)
 
     allowlist = list(llm_client.ALLOWLIST)
     if args.models.strip():

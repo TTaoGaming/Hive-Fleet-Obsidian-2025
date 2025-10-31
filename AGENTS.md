@@ -355,3 +355,25 @@ Note: If a renderer still errors, simplify labels further and remove punctuation
 - Model selection (Swarmlord):
   - Prefer the best accuracy at acceptable latency and price. Use aggregated results across lanes; consider accuracy-per-dollar.
 
+### OpenAI/GPT low-token behavior (note)
+
+- Observation
+  - On OpenAI GPT‑OSS models, very low `max_tokens` budgets lead to frequent empty responses and format errors on ARC-like tasks.
+  - In controlled runs on the ARC validation split (OSS-only, many lanes), increasing `max_tokens` reduced empties and improved accuracy:
+    - 100 tokens: high empty_content counts; depressed accuracy
+    - 200 tokens: empties drop by an order of magnitude; large accuracy jump
+    - 400 tokens: empties near zero; accuracy near plateau for this task
+- Guidance
+  - General default (GPT‑OSS): set `max_tokens ≈ 1000` to give the model ample headroom for typical tasks; cost impact is small on these models.
+  - ARC-like multiple-choice: `max_tokens >= 200` works; `>= 400` yields near-zero empties. Using 1000 is fine if cost is trivial.
+  - Resiliency in client remains enabled (retry-on-empty, optional no `response_format`).
+  - Small-batch checks at 1k and 2k token budgets (validation limit=50, 5 lanes/model) showed empty_content=0 and accuracy comparable to 400 tokens, confirming a plateau:
+    - 1k tokens: 20B ≈ 93.6% (234/250), 120B ≈ 93.2% (233/250)
+    - 2k tokens: 20B ≈ 92.4% (231/250), 120B ≈ 94.8% (237/250)
+  - Cutoff: Practical stabilization by 200–400 tokens for ARC-like tasks on GPT‑OSS; higher budgets do not materially improve accuracy but increase cost. Use ~1000 by default for broader tasks.
+
+Environment tip
+- To set a higher default globally while keeping per-run overrides, export:
+  - `OPENROUTER_MAX_TOKENS=1000`
+  - Optionally tune per mission via mission intent `llm.max_tokens`.
+

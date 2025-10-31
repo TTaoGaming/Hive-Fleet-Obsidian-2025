@@ -287,6 +287,19 @@ flowchart LR
 - Each lane receives a lane-specific `model_hint` carried into React (planner/bridger) and Engage (shaper) calls; reasoning and LLM limits follow the mission’s `llm` block or environment overrides.
 - Each PREY run emits a digest bundle at `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md` containing a BLUF, a lane↔model matrix, and a parser-safe Mermaid diagram. The blackboard `yield` receipt references this digest and the OTEL trace file.
 
+### LLM token budget policy (OpenAI/GPT‑OSS) — fix empty/format errors
+- Problem summary: Very low `max_tokens` on GPT‑OSS can produce empty responses or format errors on some tasks. Increasing the response budget removes these failures.
+- Policy (applies across Crew AI PREY lanes unless overridden by mission intent):
+  - Default: set `max_tokens ≈ 1000` for GPT‑OSS to give headroom on general tasks. Cost is typically trivial for these models.
+  - Minimum: never go below `max_tokens = 200` on GPT‑OSS. Below this, empty/content-format failures become common.
+  - ARC-like multiple-choice tasks: `max_tokens ≥ 400` achieves near-zero empties; 1000 is fine if cost is not a concern.
+  - Non-OSS/other providers: keep reasonable headroom; tune per-model as needed.
+- Evidence: Small-batch ARC validation runs showed a plateau by 200–400 tokens with zero empties at 400, and no material accuracy gains at 1k–2k vs 400. See `AGENTS.md` (OpenAI/GPT low-token behavior) for numbers and references.
+- How to set:
+  - Mission intent: set `llm.max_tokens: 1000` as a default; override per mission/task as needed.
+  - Environment: export `OPENROUTER_MAX_TOKENS=1000` to enforce across processes; per-run flags may still override.
+  - Optional: use `OPENROUTER_FORCE_NO_RESPONSE_FORMAT_MODELS` to disable response_format on first attempt for fragile models; the client already retries on empty.
+
 
 ## Section 9: Cold-Start Bootstrap (≤3 manual steps; repo-agnostic)
 1) Drop this Gen21 SSOT into the repo at `hfo_gem/gen_21/gpt5-attempt-3-gem.md`.
