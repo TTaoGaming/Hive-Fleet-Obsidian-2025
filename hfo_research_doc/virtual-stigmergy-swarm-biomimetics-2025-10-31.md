@@ -239,9 +239,8 @@ else:
 ### 3.4 Particle Swarm Optimization (PSO) in Machine Learning
 
 **Hyperparameter Tuning**:
-- **Google DeepMind**: PSO for neural architecture search (NAS) in AlphaGo training.
-- **Netflix**: Recommendation system parameter optimization (learning rates, regularization).
-- **Result**: 2-5x faster convergence vs grid search; 10-20% better final performance vs random search.
+- **Industry Applications**: PSO widely used for neural architecture search (NAS) and ML hyperparameter optimization in recommendation systems.
+- **Typical Results** (from research literature): 2-5x faster convergence vs grid search; 10-20% better final performance vs random search.
 
 **PSO Stigmergy Analog**:
 - **Global best position (gbest)**: Acts as quantitative attractor (all particles attracted).
@@ -680,12 +679,12 @@ Integration with **HFO Crew AI** maps OBSIDIAN roles to stigmergy functions: Obs
    - Long-term: Automate lane assignment based on flow network optimization.
    - Timeline: 6+ months; exploratory research.
 
-### 6.3 Metrics for Success
+### 6.3 Metrics for Success (Target Improvements)
 
-- **Convergence Speed**: 20-30% reduction in iterations to reach solution threshold (e.g., test pass + quorum verify).
-- **Solution Quality**: 5-10% improvement in mission success rate (measured via verify PASS percentage).
-- **Exploration Diversity**: Entropy H > 2.5 during first 30% of iterations (prevents premature lock-in).
-- **Stagnation Resilience**: <5 consecutive stagnation events per 100-iteration run (via adaptive evaporation).
+- **Convergence Speed** (target): 20-30% reduction in iterations to reach solution threshold (e.g., test pass + quorum verify).
+- **Solution Quality** (target): 5-10% improvement in mission success rate (measured via verify PASS percentage).
+- **Exploration Diversity** (threshold): Entropy H > 2.5 during first 30% of iterations (prevents premature lock-in).
+- **Stagnation Resilience** (threshold): <5 consecutive stagnation events per 100-iteration run (via adaptive evaporation).
 - **Visualization Insight**: Gradient heatmaps in swarmlord_digest enable 1-glance health check (per clarification pass 5 emoji dashboard guideline).
 
 ## 7. Glossary of Key Terms
