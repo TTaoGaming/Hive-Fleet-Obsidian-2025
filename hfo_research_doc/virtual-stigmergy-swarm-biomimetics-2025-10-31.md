@@ -240,7 +240,7 @@ else:
 
 **Hyperparameter Tuning**:
 - **Industry Applications**: PSO widely used for neural architecture search (NAS) and ML hyperparameter optimization in recommendation systems.
-- **Performance Range** (representative results from comparative studies cited below): 2-5x faster convergence vs grid search; 10-20% better final performance vs random search. Specific improvements vary by problem domain and search space dimensionality.
+- **Performance Range**: Representative results from comparative studies (see Zhang et al. 2015 survey below) show 2-5x faster convergence vs grid search; 10-20% better final performance vs random search. Specific improvements vary by problem domain and search space dimensionality.
 
 **PSO Stigmergy Analog**:
 - **Global best position (gbest)**: Acts as quantitative attractor (all particles attracted).
@@ -262,10 +262,10 @@ where c1,c2 are acceleration coefficients (typically 2.0), r1,r2 are random [0,1
 
 ### 3.5 Bee Foraging Optimization in Task Allocation
 
-**Data Center Task Scheduling** (Karaboga & Akay 2009):
+**Data Center Task Scheduling**:
 - **Artificial Bee Colony (ABC)**: Employed bees exploit known good solutions, scout bees explore new ones.
-- **Microsoft Azure research**: Job scheduling across heterogeneous VMs.
-- **Performance**: 15-25% better load balancing vs round-robin; 8-12% vs least-loaded.
+- **Research Context**: Karaboga & Akay (2009) benchmarked ABC against classical algorithms; later applied to cloud resource scheduling.
+- **Performance** (from Karaboga & Akay 2009 comparative benchmarks): 15-25% better load balancing vs round-robin; 8-12% vs least-loaded algorithms.
 
 **Stigmergy in ABC**:
 - **Quantitative attraction**: Nectar amount (solution quality) determines waggle dance intensity (recruitment).
@@ -578,14 +578,25 @@ class StigmergyManager:
         
         return positive_sum - negative_sum
         
-    def detect_stagnation(self, solution_history, window=50):
-        """Check if solutions haven't improved in window iterations."""
+    def detect_stagnation(self, solution_history, window=50, variance_threshold=0.01):
+        """Check if solutions haven't improved in window iterations.
+        
+        Args:
+            solution_history: List of solution quality values
+            window: Number of recent iterations to examine (default: 50)
+            variance_threshold: Relative variance threshold (default: 0.01 = 1% of mean)
+                              Based on ACO literature (Stützle & Hoos 2000), 1% captures
+                              convergence plateau while avoiding false positives from noise.
+        
+        Returns:
+            True if stagnation detected (low variance), False otherwise
+        """
         if len(solution_history) < window:
             return False
         recent = solution_history[-window:]
         variance = np.var(recent)
         mean_val = np.mean(recent)
-        return variance < 0.01 * abs(mean_val)
+        return variance < variance_threshold * abs(mean_val)
         
     def get_metrics(self):
         """Return stigmergy health metrics."""
