@@ -28,8 +28,16 @@ Security notes:
 The pilot will perform at most one guarded LLM call per lane during the Engage phase if `OPENROUTER_API_KEY` is present. The call uses an allowlisted cheap/fast model, low `max_tokens` (<= 96), and logs only a short preview in the blackboard.
 
 ```bash
-python3 scripts/crew_ai/runner.py \
-  --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+# Preferred while runner.py is being sanitized
+python3 scripts/crew_ai/runner_unified.py \
+  --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml
+```
+
+Alternate (direct orchestrator):
+
+```bash
+python3 scripts/crew_ai/orchestrator.py \
+  --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml
 ```
 
 Outputs:
@@ -95,45 +103,20 @@ Scoring notes:
 - Enforces strict outputs (e.g., letter-only, True/False, integer-only, or JSON-only) to catch instruction-following drift.
 - Reports per-category accuracy and format-failure rate to surface brittle behavior beyond raw correctness.
 
-## ARC-Challenge (research-grade, MCQ)
+## ARC-Challenge under the unified PREY workflow
 
-Evaluate models on the official AI2 ARC-Challenge dataset (validation split by default). This is a standard, widely-used benchmark for non-trivial reasoning.
+ARC evaluation now runs inside the same PREY lanes orchestrated by the pilot runner. Use a mission intent with `provider: arc` (see `hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml`). The runner will spawn one lane per allowlisted model by default and write the same Gen22 artifacts, receipts, spans, quorum, and digest.
 
-Single-model run (budgeted defaults):
+Run (unified):
 ```bash
-# uses env OPENROUTER_MODEL_HINT if set; default max_tokens=400
-python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
-
-# or pick a model explicitly (still budgeted)
-OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
-  python3 scripts/crew_ai/arc_challenge_eval.py --limit 200
+python3 scripts/crew_ai/runner_unified.py \
+  --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml
 ```
-
-Swarm run (one or more lanes per allowlisted model):
-```bash
-# default: 1–2 lanes per model, limit 200, max_tokens=400
-python3 scripts/crew_ai/arc_swarm_runner.py --limit 200
-
-# example: 2 lanes/model, limit 100, 1k tokens, high reasoning, extended timeout
-OPENROUTER_MAX_TOKENS=1000 \
-OPENROUTER_REASONING=true \
-OPENROUTER_REASONING_EFFORT=high \
-OPENROUTER_TIMEOUT_SECONDS=60 \
-python3 scripts/crew_ai/arc_swarm_runner.py \
-  --limit 100 \
-  --lanes-per-model 2 \
-  --max-tokens 1000 \
-  --timeout-seconds 60
-```
-
-Outputs:
-- Digest: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/swarmlord_digest.md`
-- JSON: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/arc_swarm_results.json`
 
 Notes:
-- Limit defaults to 200 for cost control.
-- Guardrails: `--limit 0` (full split) requires `--allow-full` or `ALLOW_FULL_ARC=1` to avoid accidental all-up runs.
-- Accuracy is computed on the validation split for easy, labeled scoring.
+- The `engage` phase executes ARC eval per lane/model and records metrics in `engage_report.yml`.
+- Lanes, validators, receipts, and digest are identical to non-ARC runs; ARC is just a provider adapter.
+- The legacy `arc_swarm_runner.py` is deprecated and retained only as a thin wrapper for backward compatibility.
 
 ### Budget and limits (recommended)
 

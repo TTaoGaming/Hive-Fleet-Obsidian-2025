@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Crew AI pilot (dry-run)
         run: |
-          python scripts/crew_ai/runner.py --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
+          python scripts/crew_ai/runner_unified.py --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
 
       - name: Validate JSON/JSONL files (incl. blackboard)
         run: |

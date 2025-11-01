@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-ARC-Challenge swarm runner:
-- Runs ARC-Challenge (validation) in parallel across all allowlisted models
-- Writes a Swarmlord-style digest summarizing per-model accuracy and latency
+DEPRECATED — ARC-Challenge swarm runner
 
-Usage:
-  python3 scripts/crew_ai/arc_swarm_runner.py --limit 200
+This specialized runner has been superseded by the unified PREY workflow in
+`scripts/crew_ai/runner_unified.py` using a mission intent with `provider: arc`.
 
-Notes:
-- Requires OPENROUTER_API_KEY in .env. Uses your llm_client.ALLOWLIST.
-- Limit defaults to 200 for cost control; use --limit 0 for full split.
+To run ARC under the unified workflow, use:
+
+    python3 scripts/crew_ai/runner_unified.py \
+        --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml
+
+This file is kept for backward compatibility but will exit after printing a
+pointer to the unified runner.
 """
 from __future__ import annotations
 import argparse
@@ -53,6 +55,15 @@ def _write_yaml(path: Path, data: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         yaml.safe_dump(data, f, sort_keys=False)
+
+
+def _write_span(trace_path: Path, span: Dict[str, Any]) -> None:
+    trace_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with trace_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(span, ensure_ascii=False) + "\n")
+    except Exception:
+        pass
 
 
 def _write_artifact(
@@ -176,7 +187,7 @@ def _price_per_1k(model: str) -> float | None:
     return None
 
 
-def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temperature: float, timeout_seconds: int, *, lane_index: int = 0, seed_base: int = 1234, run_dir: Optional[Path] = None, trace_id: Optional[str] = None, allowlist: Optional[List[str]] = None) -> Dict[str, Any]:
+def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temperature: float, timeout_seconds: int, *, lane_index: int = 0, seed_base: int = 1234, run_dir: Optional[Path] = None, trace_id: Optional[str] = None, allowlist: Optional[List[str]] = None, trace_path: Optional[Path] = None) -> Dict[str, Any]:
     # Set env to propagate hint (client also accepts direct hint)
     os.environ["OPENROUTER_MODEL_HINT"] = model_hint
     # Prepare lane output folder and PREY artifacts
@@ -242,6 +253,21 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
             "evidence_refs": [str(ps.relative_to(ROOT))],
             "timestamp": now_z(),
         })
+        # Span: perceive
+        if trace_path is not None:
+            _write_span(trace_path, {
+                "name": f"{lane_name}:perceive",
+                "trace_id": trace_id,
+                "timestamp": now_z(),
+                "attributes": {
+                    "lane": lane_name,
+                    "phase": "perceive",
+                    "model_hint": model_hint,
+                    "max_tokens": int(max_tokens),
+                    "temperature": float(temperature),
+                    "timeout_seconds": int(timeout_seconds),
+                },
+            })
     except Exception as e:
         append_blackboard({
             "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
@@ -298,6 +324,21 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
             "evidence_refs": [str(rp.relative_to(ROOT))],
             "timestamp": now_z(),
         })
+        # Span: react
+        if trace_path is not None:
+            _write_span(trace_path, {
+                "name": f"{lane_name}:react",
+                "trace_id": trace_id,
+                "timestamp": now_z(),
+                "attributes": {
+                    "lane": lane_name,
+                    "phase": "react",
+                    "model_hint": model_hint,
+                    "max_tokens": int(max_tokens),
+                    "temperature": float(temperature),
+                    "timeout_seconds": int(timeout_seconds),
+                },
+            })
     except Exception:
         append_blackboard({
             "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
@@ -377,6 +418,22 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
             "evidence_refs": [str(erp.relative_to(ROOT))],
             "timestamp": now_z(),
         })
+        # Span: engage (metrics)
+        if trace_path is not None:
+            _write_span(trace_path, {
+                "name": f"{lane_name}:engage",
+                "trace_id": trace_id,
+                "timestamp": now_z(),
+                "attributes": {
+                    "lane": lane_name,
+                    "phase": "engage",
+                    "model": er.get("llm", {}).get("model"),
+                    "avg_latency_ms": er.get("metrics_summary", {}).get("avg_latency_ms"),
+                    "format_fails": er.get("metrics_summary", {}).get("format_fails"),
+                    "empty_content": er.get("metrics_summary", {}).get("empty_content"),
+                    "total_tokens": er.get("metrics_summary", {}).get("total_tokens"),
+                },
+            })
     except Exception as e:
         append_blackboard({
             "mission_id": os.environ.get("ARC_SWARM_MISSION_ID", "arc_swarm"),
@@ -424,6 +481,18 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
             "evidence_refs": [str(ysp.relative_to(ROOT))],
             "timestamp": now_z(),
         })
+        # Span: yield
+        if trace_path is not None:
+            _write_span(trace_path, {
+                "name": f"{lane_name}:yield",
+                "trace_id": trace_id,
+                "timestamp": now_z(),
+                "attributes": {
+                    "lane": lane_name,
+                    "phase": "yield",
+                    "evidence_count": len(evidence_refs),
+                },
+            })
         val = _validate_lane_artifacts(lane_out)
         append_blackboard({
             "mission_id": ys["mission_id"],
@@ -453,22 +522,10 @@ def run_for_model(model_hint: str, limit: int, split: str, max_tokens: int, temp
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="ARC-Challenge swarm runner across allowlisted models")
-    ap.add_argument("--limit", type=int, default=200, help="Limit items per lane (0 = all; requires --allow-full)")
-    ap.add_argument("--lanes-per-model", type=int, default=2, help="Parallel lanes per model")
-    ap.add_argument("--split", type=str, default="validation", choices=["train", "validation", "test"])
-    ap.add_argument("--max-tokens", type=int, default=400)
-    ap.add_argument("--temperature", type=float, default=0.0)
-    ap.add_argument("--timeout-seconds", type=int, default=25)
-    ap.add_argument("--models", type=str, default="", help="Comma-separated substrings to filter allowlisted models (e.g., 'gpt-oss,deepseek')")
-    ap.add_argument("--allow-full", action="store_true", help="Explicitly allow full-dataset run when --limit 0 is set")
-    args = ap.parse_args()
-
-    load_dotenv(dotenv_path=ROOT / ".env", override=False)
-    api_key_present = bool(os.environ.get("OPENROUTER_API_KEY"))
-    if not api_key_present:
-        print("No OPENROUTER_API_KEY found. Set it in .env to run the swarm.")
-        return
+    print("[DEPRECATED] Use the unified PREY runner with provider: arc.")
+    print("Example:")
+    print("  python3 scripts/crew_ai/runner.py --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml")
+    return
 
     # Guard: prevent accidental full-dataset runs unless explicitly allowed
     env_allow_full = str(os.environ.get("ALLOW_FULL_ARC", "")).lower() in ("1", "true", "yes", "y")
@@ -514,6 +571,15 @@ def main() -> None:
         "blocked_capabilities": [],
         "timestamp": now_z(),
     })
+
+    # Prepare trace file early for spans
+    otel_dir = ROOT / "temp/otel"
+    otel_dir.mkdir(parents=True, exist_ok=True)
+    trace_file = otel_dir / f"trace-arc_swarm-{run_dir.name}.jsonl"
+    try:
+        _write_span(trace_file, {"name": "arc_swarm:start", "trace_id": trace_id, "timestamp": now_z(), "attributes": {"models": list(allowlist), "lanes_per_model": int(args.lanes_per_model), "limit": args.limit, "split": args.split}})
+    except Exception:
+        pass
 
     # Write a top-level perception snapshot for the swarm run
     try:
@@ -576,6 +642,7 @@ def main() -> None:
                 run_dir=run_dir,
                 trace_id=trace_id,
                 allowlist=allowlist,
+                trace_path=trace_file,
             ): (m, ln)
             for (m, ln) in lanes
         }
@@ -661,15 +728,8 @@ def main() -> None:
     }
     _write_yaml(run_dir / "quorum_report.yml", quorum)
 
-    # Minimal trace file to satisfy digest pointer and future analysis (content is placeholder-safe JSONL)
-    otel_dir = ROOT / "temp/otel"
-    otel_dir.mkdir(parents=True, exist_ok=True)
-    trace_file = otel_dir / f"trace-arc_swarm-{int(time.time()*1000)}.jsonl"
-    try:
-        with trace_file.open("w", encoding="utf-8") as tf:
-            tf.write(json.dumps({"name": "arc_swarm", "trace_id": trace_id, "timestamp": now_z()}, ensure_ascii=False) + "\n")
-    except Exception:
-        pass
+    # Final span
+    _write_span(trace_file, {"name": "arc_swarm:end", "trace_id": trace_id, "timestamp": now_z(), "attributes": {"lanes": len(lanes)}})
 
     # Write digest
     lines = []

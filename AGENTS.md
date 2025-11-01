@@ -538,3 +538,95 @@ This repo assumes a neutral, goal‑agnostic control loop driven by mission inte
 - On PASS, the Swarmlord emits a digest back to the operator and records receipts to the blackboard.
 - This control path is invariant across tasks and domains; providers/adapters simply plug into PREY phases.
 
+## Operational note — Quick ARC eval mode (2025-11-01)
+
+- Purpose: fast sanity checks with small budgets and visible per-phase traces.
+- How:
+  - Use a short mission intent (limit=10) under `hfo_mission_intent/YYYY-MM-DD/`.
+  - For ARC provider, PREY now performs LLM calls at every phase (Perceive/React/Yield) in addition to Engage.
+  - Per-phase notes are written per lane as: `perceive_llm_note.md`, `react_llm_note.md`, `yield_llm_note.md`.
+  - Engage writes `engage_report.yml` with `metrics_summary` (total, correct, accuracy, format_fails, empty_content, total_tokens).
+- Background runs:
+  - Start the runner in the background to keep the shell responsive; inspect artifacts from a separate terminal.
+  - Expect longer wall‑clock when per‑phase notes are enabled (3 extra LLM calls per lane).
+- Where to look:
+  - Runs: `hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/`
+  - Digest: `.../swarmlord_digest.md` • Quorum: `.../quorum_report.yml` • Spans: `temp/otel/trace-*.jsonl`
+- Guardrails:
+  - `.env` is auto‑loaded from repo root; set `OPENROUTER_API_KEY` and optional `OPENROUTER_MAX_TOKENS`.
+  - Keep `engage.max_tokens` around 400–1000 for OSS models to reduce empties.
+
+## Troubleshooting — perceived freezes and fast inspection (2025-11-01)
+
+- Foreground run blocks the shell
+  - If the runner is started in the foreground, that terminal won’t accept new commands until it ends. Use a second terminal for inspection or run the orchestrator in the background.
+
+- Slow “latest run” listing can look like a hang
+  - Sorting many run folders by modification time (e.g., to find the latest) performs many filesystem stats and can be slow. Prefer inspecting a known run path or list a small, specific subset.
+
+- Blackboard JSONL append quoting gotchas
+  - Appending JSON via shell can fail due to quoting of parentheses/quotes. Use a tiny helper (Python or jq) to construct valid JSON, or rely on existing logging paths in the orchestrator.
+
+- UTC date folders
+  - Outputs are grouped by UTC date. Near local midnight, new runs appear under the next UTC date folder.
+
+- 0/50 empties diagnostic
+  - Symptom: `empty_content=50`, `format_fails=50`, `total_tokens=0`. Cause: no effective API key at that time. Ensure `.env` contains `OPENROUTER_API_KEY` and that the orchestrator loads it (auto‑loaded in current code).
+
+- Per‑phase notes timing
+  - Runs made before ARC per‑phase hooks were enabled won’t have `perceive_llm_note.md` / `react_llm_note.md` / `yield_llm_note.md`. New runs with ARC provider now include these per lane.
+
+- Minimal inspection routine
+  - Identify the exact run folder (avoid expensive global sorts when possible).
+  - For each lane, open `attempt_1/engage_report.yml` and read `metrics_summary` (`total`, `correct`, `accuracy`).
+  - Check for per‑phase note files in the same folder to confirm LLM calls on Perceive/React/Yield.
+
+## Helper tools — blackboard append and run summary (2025-11-01)
+
+This repo includes two small utilities to make day‑to‑day ops simple and consistent with the SSOT.
+
+- Append a JSONL blackboard receipt (append‑only)
+  - File: `scripts/blackboard_logger.py`
+  - Purpose: Safely append a receipt without brittle shell quoting.
+  - Required fields: `mission_id`, `phase`, `summary`
+  - Usage examples:
+    ```bash
+    # Minimal (append one line)
+    python3 scripts/blackboard_logger.py \
+      --mission-id mi_arc_2lanes_limit10_2025-11-01 \
+      --phase yield \
+      --summary "Background ARC eval (limit=10) requested by operator"
+
+    # With evidence refs and safety envelope tweaks
+    python3 scripts/blackboard_logger.py \
+      --mission-id mi_arc_2lanes_limit10_2025-11-01 \
+      --phase verify \
+      --summary "Analyzed 2025-11-01 runs; quorum PASS" \
+      --evidence-ref hfo_crew_ai_swarm_results/2025-11-01/ \
+      --evidence-ref hfo_mission_intent/2025-11-01/mission_intent_arc_2lanes_limit10_2025-11-01.v1.yml \
+      --safety-chunk-size-max 200 --safety-line-target-min 0
+    ```
+
+- Summarize PREY runs (digest/metrics/notes)
+  - File: `scripts/crew_ai/summarize_runs.py`
+  - Purpose: Quick cross‑run report (per‑lane totals/correct/accuracy, empties/format fails/tokens, presence of LLM notes) plus digest/quorum hints.
+  - Usage examples:
+    ```bash
+    # Today’s UTC runs (default to today if --date omitted and folder exists)
+    python3 scripts/crew_ai/summarize_runs.py --date 2025-11-01
+
+    # Specific run folder
+    python3 scripts/crew_ai/summarize_runs.py --run hfo_crew_ai_swarm_results/2025-11-01/run-<ts>
+
+    # JSON output for dashboards
+    python3 scripts/crew_ai/summarize_runs.py --date 2025-11-01 --json-out temp/otel/summary_2025-11-01.json
+    ```
+
+- What to expect per lane
+  - `engage_report.yml` → `metrics_summary.total|correct|accuracy|format_fails|empty_content|total_tokens`
+  - `perceive_llm_note.md` / `react_llm_note.md` / `yield_llm_note.md` present when per‑phase LLM notes are enabled (ARC provider).
+
+- Background run tip (to avoid perceived freezes)
+  - Start the orchestrator in the background (or use a second terminal) so the shell stays usable for inspection with the summary tool.
+
+

@@ -101,12 +101,27 @@ def append_receipt(
 
 
 if __name__ == "__main__":
-    # Tiny self-test append (commented by default)
-    # append_receipt(
-    #     mission_id="selftest_000",
-    #     phase="verify",
-    #     summary="blackboard_logger self-test (no-op)",
-    #     evidence_refs=["blackboard_logger.py:1-200"],
-    #     safety_envelope={"chunk_size_max": 200, "line_target_min": 0},
-    # )
-    print("blackboard_logger module ready")
+    import argparse
+
+    ap = argparse.ArgumentParser(description="Append a JSONL receipt to the HFO blackboard (append-only)")
+    ap.add_argument("--mission-id", required=True, help="Mission id")
+    ap.add_argument("--phase", required=True, help="PREY phase: perceive|react|engage|yield|verify|digest")
+    ap.add_argument("--summary", required=True, help="Short human-readable summary")
+    ap.add_argument("--evidence-ref", action="append", default=[], help="Evidence reference (path or id). Repeatable.")
+    ap.add_argument("--safety-chunk-size-max", type=int, default=200, help="Safety envelope: chunk_size_max")
+    ap.add_argument("--safety-line-target-min", type=int, default=0, help="Safety envelope: line_target_min")
+    ap.add_argument("--blocked", action="append", default=[], help="Blocked capability. Repeatable.")
+    ap.add_argument("--jsonl", default=str(BLACKBOARD_JSONL), help="Blackboard JSONL path (default: repo blackboard)")
+    args = ap.parse_args()
+
+    se = {"chunk_size_max": args.safety_chunk_size_max, "line_target_min": args.safety_line_target_min}
+    append_receipt(
+        mission_id=args.mission_id,
+        phase=args.phase,
+        summary=args.summary,
+        evidence_refs=list(args.evidence_ref or []),
+        safety_envelope=se,
+        blocked_capabilities=list(args.blocked or []),
+        jsonl_path=args.jsonl,
+    )
+    print(f"Appended receipt: mission_id={args.mission_id} phase={args.phase}")

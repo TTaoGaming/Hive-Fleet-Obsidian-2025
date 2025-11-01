@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Validate a Crew AI PREY run directory produced by scripts/crew_ai/runner.py.
+Validate a Crew AI PREY run directory produced by scripts/crew_ai/runner_unified.py (or orchestrator).
 
 Checks performed (fast, no network):
 - Find the most recent run dir under hfo_crew_ai_swarm_results/YYYY-MM-DD/run-<ts>/
@@ -26,7 +26,9 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RESULTS_ROOT = REPO_ROOT / "hfo_crew_ai_swarm_results"
 SCHEMA_PATH = REPO_ROOT / "scripts/crew_ai/schemas/lane_artifacts.schema.yml"
+GEN22_SCHEMA_PATH = REPO_ROOT / "scripts/crew_ai/schemas/gen22_lane_artifacts.schema.yml"
 SCHEMA_MP_PATH = REPO_ROOT / "scripts/crew_ai/schemas/mission_pointer.schema.yml"
+SCHEMA_QUORUM_PATH = REPO_ROOT / "scripts/crew_ai/schemas/quorum_report.schema.yml"
 
 
 def find_latest_run_dir() -> Path | None:
@@ -53,7 +55,7 @@ def read_yaml(path: Path) -> Dict[str, Any]:
         return data if isinstance(data, dict) else {}
 
 
-def _load_required_schema() -> Dict[str, List[Tuple[str, type]]]:
+def _load_required_schema(prefer_gen22: bool = True) -> Dict[str, List[Tuple[str, type]]]:
     # Default (hard-coded) minimal schema
     default: Dict[str, List[Tuple[str, type]]] = {
         "perception_snapshot.yml": [
@@ -70,8 +72,9 @@ def _load_required_schema() -> Dict[str, List[Tuple[str, type]]]:
         ],
     }
     # If a YAML schema file exists, load and map its simple type names to Python types
-    if SCHEMA_PATH.exists():
-        raw = read_yaml(SCHEMA_PATH)
+    schema_to_use = GEN22_SCHEMA_PATH if (prefer_gen22 and GEN22_SCHEMA_PATH.exists()) else (SCHEMA_PATH if SCHEMA_PATH.exists() else None)
+    if schema_to_use and schema_to_use.exists():
+        raw = read_yaml(schema_to_use)
         mapped: Dict[str, List[Tuple[str, type]]] = {}
         type_map = {"str": str, "dict": dict, "list": list, "int": int, "float": float, "bool": bool}
         for fname, kv in (raw.items() if isinstance(raw, dict) else []):
@@ -89,8 +92,65 @@ def _load_required_schema() -> Dict[str, List[Tuple[str, type]]]:
     return default
 
 
-def validate_lane_artifacts(lane_dir: Path) -> None:
-    required = _load_required_schema()
+def _count_non_empty_lines(text: str) -> int:
+    return sum(1 for ln in (text.splitlines() if text else []) if ln.strip())
+
+
+def _sha256_file(path: Path) -> str | None:
+    import hashlib
+    try:
+        h = hashlib.sha256()
+        with path.open("rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except Exception:
+        return None
+
+
+def _validate_traceability_chain(lane_dir: Path, run_dir: Path) -> None:
+    # Expected chain: mission_pointer.yml -> perception_snapshot.yml -> react_plan.yml -> engage_report.yml -> yield_summary.yml
+    mp = run_dir / "mission_pointer.yml"
+    p = lane_dir / "perception_snapshot.yml"
+    r = lane_dir / "react_plan.yml"
+    e = lane_dir / "engage_report.yml"
+    y = lane_dir / "yield_summary.yml"
+    # Perception should reference mission_pointer
+    p_yaml = read_yaml(p)
+    mp_hash = _sha256_file(mp) if mp.exists() else None
+    if mp_hash:
+        if not any("mission_pointer.yml" in str(x) for x in (p_yaml.get("parent_refs") or [])):
+            raise SystemExit(f"Traceability: {p} missing parent_refs to mission_pointer.yml")
+        if mp_hash not in (p_yaml.get("evidence_hashes") or []):
+            raise SystemExit(f"Traceability: {p} missing evidence_hashes mission_pointer sha256")
+    # React should reference perception
+    r_yaml = read_yaml(r)
+    p_hash = _sha256_file(p) if p.exists() else None
+    if p_hash:
+        if not any("perception_snapshot.yml" in str(x) for x in (r_yaml.get("parent_refs") or [])):
+            raise SystemExit(f"Traceability: {r} missing parent_refs to perception_snapshot.yml")
+        if p_hash not in (r_yaml.get("evidence_hashes") or []):
+            raise SystemExit(f"Traceability: {r} missing evidence_hashes perception sha256")
+    # Engage should reference react
+    e_yaml = read_yaml(e)
+    r_hash = _sha256_file(r) if r.exists() else None
+    if r_hash:
+        if not any("react_plan.yml" in str(x) for x in (e_yaml.get("parent_refs") or [])):
+            raise SystemExit(f"Traceability: {e} missing parent_refs to react_plan.yml")
+        if r_hash not in (e_yaml.get("evidence_hashes") or []):
+            raise SystemExit(f"Traceability: {e} missing evidence_hashes react sha256")
+    # Yield should reference engage
+    y_yaml = read_yaml(y)
+    e_hash = _sha256_file(e) if e.exists() else None
+    if e_hash:
+        if not any("engage_report.yml" in str(x) for x in (y_yaml.get("parent_refs") or [])):
+            raise SystemExit(f"Traceability: {y} missing parent_refs to engage_report.yml")
+        if e_hash not in (y_yaml.get("evidence_hashes") or []):
+            raise SystemExit(f"Traceability: {y} missing evidence_hashes engage sha256")
+
+
+def validate_lane_artifacts(lane_dir: Path, run_dir: Path, prefer_gen22: bool = True) -> None:
+    required = _load_required_schema(prefer_gen22=prefer_gen22)
 
     for fname, req in required.items():
         fp = lane_dir / fname
@@ -108,6 +168,17 @@ def validate_lane_artifacts(lane_dir: Path) -> None:
     for core in ("perception_snapshot.yml", "react_plan.yml", "engage_report.yml"):
         if not any(core in str(x) for x in e_refs):
             raise SystemExit(f"Yield evidence_refs missing core ref: {lane_dir}/yield_summary.yml -> {core}")
+
+    # context_notes should have >= 3 non-empty lines when present
+    for fname in ("perception_snapshot.yml", "react_plan.yml", "engage_report.yml", "yield_summary.yml"):
+        fp = lane_dir / fname
+        obj = read_yaml(fp)
+        notes = obj.get("context_notes", "")
+        if notes and _count_non_empty_lines(str(notes)) < 3:
+            raise SystemExit(f"context_notes too short (<3 lines): {fp}")
+
+    # Validate hash chain & parent refs
+    _validate_traceability_chain(lane_dir, run_dir)
 
 
 def _validate_against_simple_schema(obj: Dict[str, Any], schema_dict: Dict[str, str], path_label: str) -> None:
@@ -140,6 +211,25 @@ def validate_mission_pointer(mp_path: Path) -> None:
             val = mp.get(key)
             if val is None or not isinstance(val, typ):
                 raise SystemExit(f"mission_pointer.yml missing/typed field: {mp_path}:{key}")
+
+
+def validate_quorum_report(qr_path: Path) -> None:
+    if not qr_path.exists():
+        raise SystemExit(f"quorum_report.yml missing: {qr_path}")
+    qr = read_yaml(qr_path)
+    # If quorum schema exists, enforce minimal fields
+    if SCHEMA_QUORUM_PATH.exists():
+        raw = read_yaml(SCHEMA_QUORUM_PATH)
+        section = raw.get("quorum_report.yml") if isinstance(raw, dict) else None
+        if isinstance(section, dict) and section:
+            _validate_against_simple_schema(qr, section, str(qr_path))
+    else:
+        for key, typ in (
+            ("mission_id", str), ("timestamp", str), ("validators", list), ("threshold", int), ("performed_by", str), ("votes", list),
+        ):
+            val = qr.get(key)
+            if val is None or not isinstance(val, typ):
+                raise SystemExit(f"quorum_report.yml missing/typed field: {qr_path}:{key}")
 
 
 def scan_placeholders(path: Path) -> None:
@@ -180,11 +270,29 @@ def has_mermaid_block(digest_path: Path) -> bool:
     return "```mermaid" in t
 
 
+def has_validation_checklist(digest_path: Path) -> bool:
+    try:
+        t = digest_path.read_text(encoding="utf-8")
+    except Exception:
+        return False
+    required = [
+        "bluf_present: true",
+        "matrix_present: true",
+        "diagrams_present: true",
+        "diagrams_parser_safe: true",
+        "executive_summary_present: true",
+        "evidence_refs_complete: true",
+    ]
+    tl = t.lower()
+    return all(req in tl for req in [s.lower() for s in required])
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Validate a Crew AI PREY run directory")
     ap.add_argument("--run-dir", type=str, default="", help="Path to a specific run-<ts> directory to validate")
     ap.add_argument("--require-parallel", action="store_true", help="If set, fail when analyze_traces reports no parallelism")
     ap.add_argument("--fail-on-missing-run", action="store_true", help="If set, fail when no run dir is found")
+    ap.add_argument("--gen22", action="store_true", help="Prefer Gen22 schema validation when available")
     args = ap.parse_args()
 
     run_dir = Path(args.run_dir).resolve() if args.run_dir else find_latest_run_dir()
@@ -208,7 +316,7 @@ def main() -> int:
         raise SystemExit(f"No lane outputs found in {run_dir}")
     for lane_root in lane_roots:
         lane_dir = lane_root / "attempt_1"
-        validate_lane_artifacts(lane_dir)
+        validate_lane_artifacts(lane_dir, run_dir, prefer_gen22=args.gen22 or GEN22_SCHEMA_PATH.exists())
         # placeholder scan
         for fname in ("perception_snapshot.yml", "react_plan.yml", "engage_report.yml", "yield_summary.yml"):
             scan_placeholders(lane_dir / fname)
@@ -219,6 +327,8 @@ def main() -> int:
         raise SystemExit(f"Digest missing: {digest}")
     if not has_mermaid_block(digest):
         raise SystemExit(f"Digest mermaid block missing: {digest}")
+    if not has_validation_checklist(digest):
+        raise SystemExit(f"Digest validation checklist missing or incomplete: {digest}")
     scan_placeholders(digest)
 
     # 4) Trace path from digest and optional parallelism assertion
@@ -236,6 +346,9 @@ def main() -> int:
         report = analyze_traces.summarize_overlap(spans)
         if not report.get("parallel"):
             raise SystemExit("Trace analysis reports no parallelism across lanes")
+
+    # 5) Quorum report exists and minimally valid
+    validate_quorum_report(run_dir / "quorum_report.yml")
 
     print(f"PREY run validation PASS: {run_dir}")
     return 0

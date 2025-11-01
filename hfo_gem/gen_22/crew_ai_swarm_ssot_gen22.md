@@ -239,7 +239,7 @@ quorum_report.yml:
 - PettingZoo: simple_tag_v3; runs matrix or single eval; emits compliant artifacts and receipts.
 
 ## Mapping to code (current modules)
-- Runner (pilot): scripts/crew_ai/runner.py — lane orchestration, receipts, spans, verify, digest.
+- Unified runner: scripts/crew_ai/runner_unified.py — delegates to orchestrator; lane orchestration, receipts, spans, verify, digest.
 - ARC swarm: scripts/crew_ai/arc_swarm_runner.py — parallel lanes per model; must align artifacts to SSOT.
 - LLM client: scripts/crew_ai/llm_client.py — allowlist, reasoning toggles, resiliency, timeouts.
 - Validator: scripts/crew_ai/validate_run.py — lane/run validation; extend to enforce SSOT schemas.
@@ -324,7 +324,7 @@ Interpretation:
   - Mission intent aligned: `hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml`
 
 - Pilot run
-  - `.venv/bin/python scripts/crew_ai/runner.py --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml`
+  - `.venv/bin/python scripts/crew_ai/runner_unified.py --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml`
   - Confirm: lane artifacts present with evidence_hashes, quorum_report.yml, digest checklist.
   - Validate: `python3 scripts/crew_ai/gen22_gap_report.py --strict`
 
@@ -343,4 +343,14 @@ Interpretation:
 - Expand validator to enforce normative schemas (Gen22 mode).
 - Mirror stigmergy blocks on artifact-write receipts consistently.
 - ARC adapter: emit full Gen22 traceability (trace_id, parent_refs, evidence_hashes, context_notes ≥ 3).
+
+## Swarmlord orchestration note (task‑agnostic)
+
+This system is intentionally task‑ and goal‑agnostic; the control loop is always:
+
+- Operator sets a mission intent that encodes lanes, safety, and per‑stage LLM defaults.
+- Swarmlord orchestrates a PREY workflow per lane (Perceive → React → Engage → Yield) using the configured LLM plan.
+- After all lanes Yield, a deterministic quorum Verify runs with independent validators and a set threshold.
+- On PASS, Swarmlord emits a digest back to the operator and appends receipts to the blackboard.
+- Adapters/providers only change how phases do the work, not the control path.
 
