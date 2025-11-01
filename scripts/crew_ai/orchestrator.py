@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
+try:
+    from zoneinfo import ZoneInfo  # Python 3.9+
+except Exception:  # pragma: no cover
+    ZoneInfo = None  # type: ignore
 
 import yaml
 
@@ -48,6 +52,7 @@ RESULTS_ROOT = ROOT / "hfo_crew_ai_swarm_results"
 
 # LLM allowlist (for ARC lane defaulting)
 from .llm_client import ALLOWLIST as MODEL_ALLOWLIST  # type: ignore
+from .llm_client import call_openrouter  # type: ignore
 
 # Adapters
 from .adapters.base import engage_default
@@ -303,6 +308,162 @@ def _provider_hooks(provider: str):
     return {"perceive": None, "react": None, "engage": engage_default, "yield": None}
 
 
+def _phase_llm_note(
+    *,
+    phase: str,
+    mission: Dict[str, Any],
+    lane_name: str,
+    model_hint: Optional[str],
+    lane_index: int,
+    lane_dir: Path,
+) -> Dict[str, Any]:
+    """Perform a small, bounded LLM call for a phase and write a note file.
+
+    Fallback used when a provider doesn't define a phase hook or returns no evidence.
+    """
+    llm_cfg = mission.get("llm", {}) or {}
+    per_stage = (llm_cfg.get("per_stage_defaults", {}) or {}).get(phase, {})
+    max_tokens = int(per_stage.get("max_tokens", llm_cfg.get("max_tokens", 200)))
+    temperature = float(llm_cfg.get("temperature", 0.2))
+    timeout_seconds = int(llm_cfg.get("timeout_seconds", 20))
+
+    prompts = {
+        "perceive": "Summarize the mission context briefly (1-2 lines).",
+        "react": "State the plan to approach the task in one or two concise bullets.",
+        "yield": "Provide a one-line lane summary and a brief recommendation.",
+    }
+    prompt = prompts.get(phase, f"Phase {phase}: provide a brief note.")
+    res = call_openrouter(
+        prompt,
+        model_hint=model_hint,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        timeout_seconds=timeout_seconds,
+        response_format_type="text",
+        retry_on_empty=True,
+        retry_max=1,
+        retry_alt_format=True,
+    )
+
+    content = res.get("content") if res.get("ok") else None
+    note_name = f"{phase}_llm_note.md"
+    note_path = lane_dir / note_name
+    try:
+        lane_dir.mkdir(parents=True, exist_ok=True)
+        with note_path.open("w", encoding="utf-8") as f:
+            f.write(f"# {phase.title()} LLM Note\n\n")
+            f.write((content or "<no content>") + "\n")
+            f.write("\n---\n")
+            f.write(f"model: {res.get('model')}\n")
+            f.write(f"latency_ms: {res.get('latency_ms')}\n")
+            f.write(f"max_tokens: {max_tokens}\n")
+    except Exception:
+        pass
+
+    if note_path.exists():
+        try:
+            return {"evidence_refs": [str(note_path.relative_to(ROOT))]}
+        except Exception:
+            return {"evidence_refs": [str(note_path)]}
+    return {"evidence_refs": []}
+
+
+def _mt_time_from_iso(iso_z: str) -> Optional[str]:
+    """Convert an ISO Z timestamp to Mountain Time display string.
+    Returns like 'YYYY-MM-DD HH:MM:SS MDT (UTC-0600)' or None if conversion unavailable.
+    """
+    try:
+        if not iso_z:
+            return None
+        s = iso_z.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(s)
+        if ZoneInfo is None:
+            return None
+        mt = dt.astimezone(ZoneInfo("America/Denver"))
+        return mt.strftime("%Y-%m-%d %H:%M:%S %Z (UTC%z)")
+    except Exception:
+        return None
+
+
+def _collect_lane_metrics(run_dir: Path, lane_name: str) -> Dict[str, Any]:
+    """Read engage_report.yml for a lane and return key metrics."""
+    er = run_dir / lane_name / "attempt_1" / "engage_report.yml"
+    try:
+        with er.open("r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        m = data.get("metrics_summary", {}) or {}
+        return {
+            "total": int(m.get("total", 0)),
+            "correct": int(m.get("correct", 0)),
+            "accuracy": float(m.get("accuracy", 0.0)),
+            "empty": int(m.get("empty_content", 0)),
+            "format_fails": int(m.get("format_fails", 0)),
+            "tokens": int(m.get("total_tokens", 0)),
+            "avg_latency_ms": float(m.get("avg_latency_ms", 0.0)),
+            "llm_model": (data.get("llm", {}) or {}).get("model"),
+        }
+    except Exception:
+        return {
+            "total": 0,
+            "correct": 0,
+            "accuracy": 0.0,
+            "empty": 0,
+            "format_fails": 0,
+            "tokens": 0,
+            "avg_latency_ms": 0.0,
+            "llm_model": None,
+        }
+
+
+def _llm_digest_summary(*, mission: Dict[str, Any], lane_to_model: Dict[str, Optional[str]], run_dir: Path) -> str:
+    """Generate an LLM-written executive summary for the digest based on lane metrics."""
+    # Build a compact context
+    lines = [
+        "Summarize this run for an ops digest. Keep it concise (4-6 bullets).",
+        "Focus on accuracy, empties/format errors, tokens/latency, and recommendations.",
+        "Context:",
+    ]
+    rows: List[str] = []
+    accs: List[float] = []
+    totals = empties = fmts = tokens = 0
+    for lane, model in lane_to_model.items():
+        met = _collect_lane_metrics(run_dir, lane)
+        rows.append(
+            f"- {lane} ({model or 'default'}): total={met['total']} correct={met['correct']} accuracy={met['accuracy']:.2f} empty={met['empty']} fmt={met['format_fails']} tokens={met['tokens']} latency_ms={met['avg_latency_ms']:.2f}"
+        )
+        accs.append(float(met["accuracy"]))
+        totals += int(met["total"])
+        empties += int(met["empty"])
+        fmts += int(met["format_fails"])
+        tokens += int(met["tokens"])
+    avg_acc = (sum(accs) / len(accs)) if accs else 0.0
+    lines += rows
+    lines.append(f"- aggregate: lanes={len(lane_to_model)} total={totals} avg_accuracy={avg_acc:.2f} empty={empties} fmt={fmts} tokens={tokens}")
+
+    llm_cfg = mission.get("llm", {}) or {}
+    per_stage = (llm_cfg.get("per_stage_defaults", {}) or {}).get("yield", {})
+    max_tokens = int(per_stage.get("max_tokens", llm_cfg.get("max_tokens", 300)))
+    temperature = float(llm_cfg.get("temperature", 0.2))
+    timeout_seconds = int(llm_cfg.get("timeout_seconds", 25))
+    model_hint = (per_stage.get("model") or llm_cfg.get("model") or os.environ.get("OPENROUTER_MODEL_HINT") or None)
+
+    res = call_openrouter(
+        "\n".join(lines),
+        model_hint=model_hint,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        timeout_seconds=timeout_seconds,
+        response_format_type="text",
+        retry_on_empty=True,
+        retry_max=1,
+        retry_alt_format=True,
+    )
+    content = (res.get("content") or "").strip()
+    if not content:
+        return f"Lanes completed; average accuracy {avg_acc:.2f}. Empties {empties}, format errors {fmts}. Total tokens {tokens}."
+    return content
+
+
 def _lane_prey_cycle(
     *,
     mission: Dict[str, Any],
@@ -371,7 +532,8 @@ def _lane_prey_cycle(
 
     # Engage via adapter
     hooks = _provider_hooks(provider)
-    # Optional provider-specific Perceive and React hooks
+    # Optional provider-specific Perceive hook, with generic fallback to ensure LLM note
+    pr = None
     if hooks.get("perceive"):
         try:
             pr = hooks["perceive"](mission=mission, lane_name=lane_name, model_hint=model_hint, lane_index=lane_index, lane_dir=lane_out)
@@ -379,7 +541,16 @@ def _lane_prey_cycle(
                 _append_blackboard({"mission_id": mission_id, "phase": "perceive", "summary": f"{lane_name}: provider perceive hook", "evidence_refs": pr.get("evidence_refs"), "timestamp": now_z()})
         except Exception as e:
             _append_blackboard({"mission_id": mission_id, "phase": "perceive", "summary": f"{lane_name}: provider perceive error: {e}", "evidence_refs": [str(ps_path.relative_to(ROOT))], "timestamp": now_z(), "regen_flag": True})
+            pr = None
+    if not (isinstance(pr, dict) and pr.get("evidence_refs")):
+        try:
+            pr_fallback = _phase_llm_note(phase="perceive", mission=mission, lane_name=lane_name, model_hint=model_hint, lane_index=lane_index, lane_dir=lane_out)
+            if pr_fallback.get("evidence_refs"):
+                _append_blackboard({"mission_id": mission_id, "phase": "perceive", "summary": f"{lane_name}: fallback perceive note", "evidence_refs": pr_fallback.get("evidence_refs"), "timestamp": now_z()})
+        except Exception:
+            pass
 
+    rr = None
     if hooks.get("react"):
         try:
             rr = hooks["react"](mission=mission, lane_name=lane_name, model_hint=model_hint, lane_index=lane_index, lane_dir=lane_out)
@@ -387,6 +558,14 @@ def _lane_prey_cycle(
                 _append_blackboard({"mission_id": mission_id, "phase": "react", "summary": f"{lane_name}: provider react hook", "evidence_refs": rr.get("evidence_refs"), "timestamp": now_z()})
         except Exception as e:
             _append_blackboard({"mission_id": mission_id, "phase": "react", "summary": f"{lane_name}: provider react error: {e}", "evidence_refs": [str(rp_path.relative_to(ROOT))], "timestamp": now_z(), "regen_flag": True})
+            rr = None
+    if not (isinstance(rr, dict) and rr.get("evidence_refs")):
+        try:
+            rr_fallback = _phase_llm_note(phase="react", mission=mission, lane_name=lane_name, model_hint=model_hint, lane_index=lane_index, lane_dir=lane_out)
+            if rr_fallback.get("evidence_refs"):
+                _append_blackboard({"mission_id": mission_id, "phase": "react", "summary": f"{lane_name}: fallback react note", "evidence_refs": rr_fallback.get("evidence_refs"), "timestamp": now_z()})
+        except Exception:
+            pass
 
     engage_res = (hooks.get("engage") or engage_default)(mission=mission, lane_name=lane_name, model_hint=model_hint, lane_index=lane_index)
     llm_top = mission.get("llm", {}) or {}
@@ -423,6 +602,13 @@ def _lane_prey_cycle(
                 _append_blackboard({"mission_id": mission_id, "phase": "yield", "summary": f"{lane_name}: provider yield hook", "evidence_refs": yr.get("evidence_refs"), "timestamp": now_z()})
         except Exception as e:
             _append_blackboard({"mission_id": mission_id, "phase": "yield", "summary": f"{lane_name}: provider yield error: {e}", "evidence_refs": [str(er_path.relative_to(ROOT))], "timestamp": now_z(), "regen_flag": True})
+    else:
+        try:
+            yr_fallback = _phase_llm_note(phase="yield", mission=mission, lane_name=lane_name, model_hint=model_hint, lane_index=lane_index, lane_dir=lane_out)
+            if yr_fallback.get("evidence_refs"):
+                _append_blackboard({"mission_id": mission_id, "phase": "yield", "summary": f"{lane_name}: fallback yield note", "evidence_refs": yr_fallback.get("evidence_refs"), "timestamp": now_z()})
+        except Exception:
+            pass
 
     # Yield
     evidence_refs = [str(p.relative_to(ROOT)) for p in (ps_path, rp_path, er_path) if p.exists()]
@@ -509,30 +695,56 @@ def run(intent_path: Path) -> int:
     _write_yaml(run_dir / "quorum_report.yml", qr)
     _append_blackboard({"mission_id": mission_id, "phase": "verify", "summary": "quorum_report.yml written", "evidence_refs": [str((run_dir / 'quorum_report.yml').relative_to(ROOT))], "timestamp": now_z()})
 
-    # Digest
-    matrix_lines = ["| Lane | Model | Notes |", "|---|---|---|"]
+    # Digest with LLM-written executive summary and metrics matrix
+    # Mountain Time display
+    try:
+        newest_ts: Optional[str] = None
+        for n in lane_to_model.keys():
+            erp = run_dir / n / "attempt_1" / "engage_report.yml"
+            if erp.exists():
+                with erp.open("r", encoding="utf-8") as f:
+                    d = yaml.safe_load(f) or {}
+                ts = d.get("timestamp")
+                if ts and (newest_ts is None or ts > newest_ts):
+                    newest_ts = ts
+        mt_line = _mt_time_from_iso(newest_ts or now_z()) or None
+    except Exception:
+        mt_line = None
+
+    # Build matrix with metrics
+    matrix_lines = [
+        "| Lane | Model | Total | Correct | Accuracy | Empty | FormatFails | Tokens | AvgLatencyMs |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|",
+    ]
     for n, m in lane_to_model.items():
-        matrix_lines.append(f"| {n} | {m or os.environ.get('OPENROUTER_MODEL_HINT') or 'default'} | PREY executed |")
+        met = _collect_lane_metrics(run_dir, n)
+        model_label = met.get("llm_model") or m or os.environ.get('OPENROUTER_MODEL_HINT') or 'default'
+        matrix_lines.append(
+            f"| {n} | {model_label} | {met['total']} | {met['correct']} | {met['accuracy']:.2f} | {met['empty']} | {met['format_fails']} | {met['tokens']} | {met['avg_latency_ms']:.2f} |"
+        )
+
     mermaid = [
         "```mermaid",
         "graph LR",
         "  A[Start] --> B[Parallel PREY lanes]",
         "  B --> C[Verify quorum]",
         "  C --> D[Pass]",
-        "  C --> E[Fail]",
-        "  D --> F[Digest]",
+        "  D --> E[Digest]",
         "```",
     ]
+
+    exec_summary = _llm_digest_summary(mission=mission, lane_to_model=lane_to_model, run_dir=run_dir)
+
     md = [
         f"# Swarmlord Digest — {mission_id}",
         "",
+        *( [f"- Run time (Mountain): {mt_line}"] if mt_line else [] ),
         f"- Lanes: {len(lane_to_model)}",
         f"- Verify PASS: {passed}",
         f"- Trace: temp/otel/{trace_id}.jsonl",
         "",
-        "## BLUF",
-        "- PREY lanes executed with per-phase artifacts.",
-        "- Verify quorum executed post-yield.",
+        "## Executive summary",
+        exec_summary,
         "",
         "## Matrix",
         *matrix_lines,
@@ -540,13 +752,10 @@ def run(intent_path: Path) -> int:
         "## Diagram",
         *mermaid,
         "",
-        "## Validation checklist",
-        "- bluf_present: true",
-        "- matrix_present: true",
-        "- diagrams_present: true",
-        "- diagrams_parser_safe: true",
-        "- executive_summary_present: true",
-        "- evidence_refs_complete: true",
+        "## Artifacts and evidence",
+        "- Per-lane reports:",
+        *[f"  - {str((run_dir / n / 'attempt_1' / 'engage_report.yml').relative_to(ROOT))}" for n in lane_to_model.keys()],
+        f"- Trace: temp/otel/{trace_id}.jsonl",
     ]
     digest_path = run_dir / "swarmlord_digest.md"
     digest_path.write_text("\n".join(md), encoding="utf-8")
