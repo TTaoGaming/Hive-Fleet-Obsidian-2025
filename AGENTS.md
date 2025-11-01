@@ -35,12 +35,12 @@ This repo includes a minimal, parser-safe Crew AI pilot that runs two parallel P
 
 ```bash
 # default (no hint): uses openai/gpt-oss-120b
-python3 scripts/crew_ai/runner.py \
+python3 scripts/crew_ai/runner_unified.py \
   --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
 
 # or select an allowed model explicitly
 OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
-  python3 scripts/crew_ai/runner.py \
+  python3 scripts/crew_ai/runner_unified.py \
   --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml
 ```
 
@@ -77,13 +77,13 @@ OPENROUTER_MODEL_HINT=deepseek/deepseek-chat-v3-0324 \
   - Reasoning auto-enabled at high effort for supported models (gpt-5-mini, grok-4-fast, deepseek v3.2, minimax m2) unless overridden.
   - To force a specific model for a quick run: set `OPENROUTER_MODEL_HINT` to a substring of one allowlisted model.
 - Run pilot and validate locally (optional):
-  - Pilot: `python scripts/crew_ai/runner.py --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
+  - Pilot: `python scripts/crew_ai/runner_unified.py --intent hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
   - Validate: `python scripts/crew_ai/validate_run.py --require-parallel`
 
 - References
   - Mission intent: `hfo_mission_intent/2025-10-30/mission_intent_daily_2025-10-30.v5.yml`
   - Crew README: `scripts/crew_ai/README.md`
-  - Runner: `scripts/crew_ai/runner.py`
+  - Runner: `scripts/crew_ai/runner_unified.py`
   - Trace analyzer: `scripts/crew_ai/analyze_traces.py`
   - Math sanity bench: `scripts/crew_ai/math_bench.py`
 
@@ -442,7 +442,7 @@ This section gives practical, parser-safe commands to run the pilot (two PREY la
 
 ```bash
 # Two lanes from the mission intent; writes per-lane artifacts and a quorum_report
-.venv/bin/python scripts/crew_ai/runner.py \
+.venv/bin/python scripts/crew_ai/runner_unified.py \
   --intent hfo_mission_intent/2025-10-31/mission_intent_2025-10-31.v1.yml
 ```
 
@@ -527,4 +527,14 @@ Troubleshooting
 - `missing_api_key`: Pilot runs without calling the LLM; engage_llm spans show `ok=false` and `content_preview: null`.
 - ARC guard on full runs: set `--allow-full` or `ALLOW_FULL_ARC=1` when using `--limit 0`.
 - Price fields show `n/a` unless `OPENROUTER_PRICE_*` env vars are set.
+
+## Swarmlord orchestration note (task‑agnostic)
+
+This repo assumes a neutral, goal‑agnostic control loop driven by mission intent.
+
+- You (operator) set a mission intent file that encodes lanes, safety, and LLM defaults.
+- The Swarmlord orchestrates an LLM PREY workflow per lane: Perceive → React → Engage → Yield.
+- After Yield, a deterministic quorum verify runs (independent validators with a threshold).
+- On PASS, the Swarmlord emits a digest back to the operator and records receipts to the blackboard.
+- This control path is invariant across tasks and domains; providers/adapters simply plug into PREY phases.
 
