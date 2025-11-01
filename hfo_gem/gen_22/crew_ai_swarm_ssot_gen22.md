@@ -207,10 +207,18 @@ quorum_report.yml:
 ```
 
 ## LLM orchestration (per stage)
-- Defaults today: model = openai/gpt-oss-120b, max_tokens = 2000 for Orchestrate, Perceive, React, Engage, Yield, Digest.
-- Reasoning: enable for supported models with high effort unless overridden.
-- Transport resiliency: retry-on-empty = 1; on retry drop response_format if rejected; record flags in engage_report and others.
-- Env overrides allowed; allowlist enforced.
+- SSOT default model: openai/gpt-oss-120b (allowlist enforced; mission/env may override).
+- SSOT token budget: max_tokens = 1000 per node by default.
+  - Orchestrate (Swarmlord): 1000
+  - Perceive (lane): 1000
+  - React (lane): 1000
+  - Engage (lane): 1000
+  - Yield (lane): 1000
+  - Quorum (run-level): 1000
+  - Digest (run-level): 1000
+- Reasoning: enable for supported models with effort=high unless mission/env disables it.
+- Transport resiliency: retry-on-empty=1; on retry, drop response_format and reasoning; record reasoning_removed_on_retry.
+- Env overrides allowed; allowlist enforced (OPENROUTER_MODEL_HINT, OPENROUTER_MAX_TOKENS, etc.).
 
 ## Concurrency and lanes
 - lanes.count default 10; lanes.max_workers 10.
@@ -256,6 +264,7 @@ quorum_report.yml:
 - Enforce required fields, evidence refs, min-lines; produce PASS/FAIL receipts.
 5) Quorum + Digest
 - Emit quorum_report.yml and swarmlord_digest.md; validate digest per checklist.
+- Quorum LLM note (1000 tokens) summarizes votes and flags; Digest executive summary is LLM‑generated (1000 tokens) and non‑placeholder.
 6) Adapters
 - ARC/Math/PZ import the same helpers and schemas, ensuring identical artifacts and receipts.
 

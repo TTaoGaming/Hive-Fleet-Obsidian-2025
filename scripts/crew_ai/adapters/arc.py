@@ -28,9 +28,9 @@ def engage_arc(*, mission: Dict[str, Any], lane_name: str, model_hint: Optional[
     llm_cfg = mission.get("llm", {}) or {}
     engage_stage_cfg = (llm_cfg.get("per_stage_defaults", {}) or {}).get("engage", {})
     try:
-        engage_tokens = int(engage_stage_cfg.get("max_tokens", llm_cfg.get("max_tokens", 400)))
+        engage_tokens = int(engage_stage_cfg.get("max_tokens", llm_cfg.get("max_tokens", 1000)))
     except Exception:
-        engage_tokens = int(llm_cfg.get("max_tokens", 400))
+        engage_tokens = int(llm_cfg.get("max_tokens", 1000))
 
     arc_cfg = mission.get("arc", {}) or {}
     split = str(arc_cfg.get("split", "validation"))
@@ -90,7 +90,7 @@ def _phase_llm_call(
     """
     llm_cfg = mission.get("llm", {}) or {}
     per_stage = (llm_cfg.get("per_stage_defaults", {}) or {}).get(phase, {})
-    max_tokens = int(per_stage.get("max_tokens", llm_cfg.get("max_tokens", 200)))
+    max_tokens = int(per_stage.get("max_tokens", llm_cfg.get("max_tokens", 1000)))
     temperature = float(llm_cfg.get("temperature", 0.2))
     timeout_seconds = int(llm_cfg.get("timeout_seconds", 20))
 
